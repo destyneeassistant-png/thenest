@@ -2,7 +2,7 @@
 // Handles PIN entry and redirects to dashboard
 
 const CONFIG = {
-    PIN: '0315'
+    PIN: localStorage.getItem('nest_pin') || '0315'
 };
 
 class PinLock {
