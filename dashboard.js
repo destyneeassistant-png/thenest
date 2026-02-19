@@ -160,9 +160,6 @@ class Dashboard {
         // Calendar navigation
         document.getElementById('prev-month').addEventListener('click', () => this.changeMonth(-1));
         document.getElementById('next-month').addEventListener('click', () => this.changeMonth(1));
-
-        // Logout
-        document.getElementById('logout-btn').addEventListener('click', () => this.logout());
     }
 
     async loadChecklist() {
