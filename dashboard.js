@@ -134,13 +134,35 @@ class Dashboard {
     }
 
     async init() {
+        console.log('Dashboard init started');
         this.setupEventListeners();
-        await this.loadChecklist();
-        await this.loadTimeLogs();
-        this.loadProgress();
+        console.log('Event listeners setup');
+        
+        // Load schedule and calendar first (don't depend on DB)
         this.loadSchedule();
+        console.log('Schedule loaded');
         this.loadCalendar();
+        console.log('Calendar loaded');
         this.loadRandomFact();
+        console.log('Fact loaded');
+        
+        // Then load DB-dependent items
+        try {
+            await this.loadChecklist();
+            console.log('Checklist loaded');
+        } catch(e) { console.error('Checklist error:', e); }
+        
+        try {
+            await this.loadTimeLogs();
+            console.log('Time logs loaded');
+        } catch(e) { console.error('Time logs error:', e); }
+        
+        try {
+            this.loadProgress();
+            console.log('Progress loaded');
+        } catch(e) { console.error('Progress error:', e); }
+        
+        console.log('Dashboard init complete');
     }
 
     setupEventListeners() {
