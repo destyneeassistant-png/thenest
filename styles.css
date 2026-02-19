@@ -231,6 +231,11 @@ body {
     background: var(--bg-tertiary);
 }
 
+#settings-btn {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+}
+
 .status-indicator {
     font-size: 0.8rem;
 }
