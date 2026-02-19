@@ -336,8 +336,10 @@ class Dashboard {
     }
 }
 
-// Initialize dashboard
-const db = new NestDatabase();
-db.init().then(() => {
-    new Dashboard(db);
+// Initialize dashboard after DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const db = new NestDatabase();
+    db.init().then(() => {
+        new Dashboard(db);
+    });
 });
