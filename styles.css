@@ -1,0 +1,639 @@
+:root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-tertiary: #1a1a2e;
+    --neon-pink: #ff006e;
+    --neon-blue: #00f5ff;
+    --neon-purple: #8338ec;
+    --neon-green: #39ff14;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0b0;
+    --text-muted: #606070;
+    --border-color: #2a2a3e;
+    --success: #39ff14;
+    --warning: #ffbe0b;
+    --error: #ff006e;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* Screen Management */
+.screen {
+    display: none;
+    min-height: 100vh;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* Lock Screen Body */
+.lock-screen-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+    margin: 0;
+    padding: 2rem;
+}
+
+/* Icon replacements for desktop compatibility */
+.icon-calendar::before { content: "[Cal]"; }
+.icon-check::before { content: "[Chk]"; }
+.icon-clock::before { content: "[Clk]"; }
+.icon-chart::before { content: "[Bar]"; }
+.icon-brain::before { content: "[Psy]"; }
+.icon-bolt::before { content: "[Act]"; }
+.icon-quiz::before { content: "[Qz]"; }
+
+.icon-calendar, .icon-check, .icon-clock, .icon-chart, 
+.icon-brain, .icon-bolt, .icon-quiz {
+    color: var(--neon-blue);
+    font-size: 0.8em;
+    margin-right: 0.5rem;
+}
+
+.owl-icon-small {
+    width: 32px;
+    height: 32px;
+    margin-right: 0.5rem;
+}
+
+.logo[onclick] {
+    transition: all 0.2s;
+}
+
+.logo[onclick]:hover {
+    opacity: 0.8;
+    transform: scale(1.02);
+}
+
+.status-indicator.online {
+    color: var(--neon-green);
+    font-size: 1.2rem;
+}
+
+.pin-container {
+    text-align: center;
+    padding: 2rem;
+    max-width: 400px;
+    width: 100%;
+}
+
+.owl-icon {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 20px var(--neon-blue));
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+.pin-container h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+.pin-display {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+}
+
+.pin-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+.pin-dot.filled {
+    background: var(--neon-blue);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-blue);
+}
+
+.pin-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.pin-btn {
+    aspect-ratio: 1;
+    font-size: 1.5rem;
+    border: none;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid var(--border-color);
+}
+
+.pin-btn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+}
+
+.pin-btn:active {
+    transform: scale(0.95);
+}
+
+.pin-error {
+    color: var(--error);
+    margin-top: 1rem;
+    min-height: 1.5rem;
+}
+
+/* Dashboard */
+#dashboard-screen {
+    background: var(--bg-primary);
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.logo .owl {
+    font-size: 2rem;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.icon-btn:hover {
+    background: var(--bg-tertiary);
+}
+
+.status-indicator {
+    font-size: 0.8rem;
+}
+
+/* Dashboard Grid */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.widget {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s;
+}
+
+.widget:hover {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+}
+
+.widget h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--neon-blue);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Schedule Widget */
+.schedule-content {
+    background: var(--bg-tertiary);
+    padding: 1rem;
+    border-radius: 12px;
+}
+
+.schedule-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.schedule-item:last-child {
+    border-bottom: none;
+}
+
+.time {
+    color: var(--neon-pink);
+    font-weight: bold;
+    font-family: monospace;
+}
+
+/* Checklist Widget */
+.checklist-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.check-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.check-item:hover {
+    background: var(--border-color);
+}
+
+.check-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--neon-green);
+    cursor: pointer;
+}
+
+.check-item input:checked + span {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.checklist-progress {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-green), var(--neon-blue));
+    transition: width 0.3s;
+}
+
+.progress-text {
+    font-family: monospace;
+    color: var(--neon-blue);
+}
+
+/* Time Widget */
+.time-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.time-category {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+}
+
+.cat-label {
+    font-weight: 500;
+}
+
+.cat-time {
+    font-family: monospace;
+    color: var(--neon-blue);
+}
+
+.time-btn {
+    background: var(--neon-purple);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.time-btn:hover {
+    background: var(--neon-pink);
+    box-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+}
+
+.time-total {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 2px solid var(--border-color);
+    color: var(--neon-green);
+}
+
+/* Progress Widget */
+.progress-item {
+    margin-bottom: 1rem;
+}
+
+.progress-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.progress-value {
+    font-family: monospace;
+    color: var(--neon-blue);
+}
+
+/* Fact Widget */
+.fact-content {
+    background: var(--bg-tertiary);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--neon-purple);
+}
+
+.fact-text {
+    font-style: italic;
+    margin-bottom: 0.5rem;
+    line-height: 1.8;
+}
+
+.fact-source {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.btn-secondary:hover {
+    border-color: var(--neon-blue);
+    background: var(--border-color);
+}
+
+/* Calendar Widget */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.calendar-header button {
+    background: var(--bg-tertiary);
+    border: none;
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.calendar-day:hover {
+    background: var(--border-color);
+}
+
+.calendar-day.today {
+    background: var(--neon-blue);
+    color: var(--bg-primary);
+    font-weight: bold;
+}
+
+.calendar-day.has-event {
+    border: 2px solid var(--neon-pink);
+}
+
+.calendar-day[onclick] {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.calendar-day[onclick]:hover {
+    background: var(--border-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Actions Widget */
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.action-btn {
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(131, 56, 236, 0.3);
+    color: white;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    border: 2px solid var(--border-color);
+}
+
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: var(--error);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+    
+    .pin-pad {
+        gap: 0.75rem;
+    }
+    
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .app-header {
+        padding: 1rem;
+    }
+}
+
+/* Loading State */
+.loading {
+    color: var(--text-muted);
+    text-align: center;
+    padding: 2rem;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.widget {
+    animation: slideIn 0.3s ease-out;
+}
+
+.shake {
+    animation: shake 0.5s ease-in-out;
+}

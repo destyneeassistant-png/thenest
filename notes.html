@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>The Nest - Notes</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="assets/owl-icon.svg">
+    <style>
+        .notes-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1.5rem;
+        }
+
+        .notes-sidebar {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            padding: 1rem;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            color: var(--neon-blue);
+        }
+
+        .new-note-btn {
+            background: var(--neon-green);
+            color: var(--bg-primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .new-note-btn:hover {
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+        }
+
+        .notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .note-preview {
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .note-preview:hover {
+            background: var(--border-color);
+        }
+
+        .note-preview.active {
+            border-left-color: var(--neon-blue);
+            background: var(--border-color);
+        }
+
+        .note-preview-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .note-preview-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .note-editor {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 150px);
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .note-title-input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: bold;
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        .note-title-input:focus {
+            outline: none;
+            border-bottom: 2px solid var(--neon-blue);
+        }
+
+        .note-title-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .editor-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .editor-btn:hover {
+            border-color: var(--neon-blue);
+            background: var(--border-color);
+        }
+
+        .editor-btn.danger:hover {
+            border-color: var(--error);
+            background: rgba(255, 0, 110, 0.1);
+            color: var(--error);
+        }
+
+        .note-timestamp {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .note-textarea {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: none;
+            font-family: inherit;
+        }
+
+        .note-textarea:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+        }
+
+        .save-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .save-status.saving {
+            background: rgba(255, 190, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .save-status.saved {
+            background: rgba(57, 255, 20, 0.1);
+            color: var(--success);
+        }
+
+        .save-status.error {
+            background: rgba(255, 0, 110, 0.1);
+            color: var(--error);
+        }
+
+        .empty-editor {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .empty-editor-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .word-count {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .notes-container {
+                grid-template-columns: 1fr;
+            }
+
+            .notes-sidebar {
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="notes-screen" class="screen active">
+        <header class="app-header">
+            <div class="logo" onclick="window.location.href='dashboard.html'" style="cursor:pointer;" title="Go to Dashboard">
+                <img src="assets/owl-icon.svg" class="owl-icon-small" alt="">
+                <span>The Nest - Notes</span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="back-btn">[Back]</button>
+            </div>
+        </header>
+
+        <main class="notes-container">
+            <aside class="notes-sidebar">
+                <div class="sidebar-header">
+                    <h2>[Note] My Notes</h2>
+                    <button class="new-note-btn" id="new-note-btn">+ New</button>
+                </div>
+                <div class="notes-list" id="notes-list">
+                    <!-- Notes populated by JS -->
+                </div>
+            </aside>
+
+            <div class="note-editor" id="note-editor">
+                <div class="empty-editor" id="empty-editor">
+                    <div class="empty-editor-icon">[Note]</div>
+                    <h3>Select a note or create a new one</h3>
+                    <p>Your notes are automatically saved</p>
+                </div>
+
+                <div id="editor-content" style="display: none; flex-direction: column; height: 100%;">
+                    <div class="editor-header">
+                        <input type="text" class="note-title-input" id="note-title" placeholder="Note Title">
+                        <div class="editor-actions">
+                            <button class="editor-btn danger" id="delete-btn">[Del] Delete</button>
+                        </div>
+                    </div>
+                    <div class="note-timestamp" id="note-timestamp"></div>
+                    <textarea class="note-textarea" id="note-content" placeholder="Start typing your notes here..."></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="save-status saved" id="save-status">
+                            <span>[OK]</span> Saved
+                        </div>
+                        <div class="word-count" id="word-count">0 words</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="notes.js"></script>
+</body>
+</html>

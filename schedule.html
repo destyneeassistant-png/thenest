@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>The Nest - Schedule</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="assets/owl-icon.svg">
+    <style>
+        .schedule-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--bg-secondary);
+            padding: 0.5rem;
+            border-radius: 10px;
+            width: fit-content;
+        }
+
+        .view-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: var(--neon-blue);
+            color: var(--bg-primary);
+            font-weight: bold;
+        }
+
+        .view-btn:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        .calendar-container {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            padding: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .month-title {
+            font-size: 1.5rem;
+            color: var(--neon-blue);
+            font-weight: bold;
+        }
+
+        .nav-btn {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--neon-blue);
+            background: var(--border-color);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .calendar-header-cell {
+            text-align: center;
+            padding: 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            min-height: 80px;
+            z-index: 10;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .calendar-day:hover {
+            background: var(--border-color);
+            transform: translateY(-2px);
+            cursor: pointer;
+        }
+
+        .calendar-day.has-events::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            box-shadow: 0 0 5px var(--neon-green);
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.4;
+        }
+
+        .calendar-day.today {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: var(--bg-primary);
+        }
+
+        .calendar-day.today .day-number {
+            font-weight: bold;
+        }
+
+        .calendar-day.selected {
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 15px rgba(255, 0, 110, 0.3);
+        }
+
+        .day-number {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+            pointer-events: none;
+        }
+
+        .day-events {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+        
+        .day-event {
+            cursor: pointer;
+        }
+
+        .day-event {
+            font-size: 0.65rem;
+            padding: 1px 4px;
+            border-radius: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .event-quals {
+            background: var(--neon-purple);
+            color: white;
+        }
+
+        .event-class {
+            background: var(--neon-blue);
+            color: var(--bg-primary);
+        }
+
+        .event-meeting {
+            background: var(--neon-pink);
+            color: white;
+        }
+
+        .event-gym {
+            background: var(--neon-green);
+            color: var(--bg-primary);
+        }
+
+        .events-list {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .events-list h2 {
+            color: var(--neon-blue);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .event-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid var(--neon-blue);
+        }
+
+        .event-card:hover {
+            background: var(--border-color);
+            transform: translateX(4px);
+        }
+
+        .event-edit-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .event-edit-btn:hover {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+        }
+
+        .event-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--neon-blue);
+        }
+
+        .event-item:hover {
+            background: var(--border-color);
+        }
+
+        .event-time {
+            font-family: monospace;
+            color: var(--neon-pink);
+            font-weight: bold;
+            min-width: 80px;
+        }
+
+        .event-details {
+            flex: 1;
+        }
+
+        .event-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .event-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .event-category {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            background: var(--bg-secondary);
+        }
+
+        .list-view {
+            display: none;
+        }
+
+        .list-view.active {
+            display: block;
+        }
+
+        .calendar-view {
+            display: none;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .calendar-view.active {
+            display: block;
+        }
+
+        .upcoming-events {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .upcoming-events h2 {
+            color: var(--neon-blue);
+            margin-bottom: 1rem;
+        }
+
+        .date-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .date-header {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            border-left: 3px solid var(--neon-purple);
+        }
+
+        .empty-events {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .empty-events-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .schedule-container {
+                padding: 1rem;
+            }
+
+            .calendar-container {
+                padding: 1rem;
+            }
+
+            .calendar-grid {
+                gap: 0.25rem;
+            }
+
+            .calendar-day {
+                min-height: 50px;
+                padding: 0.25rem;
+                font-size: 0.8rem;
+            }
+
+            .day-event {
+                display: none;
+            }
+
+            .calendar-day.has-events::after {
+                content: '';
+                position: absolute;
+                bottom: 4px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 6px;
+                height: 6px;
+                background: var(--neon-blue);
+                border-radius: 50%;
+            }
+
+            .calendar-header-cell {
+                font-size: 0.7rem;
+                padding: 0.5rem 0.25rem;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex !important;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .modal-header h3 {
+            color: var(--neon-blue);
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: var(--neon-pink);
+        }
+
+        #event-form {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .form-actions button {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="schedule-screen" class="screen active">
+        <header class="app-header">
+            <div class="logo" onclick="window.location.href='dashboard.html'" style="cursor:pointer;" title="Go to Dashboard">
+                <img src="assets/owl-icon.svg" class="owl-icon-small" alt="">
+                <span>The Nest - Schedule</span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="back-btn">[Back]</button>
+            </div>
+        </header>
+
+        <main class="schedule-container">
+            <h1 style="margin-bottom: 1rem;"><span class="icon-calendar"></span>Full Schedule</h1>
+            
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="calendar">Calendar</button>
+                <button class="view-btn" data-view="list">List View</button>
+            </div>
+
+            <!-- Calendar View -->
+            <div class="calendar-view active" id="calendar-view">
+                <div class="calendar-container">
+                    <div class="calendar-nav">
+                        <button class="nav-btn" id="prev-month">[Prev]</button>
+                        <h2 class="month-title" id="month-title">February 2026</h2>
+                        <button class="nav-btn" id="next-month">[Next]</button>
+                    </div>
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+
+                <div class="events-list">
+                    <h2>[List] Events for <span id="selected-date">Today</span></h2>
+                    <div id="day-events">
+                        <div class="empty-events">
+                            <div class="empty-events-icon">[Empty]</div>
+                            <p>No events for this day</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List View -->
+            <div class="list-view" id="list-view">
+                <div class="upcoming-events">
+                    <h2>[List] Upcoming Events</h2>
+                    <div id="upcoming-list">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Event Modal -->
+    <div id="event-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">[Add] Event</h3>
+                <button class="close-btn" id="close-modal">[X]</button>
+            </div>
+            <form id="event-form">
+                <input type="hidden" id="event-id">
+                <div class="form-group">
+                    <label for="event-title">Title</label>
+                    <input type="text" id="event-title" required placeholder="Event name">
+                </div>
+                <div class="form-group">
+                    <label for="event-date">Date</label>
+                    <input type="date" id="event-date" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="event-time">Time</label>
+                        <input type="time" id="event-time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-duration">Duration</label>
+                        <input type="text" id="event-duration" placeholder="1 hour">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="event-category">Category</label>
+                    <select id="event-category" required>
+                        <option value="class">[Class]</option>
+                        <option value="meeting">[Meeting]</option>
+                        <option value="quals">[Quals]</option>
+                        <option value="dissertation">[Dissertation]</option>
+                        <option value="reports">[Reports]</option>
+                        <option value="wellness">[Wellness]</option>
+                        <option value="other">[Other]</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="delete-event" style="display:none;">[Del]</button>
+                    <button type="submit" class="action-btn">[Save]</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="schedule.js"></script>
+</body>
+</html>

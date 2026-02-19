@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>The Nest - Quiz</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="assets/owl-icon.svg">
+    <style>
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .topic-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .topic-btn {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .topic-btn:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .topic-btn.active {
+            border-color: var(--neon-blue);
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+        }
+
+        .topic-btn h3 {
+            margin-bottom: 0.5rem;
+            color: var(--neon-blue);
+        }
+
+        .topic-btn p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .quiz-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .quiz-progress {
+            color: var(--neon-blue);
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        .quiz-score {
+            color: var(--neon-green);
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .answer-btn {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            border-color: var(--neon-blue);
+            background: var(--border-color);
+        }
+
+        .answer-btn.correct {
+            border-color: var(--success);
+            background: rgba(57, 255, 20, 0.1);
+        }
+
+        .answer-btn.incorrect {
+            border-color: var(--error);
+            background: rgba(255, 0, 110, 0.1);
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .feedback {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        .feedback.correct {
+            background: rgba(57, 255, 20, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .feedback.incorrect {
+            background: rgba(255, 0, 110, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(131, 56, 236, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-card {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .final-score {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .score-message {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .score-history {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .score-history h3 {
+            margin-bottom: 1rem;
+            color: var(--neon-blue);
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-item .topic {
+            color: var(--text-secondary);
+        }
+
+        .score-item .result {
+            color: var(--neon-green);
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        .difficulty-easy {
+            background: rgba(57, 255, 20, 0.2);
+            color: var(--success);
+        }
+
+        .difficulty-medium {
+            background: rgba(255, 190, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .difficulty-hard {
+            background: rgba(255, 0, 110, 0.2);
+            color: var(--error);
+        }
+
+        @media (max-width: 768px) {
+            .topic-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-screen" class="screen active">
+        <header class="app-header">
+            <div class="logo" onclick="window.location.href='dashboard.html'" style="cursor:pointer;" title="Go to Dashboard">
+                <img src="assets/owl-icon.svg" class="owl-icon-small" alt="">
+                <span>The Nest - Quiz</span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="back-btn">[Back]</button>
+            </div>
+        </header>
+
+        <main class="quiz-container">
+            <h1 style="margin-bottom: 1.5rem; text-align: center;"><span class="icon-quiz"></span>Psychology Quiz</h1>
+            
+            <div id="topic-selection">
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: 1.5rem;">Select a topic to begin:</p>
+                <div class="topic-selector">
+                    <button class="topic-btn" data-topic="cognitive-dev">
+                        <h3>[Brain] Cognitive Development</h3>
+                        <p>Piaget, Vygotsky, information processing, and executive function</p>
+                    </button>
+                    <button class="topic-btn" data-topic="lifespan">
+                        <h3>[Life] Lifespan Development</h3>
+                        <p>Erikson, attachment, emerging adulthood, aging, and identity</p>
+                    </button>
+                    <button class="topic-btn" data-topic="learning">
+                        <h3>[Book] Learning Theory</h3>
+                        <p>Classical/operant conditioning, social learning, and memory</p>
+                    </button>
+                    <button class="topic-btn" data-topic="social">
+                        <h3>[Group] Social Psychology</h3>
+                        <p>Attitudes, conformity, groups, aggression, and prosocial behavior</p>
+                    </button>
+                </div>
+            </div>
+
+            <div id="quiz-area" style="display: none;">
+                <div class="quiz-card">
+                    <div class="quiz-header">
+                        <span class="quiz-progress">Question <span id="current-q">1</span> of <span id="total-q">5</span></span>
+                        <span class="quiz-score">Score: <span id="current-score">0</span></span>
+                    </div>
+                    
+                    <div class="question-text" id="question-text">
+                        Loading question...
+                    </div>
+                    
+                    <div class="answer-options" id="answer-options">
+                        <!-- Answers generated by JS -->
+                    </div>
+                    
+                    <div id="feedback" class="feedback" style="display: none;"></div>
+                </div>
+                
+                <div class="quiz-nav">
+                    <button class="btn-secondary" id="quit-btn">Quit Quiz</button>
+                    <button class="btn-primary" id="next-btn" disabled>Next Question -></button>
+                </div>
+            </div>
+
+            <div id="results-area" style="display: none;">
+                <div class="quiz-card results-card">
+                    <h2>Quiz Complete! [Done]</h2>
+                    <div class="final-score" id="final-score">0%</div>
+                    <p class="score-message" id="score-message">Great job!</p>
+                    <button class="btn-primary" id="restart-btn">Try Another Quiz</button>
+                </div>
+                
+                <div class="quiz-card score-history">
+                    <h3><span class="icon-chart"></span>Your Score History</h3>
+                    <div id="score-list">
+                        <p style="color: var(--text-muted);">No previous scores</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="quiz.js"></script>
+</body>
+</html>

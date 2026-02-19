@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>The Nest - Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="assets/owl-icon.svg">
+</head>
+<body>
+    <div id="dashboard-screen" class="screen active">
+        <header class="app-header">
+            <div class="logo">
+                <img src="assets/owl-icon.svg" alt="" class="owl-icon-small">
+                <span>The Nest</span>
+            </div>
+            <div class="header-actions">
+                <span class="status-indicator online" id="sync-status" title="Online">●</span>
+                <button class="icon-btn" id="settings-btn" title="Settings">[S]</button>
+                <button class="icon-btn" id="logout-btn" title="Lock">[L]</button>
+            </div>
+        </header>
+
+        <main class="dashboard">
+            <!-- Today's Schedule Widget -->
+            <section class="widget schedule-widget">
+                <h2><span class="icon-calendar"></span> Today's Schedule</h2>
+                <div class="schedule-content" id="today-schedule">
+                    <p class="loading">Loading...</p>
+                </div>
+            </section>
+
+            <!-- Daily Checklist Widget -->
+            <section class="widget checklist-widget">
+                <h2><span class="icon-check"></span> Daily Checklist</h2>
+                <div class="checklist-content" id="daily-checklist">
+                    <label class="check-item">
+                        <input type="checkbox" data-task="mindfulness">
+                        <span>15 min Mindfulness (6:45-7:00am)</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" data-task="quals">
+                        <span>Quals Study (2+ hours)</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" data-task="dissertation">
+                        <span>Dissertation Work (2+ pages)</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" data-task="reports">
+                        <span>Report Writing (if scheduled)</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" data-task="protein">
+                        <span>90-120g Protein</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" data-task="gym">
+                        <span>Gym (if scheduled)</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" data-task="no-caffeine">
+                        <span>No Caffeine After 11am</span>
+                    </label>
+                </div>
+                <div class="checklist-progress">
+                    <div class="progress-bar" id="checklist-progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <span class="progress-text" id="checklist-progress-text">0/7</span>
+                </div>
+            </section>
+
+            <!-- Time Logging Widget -->
+            <section class="widget time-widget">
+                <h2><span class="icon-clock"></span> Time Logger</h2>
+                <div class="time-categories">
+                    <div class="time-category">
+                        <span class="cat-label">Quals Study</span>
+                        <span class="cat-time" id="quals-time">0h 0m</span>
+                        <button class="time-btn" data-cat="quals">+15m</button>
+                    </div>
+                    <div class="time-category">
+                        <span class="cat-label">Dissertation</span>
+                        <span class="cat-time" id="dissertation-time">0h 0m</span>
+                        <button class="time-btn" data-cat="dissertation">+15m</button>
+                    </div>
+                    <div class="time-category">
+                        <span class="cat-label">Reports</span>
+                        <span class="cat-time" id="reports-time">0h 0m</span>
+                        <button class="time-btn" data-cat="reports">+15m</button>
+                    </div>
+                    <div class="time-category">
+                        <span class="cat-label">Class/Clients</span>
+                        <span class="cat-time" id="class-time">0h 0m</span>
+                        <button class="time-btn" data-cat="class">+15m</button>
+                    </div>
+                </div>
+                <div class="time-total">
+                    <strong>Total Today: <span id="total-time">0h 0m</span></strong>
+                </div>
+            </section>
+
+            <!-- Progress Widget -->
+            <section class="widget progress-widget">
+                <h2><span class="icon-chart"></span> Progress</h2>
+                <div class="progress-item">
+                    <span class="progress-label">Quals Study (300h goal)</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="quals-progress" style="width: 0%"></div>
+                    </div>
+                    <span class="progress-value" id="quals-progress-text">0%</span>
+                </div>
+                <div class="progress-item">
+                    <span class="progress-label">Dissertation Pages (20 pg goal)</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="diss-progress" style="width: 0%"></div>
+                    </div>
+                    <span class="progress-value" id="diss-progress-text">0/20</span>
+                </div>
+                <div class="progress-item">
+                    <span class="progress-label">Report Hours (21h goal)</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="report-progress" style="width: 0%"></div>
+                    </div>
+                    <span class="progress-value" id="report-progress-text">0/21</span>
+                </div>
+            </section>
+
+            <!-- Psychology Fact Widget -->
+            <section class="widget fact-widget">
+                <h2><span class="icon-brain"></span> Psychology Fact</h2>
+                <div class="fact-content" id="psych-fact">
+                    <p class="fact-text">"Emerging adulthood (ages 18-25) is a distinct developmental period characterized by identity exploration, instability, self-focus, feeling in-between, and possibilities."</p>
+                    <p class="fact-source">— Arnett, 2000</p>
+                </div>
+                <button class="btn-secondary" id="new-fact-btn">New Fact</button>
+            </section>
+
+            <!-- Calendar Widget -->
+            <section class="widget calendar-widget">
+                <h2><span class="icon-calendar"></span> Calendar</h2>
+                <div class="calendar-header">
+                    <button id="prev-month">←</button>
+                    <span id="calendar-month">February 2026</span>
+                    <button id="next-month">→</button>
+                </div>
+                <div class="calendar-grid" id="calendar-grid">
+                    <!-- Generated by JS -->
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="widget actions-widget">
+                <h2><span class="icon-bolt"></span> Quick Actions</h2>
+                <div class="action-buttons">
+                    <a href="quiz.html" class="action-btn">[Q] Take Quiz</a>
+                    <a href="upload.html" class="action-btn">[U] Upload PDF</a>
+                    <a href="notes.html" class="action-btn">[N] Notes</a>
+                    <a href="schedule.html" class="action-btn">[F] Full Schedule</a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
