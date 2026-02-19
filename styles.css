@@ -50,20 +50,19 @@ body {
     padding: 2rem;
 }
 
-/* Icon replacements for desktop compatibility */
-.icon-calendar::before { content: "[Cal]"; }
-.icon-check::before { content: "[Chk]"; }
-.icon-clock::before { content: "[Clk]"; }
-.icon-chart::before { content: "[Bar]"; }
-.icon-brain::before { content: "[Psy]"; }
-.icon-bolt::before { content: "[Act]"; }
-.icon-quiz::before { content: "[Qz]"; }
+/* Widget icons using Unicode emojis - widely supported */
+.icon-calendar::before { content: "📅"; }
+.icon-check::before { content: "✅"; }
+.icon-clock::before { content: "⏱️"; }
+.icon-chart::before { content: "📊"; }
+.icon-brain::before { content: "🧠"; }
+.icon-bolt::before { content: "⚡"; }
+.icon-quiz::before { content: "📝"; }
 
 .icon-calendar, .icon-check, .icon-clock, .icon-chart, 
 .icon-brain, .icon-bolt, .icon-quiz {
-    color: var(--neon-blue);
-    font-size: 0.8em;
     margin-right: 0.5rem;
+    font-size: 1em;
 }
 
 .owl-icon-small {
