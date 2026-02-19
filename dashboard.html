@@ -12,7 +12,7 @@
 <body>
     <div id="dashboard-screen" class="screen active">
         <header class="app-header">
-            <div class="logo">
+            <div class="logo" onclick="if(confirm('Hard reset? This will reload the page and clear cache.'))location.reload(true)" style="cursor:pointer;" title="Click for Hard Reset">
                 <img src="assets/owl-icon.svg" alt="" class="owl-icon-small">
                 <span>The Nest</span>
             </div>
