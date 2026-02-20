@@ -1,4 +1,4 @@
-// Schedule JavaScript - Enhanced Interactive Version
+// Schedule JavaScript - Enhanced with Recurring Weekly Schedule & Multi-View
 
 // Category colors
 const categoryColors = {
@@ -8,6 +8,9 @@ const categoryColors = {
     dissertation: '#39ff14',
     reports: '#ffbe0b',
     wellness: '#fb5607',
+    supervision: '#ff9f1c',
+    client: '#2ec4b6',
+    study: '#e71d36',
     other: '#a0a0b0'
 };
 
@@ -19,14 +22,48 @@ const categoryLabels = {
     dissertation: 'Dissertation',
     reports: 'Reports',
     wellness: 'Wellness',
+    supervision: 'Supervision',
+    client: 'Client Session',
+    study: 'Study',
     other: 'Other'
+};
+
+// Destynee's Permanent Weekly Schedule
+const weeklySchedule = {
+    1: [ // Monday
+        { title: 'Group Supervision', time: '12:00', duration: '1 hour', category: 'supervision', recurring: true },
+        { title: 'Client Session', time: '13:00', duration: '1 hour', category: 'client', recurring: true },
+        { title: 'Client Session', time: '14:00', duration: '1 hour', category: 'client', recurring: true }
+    ],
+    2: [ // Tuesday
+        { title: 'Dissertation Meeting', time: '09:00', duration: '45 min', category: 'dissertation', recurring: true },
+        { title: 'Cognitive Development Class', time: '10:00', duration: '8.5 hours', category: 'class', recurring: true }
+    ],
+    3: [ // Wednesday
+        { title: 'Individual Supervision', time: '08:30', duration: '1 hour', category: 'supervision', recurring: true },
+        { title: 'Client Session', time: '10:00', duration: '1 hour', category: 'client', recurring: true },
+        { title: 'Client Session', time: '12:00', duration: '1 hour', category: 'client', recurring: true },
+        { title: 'Client Session', time: '13:00', duration: '1 hour', category: 'client', recurring: true }
+    ],
+    4: [ // Thursday - OFF DAY
+        { title: 'OFF DAY - Dissertation/Quals Focus', time: '09:00', duration: 'all day', category: 'study', recurring: true, allDay: true }
+    ],
+    5: [ // Friday - OFF DAY
+        { title: 'OFF DAY - Dissertation/Quals Focus', time: '09:00', duration: 'all day', category: 'study', recurring: true, allDay: true }
+    ],
+    6: [ // Saturday - Weekend Study
+        { title: 'Heavy Study Day', time: '08:00', duration: 'all day', category: 'study', recurring: true, allDay: true }
+    ],
+    0: [ // Sunday - Weekend Study
+        { title: 'Heavy Study Day', time: '08:00', duration: 'all day', category: 'study', recurring: true, allDay: true }
+    ]
 };
 
 class ScheduleManager {
     constructor() {
         this.currentDate = new Date();
         this.selectedDate = new Date();
-        this.view = 'calendar';
+        this.view = 'month'; // 'month', 'week', 'day', 'list'
         this.events = this.loadEvents();
         this.editingEventId = null;
         
@@ -40,9 +77,7 @@ class ScheduleManager {
 
     init() {
         this.setupEventListeners();
-        this.renderCalendar();
-        this.renderDayEvents();
-        this.renderUpcomingList();
+        this.render();
         
         // Open add modal if requested via URL
         if (this.urlParams.get('add') === 'true') {
@@ -58,21 +93,50 @@ class ScheduleManager {
             // Convert date strings back to Date objects
             return events.map(e => ({
                 ...e,
-                date: new Date(e.date)
+                date: new Date(e.date),
+                recurring: false // User-added events are one-off by default
             }));
         }
-        // Default sample events if none saved
-        return [
-            { id: 1, title: 'Morning Mindfulness', time: '06:45', duration: '15 min', category: 'wellness', date: new Date() },
-            { id: 2, title: 'Dissertation Meeting', time: '09:00', duration: '1 hour', category: 'meeting', date: new Date() },
-            { id: 3, title: 'Cognitive Development Class', time: '10:00', duration: '3 hours', category: 'class', date: new Date() },
-            { id: 4, title: 'Quals Study Session', time: '14:00', duration: '2 hours', category: 'quals', date: new Date() },
-            { id: 5, title: 'Report Writing', time: '20:30', duration: '2 hours', category: 'reports', date: new Date() }
-        ];
+        return [];
     }
 
     saveEvents() {
         localStorage.setItem('nest_events', JSON.stringify(this.events));
+    }
+
+    // Get recurring events for a specific date
+    getRecurringEventsForDate(date) {
+        const dayOfWeek = date.getDay();
+        const recurring = weeklySchedule[dayOfWeek] || [];
+        
+        return recurring.map((event, index) => ({
+            id: `recurring-${dayOfWeek}-${index}`,
+            ...event,
+            date: new Date(date),
+            isRecurring: true
+        }));
+    }
+
+    // Get all events (recurring + one-off) for a date
+    getAllEventsForDate(date) {
+        const dateStr = date.toDateString();
+        
+        // Get one-off events for this date
+        const oneOffEvents = this.events.filter(event => {
+            const eventDate = new Date(event.date);
+            return eventDate.toDateString() === dateStr;
+        });
+        
+        // Get recurring events for this date
+        const recurringEvents = this.getRecurringEventsForDate(date);
+        
+        // Combine and sort by time
+        return [...recurringEvents, ...oneOffEvents].sort((a, b) => {
+            // All-day events go first
+            if (a.allDay && !b.allDay) return -1;
+            if (!a.allDay && b.allDay) return 1;
+            return a.time.localeCompare(b.time);
+        });
     }
 
     setupEventListeners() {
@@ -81,16 +145,10 @@ class ScheduleManager {
             window.location.href = 'dashboard.html';
         });
 
-        // Month navigation
-        document.getElementById('prev-month').addEventListener('click', () => {
-            this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-            this.renderCalendar();
-        });
-
-        document.getElementById('next-month').addEventListener('click', () => {
-            this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-            this.renderCalendar();
-        });
+        // Navigation buttons
+        document.getElementById('prev-period').addEventListener('click', () => this.navigatePrev());
+        document.getElementById('next-period').addEventListener('click', () => this.navigateNext());
+        document.getElementById('today-btn').addEventListener('click', () => this.goToToday());
 
         // View toggle
         document.querySelectorAll('.view-btn').forEach(btn => {
@@ -118,16 +176,87 @@ class ScheduleManager {
             btn.classList.toggle('active', btn.dataset.view === view);
         });
 
-        document.getElementById('calendar-view').classList.toggle('active', view === 'calendar');
-        document.getElementById('list-view').classList.toggle('active', view === 'list');
+        // Hide all views
+        document.getElementById('month-view').classList.remove('active');
+        document.getElementById('week-view').classList.remove('active');
+        document.getElementById('day-view').classList.remove('active');
+        document.getElementById('list-view').classList.remove('active');
+
+        // Show selected view
+        document.getElementById(`${view}-view`).classList.add('active');
+
+        this.render();
     }
 
-    renderCalendar() {
+    navigatePrev() {
+        switch(this.view) {
+            case 'month':
+                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                break;
+            case 'week':
+                this.currentDate.setDate(this.currentDate.getDate() - 7);
+                break;
+            case 'day':
+                this.currentDate.setDate(this.currentDate.getDate() - 1);
+                break;
+            case 'list':
+                this.currentDate.setDate(this.currentDate.getDate() - 7);
+                break;
+        }
+        this.render();
+    }
+
+    navigateNext() {
+        switch(this.view) {
+            case 'month':
+                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                break;
+            case 'week':
+                this.currentDate.setDate(this.currentDate.getDate() + 7);
+                break;
+            case 'day':
+                this.currentDate.setDate(this.currentDate.getDate() + 1);
+                break;
+            case 'list':
+                this.currentDate.setDate(this.currentDate.getDate() + 7);
+                break;
+        }
+        this.render();
+    }
+
+    goToToday() {
+        this.currentDate = new Date();
+        this.selectedDate = new Date();
+        this.render();
+    }
+
+    render() {
+        switch(this.view) {
+            case 'month':
+                this.renderMonthView();
+                break;
+            case 'week':
+                this.renderWeekView();
+                break;
+            case 'day':
+                this.renderDayView();
+                break;
+            case 'list':
+                this.renderListView();
+                break;
+        }
+    }
+
+    updateTitle(title) {
+        document.getElementById('calendar-title').textContent = title;
+    }
+
+    // ========== MONTH VIEW ==========
+    renderMonthView() {
         const year = this.currentDate.getFullYear();
         const month = this.currentDate.getMonth();
-
-        document.getElementById('month-title').textContent = new Date(year, month)
-            .toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        
+        this.updateTitle(new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
 
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -156,8 +285,8 @@ class ScheduleManager {
                               this.selectedDate.getMonth() === month &&
                               this.selectedDate.getFullYear() === year;
 
-            // Get events for this day
-            const dayEvents = this.getEventsForDay(day, month, year);
+            const dayDate = new Date(year, month, day);
+            const dayEvents = this.getAllEventsForDate(dayDate);
             const hasEvents = dayEvents.length > 0;
 
             let classes = ['calendar-day'];
@@ -169,7 +298,10 @@ class ScheduleManager {
             if (dayEvents.length > 0) {
                 eventsHtml = '<div class="day-events">';
                 dayEvents.slice(0, 3).forEach(event => {
-                    eventsHtml += `<div class="day-event" style="background: ${categoryColors[event.category]}20; color: ${categoryColors[event.category]}; border-left: 2px solid ${categoryColors[event.category]};" data-event-id="${event.id}">${event.title}</div>`;
+                    const isRecurring = event.isRecurring || event.recurring;
+                    const recurringClass = isRecurring ? 'recurring-event' : '';
+                    const recurringIndicator = isRecurring ? '↻ ' : '';
+                    eventsHtml += `<div class="day-event ${recurringClass}" style="background: ${categoryColors[event.category]}30; color: ${categoryColors[event.category]}; border-left: 2px solid ${categoryColors[event.category]};" data-event-id="${event.id}">${recurringIndicator}${event.title}</div>`;
                 });
                 if (dayEvents.length > 3) {
                     eventsHtml += `<div class="day-event" style="color: var(--text-muted);">+${dayEvents.length - 3} more</div>`;
@@ -190,123 +322,227 @@ class ScheduleManager {
             html += `<div class="calendar-day other-month" data-day="${day}" data-month="${month + 1}" data-year="${year}"><div class="day-number">${day}</div></div>`;
         }
 
-        document.getElementById('calendar-grid').innerHTML = html;
+        document.getElementById('month-grid').innerHTML = html;
     }
 
-    getEventsForDay(day, month, year) {
-        return this.events.filter(event => {
-            const eventDate = new Date(event.date);
-            return eventDate.getDate() === day &&
-                   eventDate.getMonth() === month &&
-                   eventDate.getFullYear() === year;
-        }).sort((a, b) => a.time.localeCompare(b.time));
-    }
+    // ========== WEEK VIEW ==========
+    renderWeekView() {
+        const startOfWeek = new Date(this.currentDate);
+        startOfWeek.setDate(this.currentDate.getDate() - this.currentDate.getDay());
+        
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-    renderDayEvents() {
-        const dayEvents = this.getEventsForDay(
-            this.selectedDate.getDate(),
-            this.selectedDate.getMonth(),
-            this.selectedDate.getFullYear()
-        );
+        const startStr = startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const endStr = endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        this.updateTitle(`${startStr} - ${endStr}`);
 
-        document.getElementById('selected-date').textContent = this.selectedDate.toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'short',
-            day: 'numeric'
-        });
-
-        const container = document.getElementById('day-events');
-
-        if (dayEvents.length === 0) {
-            container.innerHTML = `
-                <div class="empty-events">
-                    <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">[Empty]</div>
-                    <p>No events for this day</p>
-                    <button class="action-btn" style="margin-top: 1rem;" onclick="scheduleManager.openAddModal()">[+] Add Event</button>
-                </div>
-            `;
-            return;
+        let html = '';
+        
+        // Time column header
+        html += '<div class="week-time-header"></div>';
+        
+        // Day headers
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        for (let i = 0; i < 7; i++) {
+            const dayDate = new Date(startOfWeek);
+            dayDate.setDate(startOfWeek.getDate() + i);
+            const isToday = dayDate.toDateString() === new Date().toDateString();
+            const dayNum = dayDate.getDate();
+            
+            html += `<div class="week-day-header ${isToday ? 'today' : ''}">
+                <div class="day-name">${dayNames[i]}</div>
+                <div class="day-num">${dayNum}</div>
+            </div>`;
         }
 
-        container.innerHTML = dayEvents.map(event => `
-            <div class="event-card" data-event-id="${event.id}" style="border-left: 4px solid ${categoryColors[event.category]}">
-                <div class="event-time">${this.formatTime(event.time)}</div>
-                <div class="event-details">
-                    <div class="event-title">${event.title}</div>
-                    <div class="event-desc">${event.duration} • ${categoryLabels[event.category]}</div>
-                </div>
-                <button class="event-edit-btn" onclick="scheduleManager.openEditModal(${event.id}); event.stopPropagation();">[Edit]</button>
-            </div>
-        `).join('');
-
-        // Add click handlers to event cards
-        container.querySelectorAll('.event-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const eventId = parseInt(card.dataset.eventId);
-                this.openEditModal(eventId);
-            });
-        });
-    }
-
-    renderUpcomingList() {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        // Get events from today onwards, sorted by date
-        const upcoming = this.events
-            .filter(event => new Date(event.date) >= today)
-            .sort((a, b) => new Date(a.date) - new Date(b.date) || a.time.localeCompare(b.time))
-            .slice(0, 20); // Limit to 20 events
-
-        const container = document.getElementById('upcoming-list');
-
-        if (upcoming.length === 0) {
-            container.innerHTML = `
-                <div class="empty-events">
-                    <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">[Empty]</div>
-                    <p>No upcoming events</p>
-                </div>
-            `;
-            return;
+        // Time slots
+        const timeSlots = [];
+        for (let hour = 7; hour <= 21; hour++) {
+            timeSlots.push(`${hour}:00`);
         }
 
-        // Group by date
-        let currentDate = null;
+        timeSlots.forEach(time => {
+            // Time label
+            html += `<div class="week-time-label">${this.formatTime(time)}</div>`;
+            
+            // Day columns
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(startOfWeek);
+                dayDate.setDate(startOfWeek.getDate() + i);
+                const isToday = dayDate.toDateString() === new Date().toDateString();
+                
+                // Get events for this day
+                const dayEvents = this.getAllEventsForDate(dayDate);
+                const hourEvents = dayEvents.filter(e => {
+                    if (e.allDay) return false;
+                    const eventHour = parseInt(e.time.split(':')[0]);
+                    const slotHour = parseInt(time.split(':')[0]);
+                    return eventHour === slotHour;
+                });
+
+                let eventsHtml = '';
+                hourEvents.forEach(event => {
+                    const isRecurring = event.isRecurring || event.recurring;
+                    const recurringClass = isRecurring ? 'recurring-week-event' : '';
+                    const recurringIndicator = isRecurring ? '↻ ' : '';
+                    eventsHtml += `<div class="week-event ${recurringClass}" style="background: ${categoryColors[event.category]};" onclick="event.stopPropagation(); scheduleManager.openEditModal('${event.id}')">${recurringIndicator}${event.title}</div>`;
+                });
+
+                html += `<div class="week-time-slot ${isToday ? 'today' : ''}" onclick="scheduleManager.selectDateAndOpenAdd('${dayDate.toISOString()}', '${time}')">${eventsHtml}</div>`;
+            }
+        });
+
+        document.getElementById('week-grid').innerHTML = html;
+    }
+
+    // ========== DAY VIEW ==========
+    renderDayView() {
+        this.updateTitle(this.currentDate.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            month: 'long', 
+            day: 'numeric',
+            year: 'numeric'
+        }));
+
+        const dayEvents = this.getAllEventsForDate(this.currentDate);
+        const isToday = this.currentDate.toDateString() === new Date().toDateString();
+
         let html = '';
 
-        upcoming.forEach(event => {
-            const eventDate = new Date(event.date);
-            const dateStr = eventDate.toDateString();
+        // All-day events
+        const allDayEvents = dayEvents.filter(e => e.allDay);
+        if (allDayEvents.length > 0) {
+            html += '<div class="day-all-day-section">';
+            html += '<div class="day-all-day-label">All Day</div>';
+            html += '<div class="day-all-day-events">';
+            allDayEvents.forEach(event => {
+                const isRecurring = event.isRecurring || event.recurring;
+                const recurringClass = isRecurring ? 'recurring-day-event' : '';
+                const recurringIndicator = isRecurring ? '<span class="recurring-badge">↻ Weekly</span>' : '';
+                html += `<div class="day-all-day-event ${recurringClass}" style="background: ${categoryColors[event.category]}30; border-left: 4px solid ${categoryColors[event.category]};" onclick="scheduleManager.openEditModal('${event.id}')">
+                    <span class="event-title">${event.title}</span>
+                    ${recurringIndicator}
+                </div>`;
+            });
+            html += '</div></div>';
+        }
 
-            if (dateStr !== currentDate) {
-                if (currentDate !== null) html += '</div>';
-                const isToday = eventDate.toDateString() === new Date().toDateString();
-                html += `
-                    <div class="date-group">
-                        <div class="date-header">${isToday ? 'Today' : eventDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</div>
-                `;
-                currentDate = dateStr;
-            }
+        // Time-based events
+        html += '<div class="day-timeline">';
+        
+        const timeSlots = [];
+        for (let hour = 6; hour <= 22; hour++) {
+            timeSlots.push(hour);
+        }
 
-            html += `
-                <div class="event-card" data-event-id="${event.id}" style="border-left: 4px solid ${categoryColors[event.category]}">
-                    <div class="event-time">${this.formatTime(event.time)}</div>
-                    <div class="event-details">
-                        <div class="event-title">${event.title}</div>
-                        <div class="event-desc">${event.duration} • ${categoryLabels[event.category]}</div>
-                    </div>
-                </div>
-            `;
+        timeSlots.forEach(hour => {
+            const timeStr = `${hour.toString().padStart(2, '0')}:00`;
+            const hourEvents = dayEvents.filter(e => {
+                if (e.allDay) return false;
+                const eventHour = parseInt(e.time.split(':')[0]);
+                return eventHour === hour;
+            });
+
+            html += `<div class="day-time-row">`;
+            html += `<div class="day-time-label">${this.formatTime(timeStr)}</div>`;
+            html += `<div class="day-time-slot ${isToday ? 'today' : ''}" onclick="scheduleManager.selectTimeAndOpenAdd('${timeStr}')">`;
+            
+            hourEvents.forEach(event => {
+                const isRecurring = event.isRecurring || event.recurring;
+                const recurringClass = isRecurring ? 'recurring-day-event' : '';
+                const recurringIndicator = isRecurring ? '<span class="recurring-badge">↻ Weekly</span>' : '';
+                html += `<div class="day-timeline-event ${recurringClass}" style="background: ${categoryColors[event.category]}30; border-left: 4px solid ${categoryColors[event.category]};" onclick="event.stopPropagation(); scheduleManager.openEditModal('${event.id}')">
+                    <div class="timeline-event-time">${this.formatTime(event.time)}</div>
+                    <div class="timeline-event-title">${event.title}</div>
+                    <div class="timeline-event-meta">${event.duration} • ${categoryLabels[event.category]} ${recurringIndicator}</div>
+                </div>`;
+            });
+            
+            html += `</div></div>`;
         });
 
         html += '</div>';
-        container.innerHTML = html;
 
-        // Add click handlers
-        container.querySelectorAll('.event-card').forEach(card => {
+        // Add event button
+        html += `<button class="action-btn day-add-btn" onclick="scheduleManager.openAddModal()">+ Add Event</button>`;
+
+        document.getElementById('day-container').innerHTML = html;
+    }
+
+    // ========== LIST VIEW ==========
+    renderListView() {
+        const startDate = new Date(this.currentDate);
+        startDate.setDate(startDate.getDate() - startDate.getDay()); // Start of week
+        
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 13); // 2 weeks
+
+        const startStr = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const endStr = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        this.updateTitle(`${startStr} - ${endStr}`);
+
+        let html = '';
+        let currentDate = new Date(startDate);
+
+        while (currentDate <= endDate) {
+            const dayEvents = this.getAllEventsForDate(currentDate);
+            const isToday = currentDate.toDateString() === new Date().toDateString();
+
+            if (dayEvents.length > 0 || isToday) {
+                const dateStr = isToday ? 'Today' : currentDate.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+
+                html += `<div class="date-group">`;
+                html += `<div class="date-header ${isToday ? 'today' : ''}">${dateStr}</div>`;
+
+                if (dayEvents.length === 0) {
+                    html += `<div class="empty-day-message">No events scheduled</div>`;
+                } else {
+                    dayEvents.forEach(event => {
+                        const isRecurring = event.isRecurring || event.recurring;
+                        const recurringClass = isRecurring ? 'recurring-list-event' : '';
+                        const recurringIndicator = isRecurring ? '<span class="recurring-badge">↻ Weekly</span>' : '';
+                        const timeDisplay = event.allDay ? 'All Day' : this.formatTime(event.time);
+                        
+                        html += `<div class="event-card ${recurringClass}" data-event-id="${event.id}" style="border-left: 4px solid ${categoryColors[event.category]}">
+                            <div class="event-time">${timeDisplay}</div>
+                            <div class="event-details">
+                                <div class="event-title">${event.title} ${recurringIndicator}</div>
+                                <div class="event-desc">${event.duration} • ${categoryLabels[event.category]}</div>
+                            </div>
+                            ${!isRecurring ? `<button class="event-edit-btn" onclick="scheduleManager.openEditModal('${event.id}'); event.stopPropagation();">Edit</button>` : ''}
+                        </div>`;
+                    });
+                }
+
+                html += `</div>`;
+            }
+
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        if (html === '') {
+            html = `
+                <div class="empty-events">
+                    <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">[Empty]</div>
+                    <p>No upcoming events in this period</p>
+                </div>
+            `;
+        }
+
+        document.getElementById('list-container').innerHTML = html;
+
+        // Add click handlers to event cards
+        document.querySelectorAll('.event-card').forEach(card => {
             card.addEventListener('click', () => {
-                const eventId = parseInt(card.dataset.eventId);
-                this.openEditModal(eventId);
+                const eventId = card.dataset.eventId;
+                if (!eventId.startsWith('recurring-')) {
+                    this.openEditModal(eventId);
+                }
             });
         });
     }
@@ -319,38 +555,51 @@ class ScheduleManager {
         return `${displayHour}:${minutes} ${ampm}`;
     }
 
+    selectDateAndOpenAdd(dateStr, time) {
+        this.selectedDate = new Date(dateStr);
+        this.currentDate = new Date(dateStr);
+        document.getElementById('event-time').value = time;
+        this.openAddModal();
+    }
+
+    selectTimeAndOpenAdd(time) {
+        document.getElementById('event-time').value = time;
+        this.openAddModal();
+    }
+
     // Modal functions
     openAddModal() {
-        console.log('openAddModal called');
         this.editingEventId = null;
         
         const modal = document.getElementById('event-modal');
-        if (!modal) {
-            console.error('Modal not found!');
-            return;
-        }
+        if (!modal) return;
         
-        document.getElementById('modal-title').textContent = '[Add] Event';
+        document.getElementById('modal-title').textContent = 'Add Event';
         document.getElementById('delete-event').style.display = 'none';
         
-        // Set default date to selected date
-        const dateStr = this.selectedDate.toISOString().split('T')[0];
+        // Set default date to selected/current date
+        const dateStr = this.currentDate.toISOString().split('T')[0];
         document.getElementById('event-date').value = dateStr;
-        document.getElementById('event-time').value = '09:00';
+        document.getElementById('event-time').value = document.getElementById('event-time').value || '09:00';
         document.getElementById('event-title').value = '';
         document.getElementById('event-duration').value = '1 hour';
         document.getElementById('event-category').value = 'other';
         
         modal.classList.add('active');
-        console.log('Modal opened');
     }
 
     openEditModal(eventId) {
-        const event = this.events.find(e => e.id === eventId);
+        // Can't edit recurring events (they're auto-generated)
+        if (String(eventId).startsWith('recurring-')) {
+            alert('This is a recurring weekly event. To modify your permanent schedule, please contact your administrator.');
+            return;
+        }
+
+        const event = this.events.find(e => String(e.id) === String(eventId));
         if (!event) return;
 
         this.editingEventId = eventId;
-        document.getElementById('modal-title').textContent = '[Edit] Event';
+        document.getElementById('modal-title').textContent = 'Edit Event';
         document.getElementById('delete-event').style.display = 'block';
 
         document.getElementById('event-id').value = eventId;
@@ -382,58 +631,55 @@ class ScheduleManager {
             date: new Date(dateStr),
             time,
             duration,
-            category
+            category,
+            recurring: false
         };
 
         if (this.editingEventId) {
             // Update existing
-            const index = this.events.findIndex(e => e.id === this.editingEventId);
+            const index = this.events.findIndex(e => String(e.id) === String(this.editingEventId));
             if (index !== -1) {
                 this.events[index] = { ...this.events[index], ...eventData };
             }
         } else {
             // Create new
-            const newId = Math.max(...this.events.map(e => e.id), 0) + 1;
+            const newId = Date.now().toString();
             this.events.push({ id: newId, ...eventData });
         }
 
         this.saveEvents();
         this.closeModal();
-        this.renderCalendar();
-        this.renderDayEvents();
-        this.renderUpcomingList();
+        this.render();
     }
 
     deleteEvent() {
         if (!this.editingEventId) return;
 
         if (confirm('Delete this event?')) {
-            this.events = this.events.filter(e => e.id !== this.editingEventId);
+            this.events = this.events.filter(e => String(e.id) !== String(this.editingEventId));
             this.saveEvents();
             this.closeModal();
-            this.renderCalendar();
-            this.renderDayEvents();
-            this.renderUpcomingList();
+            this.render();
         }
     }
 }
 
-// Global click handler for inline onclick
+// Global click handler for month view
 window.handleDayClick = function(dayEl, e) {
     const day = parseInt(dayEl.dataset.day);
     const month = parseInt(dayEl.dataset.month);
     const year = parseInt(dayEl.dataset.year);
     
     scheduleManager.selectedDate = new Date(year, month, day);
-    scheduleManager.renderCalendar();
-    scheduleManager.renderDayEvents();
+    scheduleManager.currentDate = new Date(year, month, day);
+    scheduleManager.render();
 
     const eventEl = e.target.closest('.day-event[data-event-id]');
     if (eventEl) {
-        const eventId = parseInt(eventEl.dataset.eventId);
+        const eventId = eventEl.dataset.eventId;
         scheduleManager.openEditModal(eventId);
     } else if (!dayEl.classList.contains('other-month')) {
-        scheduleManager.openAddModal();
+        scheduleManager.switchView('day');
     }
 };
 
