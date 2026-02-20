@@ -216,6 +216,16 @@ body {
     gap: 1rem;
 }
 
+.header-date {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
 .icon-btn {
     background: none;
     border: none;
@@ -402,6 +412,51 @@ body {
     padding-top: 1rem;
     border-top: 2px solid var(--border-color);
     color: var(--neon-green);
+}
+
+/* Pie Chart Widget */
+.piechart-container {
+    position: relative;
+    height: 250px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.piechart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+}
+
+.piechart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.6rem;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.piechart-legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.piechart-legend-label {
+    color: var(--text-secondary);
+}
+
+.piechart-legend-value {
+    color: var(--text-primary);
+    font-family: monospace;
+    font-weight: bold;
 }
 
 /* Progress Widget */
