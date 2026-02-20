@@ -137,7 +137,12 @@ class Dashboard {
         console.log('Dashboard init started');
         this.setupEventListeners();
         console.log('Event listeners setup');
-        
+
+        // Initialize and start date updater
+        this.updateDateDisplay();
+        this.startDateUpdater();
+        console.log('Date updater started');
+
         // Load schedule and calendar first (don't depend on DB)
         this.loadSchedule();
         console.log('Schedule loaded');
@@ -161,6 +166,13 @@ class Dashboard {
             this.loadProgress();
             console.log('Progress loaded');
         } catch(e) { console.error('Progress error:', e); }
+
+        // Initialize pie chart after DB is ready
+        try {
+            this.initPieChart();
+            await this.updatePieChart();
+            console.log('Pie chart loaded');
+        } catch(e) { console.error('Pie chart error:', e); }
         
         console.log('Dashboard init complete');
     }
@@ -182,6 +194,38 @@ class Dashboard {
         // Calendar navigation
         document.getElementById('prev-month').addEventListener('click', () => this.changeMonth(-1));
         document.getElementById('next-month').addEventListener('click', () => this.changeMonth(1));
+    }
+
+    updateDateDisplay() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const dateString = now.toLocaleDateString('en-US', options);
+
+        const dateElement = document.getElementById('header-date');
+        if (dateElement) {
+            dateElement.textContent = dateString;
+        }
+    }
+
+    startDateUpdater() {
+        // Update immediately and then check every minute for date changes
+        this.updateDateDisplay();
+
+        // Update at midnight to handle date changes
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        const msUntilMidnight = tomorrow - now;
+
+        // Set timeout for midnight, then interval every 24 hours
+        setTimeout(() => {
+            this.updateDateDisplay();
+            setInterval(() => this.updateDateDisplay(), 24 * 60 * 60 * 1000);
+        }, msUntilMidnight);
+
+        // Also update every minute to catch any display issues
+        setInterval(() => this.updateDateDisplay(), 60000);
     }
 
     async loadChecklist() {
@@ -263,6 +307,118 @@ class Dashboard {
 
         document.getElementById('report-progress').style.width = Math.min((reportProgress.value / 21) * 100, 100) + '%';
         document.getElementById('report-progress-text').textContent = `${reportProgress.value}/21`;
+
+        // Update pie chart with latest progress data
+        this.updatePieChart();
+    }
+
+    initPieChart() {
+        const ctx = document.getElementById('progress-piechart');
+        if (!ctx) return;
+
+        // Cyberpunk theme colors
+        const colors = {
+            quals: '#00f5ff',      // neon blue
+            dissertation: '#ff006e', // neon pink
+            reports: '#39ff14',    // neon green
+            remaining: '#2a2a3e'   // border color (dark)
+        };
+
+        this.pieChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Quals Study', 'Dissertation', 'Reports', 'Remaining'],
+                datasets: [{
+                    data: [0, 0, 0, 100],
+                    backgroundColor: [colors.quals, colors.dissertation, colors.reports, colors.remaining],
+                    borderColor: '#0a0a0f',
+                    borderWidth: 3,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        display: false // Custom legend below
+                    },
+                    tooltip: {
+                        backgroundColor: '#12121a',
+                        titleColor: '#ffffff',
+                        bodyColor: '#a0a0b0',
+                        borderColor: '#2a2a3e',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: (context) => {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                if (label === 'Quals Study') return ` ${label}: ${value.toFixed(1)}% (of 300h)`;
+                                if (label === 'Dissertation') return ` ${label}: ${value.toFixed(1)}% (of 20pg)`;
+                                if (label === 'Reports') return ` ${label}: ${value.toFixed(1)}% (of 21h)`;
+                                return ` ${label}: ${value.toFixed(1)}%`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    duration: 800
+                }
+            }
+        });
+    }
+
+    async updatePieChart() {
+        if (!this.pieChart) return;
+
+        // Get progress data from database
+        const qualsProgress = await this.db.getProgress('quals') || { value: 0 };
+        const dissProgress = await this.db.getProgress('dissertation') || { value: 0 };
+        const reportProgress = await this.db.getProgress('reports') || { value: 0 };
+
+        // Calculate percentages based on goals
+        const qualsPercent = Math.min((qualsProgress.value / 300) * 100, 100);
+        const dissPercent = Math.min((dissProgress.value / 20) * 100, 100);
+        const reportPercent = Math.min((reportProgress.value / 21) * 100, 100);
+
+        // Calculate remaining (to make chart look complete)
+        const totalPercent = qualsPercent + dissPercent + reportPercent;
+        const remainingPercent = Math.max(0, 100 - (totalPercent / 3));
+
+        // Update chart data
+        this.pieChart.data.datasets[0].data = [qualsPercent, dissPercent, reportPercent, remainingPercent];
+        this.pieChart.update();
+
+        // Update custom legend
+        const legendContainer = document.getElementById('piechart-legend');
+        if (legendContainer) {
+            const colors = {
+                quals: '#00f5ff',
+                dissertation: '#ff006e',
+                reports: '#39ff14'
+            };
+
+            legendContainer.innerHTML = `
+                <div class="piechart-legend-item">
+                    <span class="piechart-legend-color" style="background: ${colors.quals}"></span>
+                    <span class="piechart-legend-label">Quals:</span>
+                    <span class="piechart-legend-value">${qualsProgress.value}h</span>
+                </div>
+                <div class="piechart-legend-item">
+                    <span class="piechart-legend-color" style="background: ${colors.dissertation}"></span>
+                    <span class="piechart-legend-label">Dissertation:</span>
+                    <span class="piechart-legend-value">${dissProgress.value}pg</span>
+                </div>
+                <div class="piechart-legend-item">
+                    <span class="piechart-legend-color" style="background: ${colors.reports}"></span>
+                    <span class="piechart-legend-label">Reports:</span>
+                    <span class="piechart-legend-value">${reportProgress.value}h</span>
+                </div>
+            `;
+        }
     }
 
     loadSchedule() {
@@ -340,6 +496,13 @@ class Dashboard {
 document.addEventListener('DOMContentLoaded', () => {
     const db = new NestDatabase();
     db.init().then(() => {
-        new Dashboard(db);
+        const dashboard = new Dashboard(db);
+        window.dashboard = dashboard; // Make accessible for API updates
+        
+        // Initialize Sonya API integration
+        if (window.NestAPI) {
+            const api = new NestAPI(db);
+            api.init();
+        }
     });
 });

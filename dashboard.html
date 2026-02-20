@@ -16,6 +16,7 @@
                 <img src="assets/owl-icon.svg" alt="" class="owl-icon-small">
                 <span>The Nest</span>
             </div>
+            <div class="header-date" id="header-date">Loading...</div>
             <div class="header-actions">
                 <span class="status-indicator online" id="sync-status" title="Online">●</span>
                 <button class="icon-btn" id="settings-btn" title="Settings" onclick="window.location.href='settings.html'">⚙</button>
@@ -102,6 +103,17 @@
                 </div>
             </section>
 
+            <!-- Progress Pie Chart Widget -->
+            <section class="widget piechart-widget">
+                <h2><span class="icon-chart"></span> Combined Progress</h2>
+                <div class="piechart-container">
+                    <canvas id="progress-piechart"></canvas>
+                </div>
+                <div class="piechart-legend" id="piechart-legend">
+                    <!-- Legend populated by JS -->
+                </div>
+            </section>
+
             <!-- Progress Widget -->
             <section class="widget progress-widget">
                 <h2><span class="icon-chart"></span> Progress</h2>
@@ -164,6 +176,8 @@
         </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="api.js"></script>
     <script src="dashboard.js"></script>
 </body>
 </html>
