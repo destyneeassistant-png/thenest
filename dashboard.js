@@ -422,22 +422,78 @@ class Dashboard {
     }
 
     loadSchedule() {
-        const schedule = [
-            { time: '6:30am', task: 'Wake up, breakfast' },
-            { time: '6:45am', task: '15 min Mindfulness' },
-            { time: '9:00am', task: 'Dissertation Meeting' },
-            { time: '10:00am', task: 'Class begins' },
-            { time: '8:30pm', task: 'Report Writing (2 hrs)' },
-            { time: '11:00pm', task: 'Sleep' }
-        ];
+        const dayOfWeek = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
+        
+        // Define schedules for each day
+        const schedules = {
+            0: { // Sunday
+                dayName: 'Sunday',
+                items: [
+                    { time: 'All Day', task: 'Heavy Study Day' },
+                    { time: 'Focus', task: 'Quals preparation or dissertation work' }
+                ]
+            },
+            1: { // Monday
+                dayName: 'Monday',
+                items: [
+                    { time: '12:00pm', task: 'Group Supervision' },
+                    { time: '1:00pm', task: 'Client 1' },
+                    { time: '2:00pm', task: 'Client 2' }
+                ]
+            },
+            2: { // Tuesday
+                dayName: 'Tuesday',
+                items: [
+                    { time: '9:00am', task: 'Dissertation Meeting' },
+                    { time: '10:00am', task: 'Class begins' },
+                    { time: '6:30pm', task: 'Class ends' }
+                ]
+            },
+            3: { // Wednesday
+                dayName: 'Wednesday',
+                items: [
+                    { time: '8:30am', task: 'Supervision' },
+                    { time: '10:00am', task: 'Client 1' },
+                    { time: '12:00pm', task: 'Client 2' },
+                    { time: '1:00pm', task: 'Client 3' }
+                ]
+            },
+            4: { // Thursday
+                dayName: 'Thursday',
+                items: [
+                    { time: 'All Day', task: 'OFF DAY' },
+                    { time: 'Focus', task: 'Dissertation/Quals work (no fixed events)' }
+                ]
+            },
+            5: { // Friday
+                dayName: 'Friday',
+                items: [
+                    { time: 'All Day', task: 'OFF DAY' },
+                    { time: 'Focus', task: 'Dissertation/Quals work (no fixed events)' }
+                ]
+            },
+            6: { // Saturday
+                dayName: 'Saturday',
+                items: [
+                    { time: 'All Day', task: 'Heavy Study Day' },
+                    { time: 'Focus', task: 'Intensive study session' }
+                ]
+            }
+        };
 
+        const todaySchedule = schedules[dayOfWeek];
         const container = document.getElementById('today-schedule');
-        container.innerHTML = schedule.map(item => `
-            <div class="schedule-item">
-                <span class="time">${item.time}</span>
-                <span>${item.task}</span>
-            </div>
-        `).join('');
+        
+        if (todaySchedule && todaySchedule.items.length > 0) {
+            container.innerHTML = todaySchedule.items.map(item => `
+                <div class="schedule-item">
+                    <span class="time">${item.time}</span>
+                    <span>${item.task}</span>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<p class="no-events">No scheduled events for today.</p>';
+        }
     }
 
     loadCalendar() {
