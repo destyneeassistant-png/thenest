@@ -54,6 +54,52 @@
             font-size: 0.85rem;
         }
 
+        .eppp-quizzes {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .eppp-quizzes h2 {
+            color: var(--neon-pink);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .quiz-card-link {
+            display: block;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .quiz-card-link:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .quiz-card-link h3 {
+            color: var(--neon-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .quiz-card-link p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
         .quiz-card {
             background: var(--bg-secondary);
             border: 2px solid var(--border-color);
@@ -300,6 +346,14 @@
                     <button class="topic-btn" onclick="window.location.href='quiz-intellectual-disability.html'">
                         <h3>🧩 Intellectual Disability & Communication</h3>
                         <p>IDD severity levels, etiology, language disorders, and fluency disorders (50 questions)</p>
+                    </button>
+                    <button class="topic-btn" onclick="window.location.href='quiz-clinical-psychology.html'">
+                        <h3>🧠 Clinical Psychology</h3>
+                        <p>Psychodynamic theories, Freud, Adler, Jung, Object Relations, and defense mechanisms (40 questions)</p>
+                    </button>
+                    <button class="topic-btn" onclick="window.location.href='quiz-ethics.html'">
+                        <h3>⚖️ Professional Ethics</h3>
+                        <p>APA Ethics Code, General Principles, Standards, and professional practice (40 questions)</p>
                     </button>
                 </div>
             </div>

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Psychology Quiz - The Nest</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">🦉 The Nest</div>
+            <a href="quiz.html" class="btn">← Back to Quizzes</a>
+        </header>
+
+        <main class="main-content">
+            <div class="quiz-container">
+                <div class="quiz-header">
+                    <h1>Clinical Psychology</h1>
+                    <p>Psychodynamic Theories & Theoretical Foundations</p>
+                    <p>40 EPPP-Style Questions</p>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+
+                <div id="question-container"></div>
+
+                <div class="quiz-controls">
+                    <button class="btn" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+                    <button class="btn" id="next-btn" onclick="nextQuestion()">Next</button>
+                    <button class="btn hidden" id="submit-btn" onclick="submitQuiz()">Submit</button>
+                </div>
+
+                <div id="results" class="hidden">
+                    <div class="score-display" id="score"></div>
+                    <button class="btn" onclick="reviewQuiz()">Review</button>
+                    <button class="btn" onclick="restartQuiz()">Restart</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                q: "A 35-year-old client consistently chooses partners who are emotionally unavailable. According to object relations theory, this most likely stems from:",
+                options: ["Fixation in the phallic stage","Internalized representations of early caregiver relationships","Imbalance between id and superego","Failure to achieve self-actualization"],
+                correct: 1,
+                explanation: "Object relations theory emphasizes that early relationships with caregivers become internalized as mental representations that influence later relationships."
+            },
+            {
+                q: "A client demonstrates resistance by consistently arriving late. From a psychodynamic perspective, this represents:",
+                options: ["Conscious avoidance","Unconscious avoidance of anxiety-provoking content","Deliberate sabotage","Poor motivation"],
+                correct: 1,
+                explanation: "Resistance in psychodynamic therapy is understood as an unconscious defense protecting the client from anxiety-provoking material."
+            },
+            {
+                q: "According to Freud's structural theory, delaying gratification to avoid negative consequences represents which structure's function?",
+                options: ["Id","Ego","Superego","Collective unconscious"],
+                correct: 1,
+                explanation: "The ego operates on the reality principle and mediates between the id's demands and reality constraints."
+            },
+            {
+                q: "A client with harsh parenting now has an extremely harsh inner critic. This is best explained by:",
+                options: ["Reaction formation","Internalization of the superego","Projection of the shadow","Fixation in the anal stage"],
+                correct: 1,
+                explanation: "The superego develops through internalization of parental values and standards, becoming an internal critic."
+            },
+            {
+                q: "In Adlerian therapy, what refers to the individual's unique way of striving for superiority?",
+                options: ["Style of life","Archetype","Object relations","Psychosexual stage"],
+                correct: 0,
+                explanation: "Adler's 'style of life' refers to the individual's unified approach to life including goals and strategies for compensating for inferiority."
+            },
+            {
+                q: "According to Jung, what represents universal, inherited patterns in the collective unconscious?",
+                options: ["Personal complexes","Archetypes","Defense mechanisms","Cognitive schemas"],
+                correct: 1,
+                explanation: "Jung proposed archetypes as universal, inherited patterns in the collective unconscious (e.g., mother, hero archetypes)."
+            },
+            {
+                q: "An object relations therapist would focus intervention on:",
+                options: ["Resolving oedipal conflicts","Modifying cognitive schemas","Changing patterns based on internalized object representations","Facilitating self-actualization"],
+                correct: 2,
+                explanation: "Object relations therapy focuses on how early relationships become internalized and influence current relationships."
+            },
+            {
+                q: "Expressing excessive admiration for a colleague one actually resents exemplifies which defense mechanism?",
+                options: ["Sublimation","Reaction formation","Intellectualization","Displacement"],
+                correct: 1,
+                explanation: "Reaction formation transforms unacceptable impulses into their opposite—converting resentment into admiration."
+            },
+            {
+                q: "Fixation in which stage is associated with excessive orderliness and obstinacy?",
+                options: ["Oral","Anal","Phallic","Genital"],
+                correct: 1,
+                explanation: "Freud proposed anal stage fixation (from toilet training issues) leads to 'anal retentive' traits like orderliness and obstinacy."
+            },
+            {
+                q: "A recurring dream of being pursued by a shadowy figure most likely represents:",
+                options: ["Anima/animus","Shadow archetype","Phallic fixation","Superior function"],
+                correct: 1,
+                explanation: "In Jungian theory, the shadow archetype represents disowned aspects of the self, often appearing as pursuing figures in dreams."
+            },
+            {
+                q: "Which technique involves the client saying whatever comes to mind without censorship?",
+                options: ["Interpretation","Free association","Working through","Confrontation"],
+                correct: 1,
+                explanation: "Free association is a fundamental psychoanalytic technique where clients report thoughts without censorship to access unconscious material."
+            },
+            {
+                q: "According to Freud, dreams serve primarily to:",
+                options: ["Process daily events","Fulfill wishes through symbolic means","Consolidate memories","Process trauma"],
+                correct: 1,
+                explanation: "Freud viewed dreams as 'the royal road to the unconscious,' serving to fulfill repressed wishes through symbolic imagery."
+            },
+            {
+                q: "A client who experienced neglect as a child now struggles with boundary issues and enmeshment in relationships. This aligns with which theoretical concept?",
+                options: ["Oedipal complex","Object constancy failure","Penis envy","Self-actualization"],
+                correct: 1,
+                explanation: "Object constancy—the ability to maintain positive feelings toward others despite separation or frustration—develops from consistent caregiving. Neglect disrupts this."
+            },
+            {
+                q: "In psychodynamic therapy, 'working through' refers to:",
+                options: ["Initial assessment","The gradual assimilation of insights","Crisis intervention","Termination"],
+                correct: 1,
+                explanation: "Working through is the lengthy process of repeatedly exploring insights in various contexts until they are fully integrated."
+            },
+            {
+                q: "Adler believed that feelings of inferiority:",
+                options: ["Should be eliminated","Are pathological","Motivate striving for superiority","Result from fixation"],
+                correct: 2,
+                explanation: "Adler viewed inferiority feelings as universal and motivating, driving the striving for superiority that fuels human development."
+            },
+            {
+                q: "The process of integrating conscious and unconscious aspects of the psyche is called:",
+                options: ["Self-actualization","Individuation","Working through","Rationalization"],
+                correct: 1,
+                explanation: "Jung's concept of individuation refers to the lifelong process of integrating all aspects of the psyche into a unified self."
+            },
+            {
+                q: "A therapist notices a client becomes angry whenever the therapist is supportive. This may represent:",
+                options: ["Positive transference","Negative transference","Countertransference","Resistance"],
+                correct: 1,
+                explanation: "Negative transference occurs when clients redirect negative feelings from past relationships onto the therapist."
+            },
+            {
+                q: "Which concept describes redirecting emotions from their original source to a safer target?",
+                options: ["Repression","Displacement","Projection","Sublimation"],
+                correct: 1,
+                explanation: "Displacement redirects emotions (especially anger) from their original threatening target to a safer, less threatening one."
+            },
+            {
+                q: "According to Freud, the purpose of defense mechanisms is to:",
+                options: ["Increase awareness","Protect the ego from anxiety","Resolve unconscious conflicts","Build relationships"],
+                correct: 1,
+                explanation: "Defense mechanisms operate unconsciously to protect the ego from anxiety arising from conflicting demands of id, superego, and reality."
+            },
+            {
+                q: "A client who intellectualizes their divorce by focusing on logistics rather than grief is using which defense?",
+                options: ["Denial","Intellectualization","Reaction formation","Undoing"],
+                correct: 1,
+                explanation: "Intellectualization avoids emotional awareness by focusing excessively on abstract, analytical aspects of a situation."
+            },
+            {
+                q: "The oral stage (0-18 months) centers on gratification through:",
+                options: ["Toilet training","Mouth activities","Genital stimulation","Peer relationships"],
+                correct: 1,
+                explanation: "The oral stage centers on mouth activities—eating, drinking, sucking—as sources of pleasure and gratification."
+            },
+            {
+                q: "According to Winnicott, what is crucial for healthy development?",
+                options: ["Strict discipline","'Good enough' mothering","Absence of frustration","Early independence"],
+                correct: 1,
+                explanation: "Winnicott emphasized 'good enough' mothering—attuned but not perfect caregiving that allows gradual frustration tolerance."
+            },
+            {
+                q: "A child who was abused now abuses others. This pattern illustrates:",
+                options: ["Identification with the aggressor","Reaction formation","Sublimation","Repression"],
+                correct: 0,
+                explanation: "Identification with the aggressor is a defense where the victim adopts the abuser's behavior to gain a sense of power and control."
+            },
+            {
+                q: "Jung's concept of the persona refers to:",
+                options: ["True self","Social mask presented to world","Shadow aspects","Animus/anima"],
+                correct: 1,
+                explanation: "The persona is the social mask or public face one presents to meet social expectations, distinct from the authentic self."
+            },
+            {
+                q: "In Kohut's self psychology, what is essential for healthy self-development?",
+                options: ["Resolution of Oedipus complex","Empathic mirroring from caregivers","Behavioral reinforcement","Cognitive restructuring"],
+                correct: 1,
+                explanation: "Kohut emphasized empathic mirroring—caregivers' attuned responsiveness to the child's needs—as essential for healthy narcissistic development."
+            },
+            {
+                q: "A client insists their therapist reminds them exactly of their mother. This is:",
+                options: ["Reality testing failure","Transference","Countertransference","Projection"],
+                correct: 1,
+                explanation: "Transference involves unconsciously redirecting feelings and attitudes from past relationships onto the therapist."
+            },
+            {
+                q: "The death instinct (Thanatos) proposed by Freud involves:",
+                options: ["Fear of death","Aggressive and self-destructive drives","Grief process","Survival instinct"],
+                correct: 1,
+                explanation: "Freud's concept of Thanatos posits an innate drive toward aggression, destruction, and ultimately the return to an inorganic state."
+            },
+            {
+                q: "According to Fairbairn, the primary human motivation is:",
+                options: ["Pleasure seeking","Object seeking (relationships)","Aggression reduction","Self-actualization"],
+                correct: 1,
+                explanation: "Fairbairn proposed object-seeking (the drive for relationships) rather than pleasure-seeking as the primary human motivation."
+            },
+            {
+                q: "Which concept describes attributing one's own unacceptable impulses to others?",
+                options: ["Repression","Projection","Introjection","Splitting"],
+                correct: 1,
+                explanation: "Projection involves attributing one's own unacceptable thoughts, feelings, or impulses to someone else."
+            },
+            {
+                q: "A client cannot remember childhood trauma despite evidence it occurred. This illustrates:",
+                options: ["Repression","Suppression","Dissociation","Confabulation"],
+                correct: 0,
+                explanation: "Repression is the unconscious defense that banishes threatening memories, thoughts, or feelings from conscious awareness."
+            },
+            {
+                q: "In Mahler's separation-individuation theory, 'rapprochement' refers to:",
+                options: ["Complete independence","Returning to mother for reassurance while exploring","Permanent separation","Symbiotic fusion"],
+                correct: 1,
+                explanation: "Rapprochement (16-24 months) is when toddlers return to caregivers for reassurance while actively exploring the world."
+            },
+            {
+                q: "What characterizes borderline personality organization according to Kernberg?",
+                options: ["Strong ego strength","Identity diffusion and primitive defenses","Sublimation dominance","Stable object relations"],
+                correct: 1,
+                explanation: "Kernberg described borderline personality organization as characterized by identity diffusion, primitive defenses (splitting), and unstable relationships."
+            },
+            {
+                q: "The therapeutic alliance in psychodynamic therapy is primarily based on:",
+                options: ["Real relationship between client and therapist","Transference only","Technical interventions","Advice giving"],
+                correct: 0,
+                explanation: "The therapeutic alliance combines the real relationship (genuine connection) with aspects of transference in a working partnership."
+            },
+            {
+                q: "According to Freud, which structure operates on the pleasure principle?",
+                options: ["Id","Ego","Superego","Preconscious"],
+                correct: 0,
+                explanation: "The id operates on the pleasure principle, seeking immediate gratification of instinctual drives without regard for reality."
+            },
+            {
+                q: "A client channels aggressive impulses into competitive sports. This is:",
+                options: ["Displacement","Sublimation","Reaction formation","Projection"],
+                correct: 1,
+                explanation: "Sublimation channels unacceptable impulses into socially acceptable activities (e.g., aggression into competitive sports)."
+            },
+            {
+                q: "The "blank screen" technique in psychoanalysis refers to:",
+                options: ["Not taking notes","Therapist neutrality to facilitate transference","Empty chair technique","Free association"],
+                correct: 1,
+                explanation: "Therapist neutrality (being a 'blank screen') allows clients to project transference feelings without interference from therapist self-disclosure."
+            },
+            {
+                q: "According to Bowlby, what is essential for secure attachment?",
+                options: ["Constant presence of mother","Consistent responsiveness to needs","Absence of separation","Multiple caregivers"],
+                correct: 1,
+                explanation: "Bowlby emphasized consistent caregiver responsiveness to attachment needs, not perfect constant presence, as the foundation of security."
+            },
+            {
+                q: "In psychodynamic terms, "enactment" refers to:",
+                options: ["Acting out unconscious dynamics in the therapeutic relationship","Behavioral rehearsal","Role playing","Cognitive restructuring"],
+                correct: 0,
+                explanation: "Enactment occurs when client and therapist unconsciously act out relational patterns from the client's history within the therapy."
+            },
+            {
+                q: "Which defense involves unconsciously taking in aspects of another person?",
+                options: ["Projection","Introjection","Identification","Incorporation"],
+                correct: 2,
+                explanation: "Identification involves unconsciously adopting another person's characteristics, values, or behaviors."
+            },
+            {
+                q: "The depressive position in Kleinian theory involves:",
+                options: ["Awareness of whole objects with guilt over aggressive impulses","Denial of aggression","Paranoid fears","Manic triumph"],
+                correct: 0,
+                explanation: "The depressive position (around 6 months) involves recognizing the mother as a whole object, leading to guilt over aggressive impulses and desire for reparation."
+            },
+            {
+                q: "According to psychodynamic theory, symptoms represent:",
+                options: ["Random biological events","Compromises between conflicting unconscious wishes","Learned behaviors only","Cognitive errors"],
+                correct: 1,
+                explanation: "Symptoms are viewed as compromise formations expressing unconscious conflicts while simultaneously defending against their full awareness."
+            }
+        ];
+
+        let current = 0;
+        let answers = new Array(40).fill(null);
+        let showingResults = false;
+
+        function loadQuestion() {
+            const q = questions[current];
+            let html = `<div class="question-card">
+                <div class="question-number">Question ${current + 1} of 40</div>
+                <div class="question-text">${q.q}</div>
+                <div class="options">`;
+            
+            q.options.forEach((opt, i) => {
+                const selected = answers[current] === i ? 'selected' : '';
+                const correct = showingResults && i === q.correct ? 'correct' : '';
+                const wrong = showingResults && answers[current] === i && i !== q.correct ? 'incorrect' : '';
+                const disabled = showingResults ? 'disabled' : '';
+                html += `<button class="option ${selected} ${correct} ${wrong}" ${disabled} onclick="select(${i})">${opt}</button>`;
+            });
+            
+            html += `</div>`;
+            if (showingResults) {
+                html += `<div class="explanation"><strong>Answer:</strong> ${q.explanation}</div>`;
+            }
+            html += `</div>`;
+            
+            document.getElementById('question-container').innerHTML = html;
+            document.getElementById('progress').style.width = ((current + 1) / 40 * 100) + '%';
+            document.getElementById('prev-btn').disabled = current === 0;
+            document.getElementById('next-btn').classList.toggle('hidden', current === 39);
+            document.getElementById('submit-btn').classList.toggle('hidden', current !== 39);
+        }
+
+        function select(i) {
+            if (showingResults) return;
+            answers[current] = i;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            if (current < 39) {
+                current++;
+                loadQuestion();
+            }
+        }
+
+        function prevQuestion() {
+            if (current > 0) {
+                current--;
+                loadQuestion();
+            }
+        }
+
+        function submitQuiz() {
+            showingResults = true;
+            let score = 0;
+            answers.forEach((a, i) => {
+                if (a === questions[i].correct) score++;
+            });
+            document.getElementById('score').textContent = `Score: ${score}/40 (${Math.round(score/40*100)}%)`;
+            document.getElementById('results').classList.remove('hidden');
+            document.querySelector('.quiz-controls').classList.add('hidden');
+            loadQuestion();
+        }
+
+        function reviewQuiz() {
+            current = 0;
+            loadQuestion();
+            document.getElementById('results').classList.add('hidden');
+            document.querySelector('.quiz-controls').classList.remove('hidden');
+        }
+
+        function restartQuiz() {
+            current = 0;
+            answers = new Array(40).fill(null);
+            showingResults = false;
+            document.getElementById('results').classList.add('hidden');
+            document.querySelector('.quiz-controls').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>

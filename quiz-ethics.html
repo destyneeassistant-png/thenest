@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethics Quiz - The Nest</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">🦉 The Nest</div>
+            <a href="quiz.html" class="btn">← Back to Quizzes</a>
+        </header>
+
+        <main class="main-content">
+            <div class="quiz-container">
+                <div class="quiz-header">
+                    <h1>Professional Ethics</h1>
+                    <p>APA Ethics Code & Professional Practice</p>
+                    <p>40 EPPP-Style Questions</p>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+
+                <div id="question-container"></div>
+
+                <div class="quiz-controls">
+                    <button class="btn" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+                    <button class="btn" id="next-btn" onclick="nextQuestion()">Next</button>
+                    <button class="btn hidden" id="submit-btn" onclick="submitQuiz()">Submit</button>
+                </div>
+
+                <div id="results" class="hidden">
+                    <div class="score-display" id="score"></div>
+                    <button class="btn" onclick="reviewQuiz()">Review</button>
+                    <button class="btn" onclick="restartQuiz()">Restart</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                q: "According to the APA Ethics Code, which of the following is TRUE about the General Principles?",
+                options: ["They are enforceable rules","They are aspirational goals to guide psychologists","They are mandatory standards","They are legal requirements"],
+                correct: 1,
+                explanation: "The Preamble and General Principles (A-E) are aspirational and unenforceable, intended to guide psychologists toward the highest ideals."
+            },
+            {
+                q: "When a psychologist's ethical responsibilities conflict with law, the psychologist should:",
+                options: ["Always follow the law","Always follow the Ethics Code","Make known their commitment to the Ethics Code and attempt to resolve the conflict responsibly","Resign from their position immediately"],
+                correct: 2,
+                explanation: "When ethics and law conflict, psychologists should clarify their commitment to the Ethics Code and take steps to resolve the conflict in a responsible manner consistent with human rights principles."
+            },
+            {
+                q: "The ethical concept of 'Beneficence and Nonmaleficence' requires psychologists to:",
+                options: ["Maximize personal gain","Benefit those they work with and do no harm","Avoid all dual relationships","Maintain complete neutrality"],
+                correct: 1,
+                explanation: "General Principle A emphasizes benefiting those with whom psychologists work and taking care to do no harm."
+            },
+            {
+                q: "Under Standard 3.04 (Avoiding Harm), psychologists must:",
+                options: ["Eliminate all risk to clients","Take reasonable steps to avoid harming clients and minimize foreseeable harm","Only treat clients with simple presentations","Avoid challenging clients"],
+                correct: 1,
+                explanation: "Standard 3.04 requires psychologists to take reasonable steps to avoid harming their clients/patients, students, supervisees, research participants, and others."
+            },
+            {
+                q: "Which of the following BEST represents the ethical concept of 'Fidelity and Responsibility'?",
+                options: ["Maximizing profit","Establishing trust and upholding professional standards","Avoiding all difficult clients","Maintaining strict neutrality"],
+                correct: 1,
+                explanation: "General Principle B emphasizes establishing relationships of trust, upholding professional standards, accepting appropriate responsibility, and managing conflicts of interest."
+            },
+            {
+                q: "A psychologist learns that a colleague has engaged in insurance fraud. According to the Ethics Code, the psychologist should:",
+                options: ["Ignore it to avoid conflict","Report it to the police immediately","Attempt to resolve the issue informally with the colleague if appropriate and possible, considering potential harm","Spread rumors about the colleague"],
+                correct: 2,
+                explanation: "Standard 1.04 encourages informal resolution of ethical concerns when possible and appropriate, while considering potential harm to clients and others."
+            },
+            {
+                q: "The term 'reasonable' in the Ethics Code refers to:",
+                options: ["What the psychologist personally believes","What lawyers recommend","The prevailing professional judgment of psychologists engaged in similar activities","The least expensive option"],
+                correct: 2,
+                explanation: "'Reasonable' means the prevailing professional judgment of psychologists engaged in similar activities in similar circumstances, given the knowledge the psychologist had or should have had."
+            },
+            {
+                q: "According to Standard 2.01 (Boundaries of Competence), psychologists should provide services:",
+                options: ["In all areas of psychology","Only within their areas of competence based on education, training, supervised experience, and consultation","Only if they have a doctoral degree","In any area where they have read books"],
+                correct: 1,
+                explanation: "Standard 2.01 requires psychologists to provide services only within the boundaries of their competence based on education, training, supervised experience, consultation, study, or professional experience."
+            },
+            {
+                q: "Which of the following is TRUE regarding multiple relationships according to the Ethics Code?",
+                options: ["All multiple relationships are prohibited","Multiple relationships are encouraged","Multiple relationships that could reasonably be expected to impair objectivity or cause exploitation/harm are prohibited","Multiple relationships are only problematic if sexual"],
+                correct: 2,
+                explanation: "Standard 3.05 prohibits multiple relationships if they could reasonably be expected to impair the psychologist's objectivity, competence, or effectiveness, or risk exploitation or harm."
+            },
+            {
+                q: "When considering whether a multiple relationship is acceptable, psychologists should consider all EXCEPT:",
+                options: ["Power differential","Duration of relationship","Potential for impairment","Client's income level"],
+                correct: 3,
+                explanation: "Factors to consider include power differential, duration of relationships, and potential for impairment—not the client's income level."
+            },
+            {
+                q: "For consent to be truly 'informed,' all of the following conditions must be met EXCEPT:",
+                options: ["Capacity to consent","Comprehension of information","Voluntariness","Client's agreement with the treatment plan"],
+                correct: 3,
+                explanation: "Informed consent requires capacity, comprehension, and voluntariness—not agreement with or acceptance of the treatment plan."
+            },
+            {
+                q: "According to General Principle C (Integrity), psychologists should:",
+                options: ["Always tell clients what they want to hear","Promote accuracy, honesty, and truthfulness in science, teaching, and practice","Avoid all deception in research","Never make mistakes"],
+                correct: 1,
+                explanation: "General Principle C emphasizes promoting accuracy, honesty, and truthfulness, while recognizing that deception may be ethically justifiable in research under specific circumstances."
+            },
+            {
+                q: "Under Standard 4.01 (Maintaining Confidentiality), psychologists have a primary obligation to:",
+                options: ["Protect confidential information","Share information with family members","Report all information to insurance companies","Disclose information when convenient"],
+                correct: 0,
+                explanation: "Standard 4.01 establishes the primary obligation to protect confidential information obtained through or stored in any medium."
+            },
+            {
+                q: "Which General Principle emphasizes that 'fairness and justice entitle all persons to access to and benefit from the contributions of psychology'?",
+                options: ["Beneficence and Nonmaleficence","Fidelity and Responsibility","Integrity","Justice"],
+                correct: 3,
+                explanation: "General Principle D (Justice) specifically addresses fairness and justice in access to psychological services and benefits."
+            },
+            {
+                q: "According to General Principle E (Respect for People's Rights and Dignity), psychologists should respect:",
+                options: ["Only their own values","Only Western cultural values","The dignity and worth of all people and their rights to privacy, confidentiality, and self-determination","Only clients who agree with them"],
+                correct: 2,
+                explanation: "General Principle E emphasizes respecting the dignity and worth of all people and their rights to privacy, confidentiality, and self-determination."
+            },
+            {
+                q: "A psychologist wishes to change specialties from school psychology to clinical psychology. According to Standard 2.01, they must:",
+                options: ["Obtain a second doctoral degree","Complete the education, training, and supervised experience necessary for competence in the new specialty","Simply declare their new specialty","Only read about the new specialty"],
+                correct: 1,
+                explanation: "Changing specialties requires obtaining the necessary education, training, supervised experience, consultation, or study to establish competence in the new area."
+            },
+            {
+                q: "Under Standard 10.01 (Informed Consent to Therapy), psychologists must inform clients about all EXCEPT:",
+                options: ["The nature of anticipated services","The limits of confidentiality","The therapist's personal religious beliefs","Fees and billing arrangements"],
+                correct: 2,
+                explanation: "Required information includes the nature of services, limits of confidentiality, and fees—personal religious beliefs are not required disclosure unless relevant to treatment."
+            },
+            {
+                q: "A psychologist receives a subpoena for a client's records. The client has not consented to release. The psychologist should:",
+                options: ["Immediately release all records","Ignore the subpoena","Consult with an attorney and assert privilege if appropriate while protecting client confidentiality","Delete the records"],
+                correct: 2,
+                explanation: "Psychologists should obtain legal consultation and assert psychotherapist-client privilege where applicable to protect confidential information."
+            },
+            {
+                q: "According to Standard 3.08 (Exploitative Relationships), psychologists should NOT:",
+                options: ["Provide services to clients","Exploit persons over whom they have supervisory, evaluative, or other authority such as students and supervisees","Accept fees for services","Document their work"],
+                correct: 1,
+                explanation: "Standard 3.08 explicitly prohibits exploiting persons over whom psychologists have supervisory, evaluative, or other authority."
+            },
+            {
+                q: "The purpose of the Ethics Code is primarily to:",
+                options: ["Protect psychologists from lawsuits","Ensure the welfare and protection of individuals and groups with whom psychologists work","Maximize profits for psychologists","Satisfy regulatory boards"],
+                correct: 1,
+                explanation: "The Preamble states the primary goal is ensuring 'the welfare and protection of the individual and groups with whom psychologists work.'"
+            },
+            {
+                q: "According to Standard 1.03 (Professional and Scientific Responsibilities), if laws or regulations conflict with ethical conduct, psychologists:",
+                options: ["Must always follow the law","Clarify the nature of the conflict and make known their commitment to the Ethics Code","Ignore the conflict","Immediately leave their position"],
+                correct: 1,
+                explanation: "Standard 1.03 requires clarifying the conflict and making known commitment to the Ethics Code, then taking steps to resolve it responsibly."
+            },
+            {
+                q: "A psychologist becomes aware that a colleague has been sexually involved with a client. This represents:",
+                options: ["A minor ethical concern","Sexual misconduct and substantial harm requiring action","A private matter","Only problematic if the client complains"],
+                correct: 1,
+                explanation: "Sexual involvement with clients represents sexual misconduct, substantial harm, and a serious ethical violation requiring appropriate action."
+            },
+            {
+                q: "Under Standard 5.04 (Maintenance of Records), psychologists must:",
+                options: ["Maintain records for at least 7 years","Create and maintain records that are sufficient to support conclusions and professional actions","Only keep billing records","Destroy records immediately after termination"],
+                correct: 1,
+                explanation: "Standard 5.04 requires creating and maintaining records that document professional and scientific work sufficient to support conclusions and enable replication."
+            },
+            {
+                q: "Which of the following is TRUE about pro bono services according to the Ethics Code?",
+                options: ["They are required for all psychologists","They are recommended but not required","They are prohibited","They must comprise 20% of practice"],
+                correct: 1,
+                explanation: "While psychologists are encouraged to provide some portion of their professional time for little or no compensation (General Principle B), pro bono services are not mandated."
+            },
+            {
+                q: "A psychologist is asked to provide a psychological evaluation of a client they have never met for a custody case. According to Standard 9.01 (Bases for Assessments), they should:",
+                options: ["Complete the evaluation based on file review alone","Provide opinions based on secondhand information","Limit opinions to what the data support and acknowledge any limitations","Make definitive conclusions based on limited data"],
+                correct: 2,
+                explanation: "Standard 9.01 requires basing opinions on sufficient data and acknowledging any limitations in the data or conclusions."
+            },
+            {
+                q: "Standard 4.04 (Minimizing Intrusions on Privacy) states that psychologists should:",
+                options: ["Share all client information with the treatment team","Include only information germane to the purpose in written or oral reports","Avoid all record keeping","Tell clients they have no privacy"],
+                correct: 1,
+                explanation: "Standard 4.04 requires including in written and oral reports only information germane to the purpose for which the communication is made."
+            },
+            {
+                q: "According to Standard 10.10 (Terminating Therapy), psychologists should terminate therapy when:",
+                options: ["The client disagrees with them","It becomes reasonably clear that the client no longer needs the service, is not likely to benefit, or is being harmed by continued service","They want to take a vacation","A better-paying client becomes available"],
+                correct: 1,
+                explanation: "Standard 10.10 requires termination when it's reasonably clear the client doesn't need services, is not benefiting, or is being harmed by continued treatment."
+            },
+            {
+                q: "Under Standard 6.01 (Documentation of Professional and Scientific Work), psychologists must document:",
+                options: ["Only their billing","Only successful interventions","Professional and scientific work to facilitate provision of services later","Nothing, to protect privacy"],
+                correct: 2,
+                explanation: "Standard 6.01 requires documenting professional and scientific work to facilitate provision of services by them or other professionals."
+            },
+            {
+                q: "A psychologist's use of 'modifiers' in the Ethics Code (such as 'reasonably,' 'appropriate,' 'potentially') serves to:",
+                options: ["Allow psychologists to ignore standards","Permit professional judgment and ensure applicability across diverse activities","Make the Code more confusing","Provide loopholes for unethical conduct"],
+                correct: 1,
+                explanation: "Modifiers allow professional judgment, eliminate injustice without context, ensure applicability across activities, and prevent rigid, outdated rules."
+            },
+            {
+                q: "According to Standard 7.06 (Assisting Students and Supervisees in Obtaining Assistance), when personal problems might prevent students/supervisees from performing professionally, psychologists should:",
+                options: ["Ignore the problem","Immediately expel them from the program","Assist them in obtaining professional assistance and consider modifications that allow continued participation","Tell them to handle it themselves"],
+                correct: 2,
+                explanation: "Standard 7.06 requires assisting in obtaining professional help and considering program modifications that allow continued participation when appropriate."
+            },
+            {
+                q: "A psychologist receives a request for records from a client's attorney. The client has not signed a release. The psychologist should:",
+                options: ["Release the records immediately","Release only billing information","Not release records without client authorization unless required by law","Release only what the attorney requests"],
+                correct: 2,
+                explanation: "Confidential records should not be released without client authorization unless required by law or court order."
+            },
+            {
+                q: "Standard 3.11 (Sexual Harassment) prohibits psychologists from:",
+                options: ["Treating clients of any gender","Engaging in sexual harassment","Providing couples therapy","Working with minors"],
+                correct: 1,
+                explanation: "Standard 3.11 prohibits sexual harassment, including sexual solicitation, physical advances, or verbal/nonverbal conduct that is sexual in nature."
+            },
+            {
+                q: "According to Standard 9.07 (Assessment by Unqualified Persons), psychologists who use interpreters must:",
+                options: ["Avoid using interpreters","Use family members as interpreters to save money","Ensure the interpreter's presence does not compromise test validity or create threats to validity","Only use interpreters who are licensed psychologists"],
+                correct: 2,
+                explanation: "When interpreters are used, psychologists must ensure their presence doesn't compromise validity or create threats to validity, and consider issues such as test bias."
+            },
+            {
+                q: "Under Standard 10.05 (Sexual Intimacies with Current Therapy Clients/Patients), sexual intimacies with current clients are:",
+                options: ["Permitted with consent","Prohibited","Permitted after 6 months","Only prohibited if the client is a minor"],
+                correct: 1,
+                explanation: "Standard 10.05 prohibits psychologists from engaging in sexual intimacies with current therapy clients/patients."
+            },
+            {
+                q: "A psychologist wants to conduct research with vulnerable populations. According to Standard 8.02 (Informed Consent to Research), they must:",
+                options: ["Avoid research with vulnerable populations","Provide appropriate additional safeguards to protect the rights and welfare of vulnerable persons","Only obtain verbal consent","Not document consent"],
+                correct: 1,
+                explanation: "When research involves vulnerable populations, psychologists must provide appropriate additional safeguards to protect their rights and welfare."
+            },
+            {
+                q: "Standard 1.06 (Cooperation with Ethics Committees) requires psychologists to:",
+                options: ["Cooperate with APA ethics investigations and failure to do so is itself an ethical violation","Avoid ethics committees","Only cooperate if they agree with the complaint","Cooperate only if legally required"],
+                correct: 0,
+                explanation: "Standard 1.06 mandates cooperation with ethics committees, and failure to cooperate is itself an ethical violation."
+            },
+            {
+                q: "According to Standard 4.02 (Discussing the Limits of Confidentiality), psychologists should discuss:",
+                options: ["Only the benefits of therapy","The limits of confidentiality with clients at the outset of services","Nothing, to avoid frightening clients","Only financial arrangements"],
+                correct: 1,
+                explanation: "Standard 4.02 requires discussing the limits of confidentiality with clients at the outset of services and as new circumstances warrant."
+            },
+            {
+                q: "A psychologist discovers a significant error in a published article they wrote. According to Standard 8.10 (Reporting Research Results), they should:",
+                options: ["Ignore it and hope no one notices","Take reasonable steps to correct the error","Retract the entire article regardless of the error's significance","Blame co-authors"],
+                correct: 1,
+                explanation: "If psychologists discover significant errors in their published data, they take reasonable steps to correct such errors through publication, erratum, or other appropriate means."
+            },
+            {
+                q: "Under Standard 10.06 (Sexual Intimacies with Relatives or Significant Others of Current Therapy Clients), sexual intimacies with the relatives or significant others of current clients are:",
+                options: ["Always permitted","Prohibited for 2 years after termination","Prohibited","Only prohibited if harmful"],
+                correct: 2,
+                explanation: "Standard 10.06 prohibits sexual intimacies with individuals the psychologist knows to be close relatives, guardians, or significant others of current clients."
+            },
+            {
+                q: "The Ethics Code applies to psychologists' activities that are:",
+                options: ["Part of their scientific, educational, or professional roles","Only clinical practice","Only when paid","Only in private practice"],
+                correct: 0,
+                explanation: "The Ethics Code applies to psychologists' activities that are part of their scientific, educational, or professional roles as psychologists."
+            }
+        ];
+
+        let current = 0;
+        let answers = new Array(40).fill(null);
+        let showingResults = false;
+
+        function loadQuestion() {
+            const q = questions[current];
+            let html = `<div class="question-card">
+                <div class="question-number">Question ${current + 1} of 40</div>
+                <div class="question-text">${q.q}</div>
+                <div class="options">`;
+            
+            q.options.forEach((opt, i) => {
+                const selected = answers[current] === i ? 'selected' : '';
+                const correct = showingResults && i === q.correct ? 'correct' : '';
+                const wrong = showingResults && answers[current] === i && i !== q.correct ? 'incorrect' : '';
+                const disabled = showingResults ? 'disabled' : '';
+                html += `<button class="option ${selected} ${correct} ${wrong}" ${disabled} onclick="select(${i})">${opt}</button>`;
+            });
+            
+            html += `</div>`;
+            if (showingResults) {
+                html += `<div class="explanation"><strong>Answer:</strong> ${q.explanation}</div>`;
+            }
+            html += `</div>`;
+            
+            document.getElementById('question-container').innerHTML = html;
+            document.getElementById('progress').style.width = ((current + 1) / 40 * 100) + '%';
+            document.getElementById('prev-btn').disabled = current === 0;
+            document.getElementById('next-btn').classList.toggle('hidden', current === 39);
+            document.getElementById('submit-btn').classList.toggle('hidden', current !== 39);
+        }
+
+        function select(i) {
+            if (showingResults) return;
+            answers[current] = i;
+            loadQuestion();
+        }
+
+        function nextQuestion() {
+            if (current < 39) {
+                current++;
+                loadQuestion();
+            }
+        }
+
+        function prevQuestion() {
+            if (current > 0) {
+                current--;
+                loadQuestion();
+            }
+        }
+
+        function submitQuiz() {
+            showingResults = true;
+            let score = 0;
+            answers.forEach((a, i) => {
+                if (a === questions[i].correct) score++;
+            });
+            document.getElementById('score').textContent = `Score: ${score}/40 (${Math.round(score/40*100)}%)`;
+            document.getElementById('results').classList.remove('hidden');
+            document.querySelector('.quiz-controls').classList.add('hidden');
+            loadQuestion();
+        }
+
+        function reviewQuiz() {
+            current = 0;
+            loadQuestion();
+            document.getElementById('results').classList.add('hidden');
+            document.querySelector('.quiz-controls').classList.remove('hidden');
+        }
+
+        function restartQuiz() {
+            current = 0;
+            answers = new Array(40).fill(null);
+            showingResults = false;
+            document.getElementById('results').classList.add('hidden');
+            document.querySelector('.quiz-controls').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
