@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intellectual Disability & Communication Disorders - EPPP Quiz</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d1b4e 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        .quiz-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(155, 89, 182, 0.5);
+        }
+        .header h1 { color: #9b59b6; font-size: 1.8em; margin-bottom: 10px; }
+        .header p { color: #888; font-size: 0.95em; }
+        .progress-bar { width: 100%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; margin: 20px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #9b59b6, #8e44ad); transition: width 0.3s ease; }
+        .question-counter { text-align: center; color: #9b59b6; font-weight: bold; margin-bottom: 20px; }
+        .question-box { background: rgba(255,255,255,0.08); padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 4px solid #9b59b6; }
+        .question-text { font-size: 1.15em; line-height: 1.6; color: #f0f0f0; margin-bottom: 15px; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); padding: 15px 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; }
+        .option:hover { background: rgba(155, 89, 182, 0.15); border-color: #9b59b6; }
+        .option.selected { background: rgba(155, 89, 182, 0.25); border-color: #9b59b6; }
+        .option.correct { background: rgba(46, 204, 113, 0.3); border-color: #2ecc71; }
+        .option.wrong { background: rgba(231, 76, 60, 0.3); border-color: #e74c3c; }
+        .option-letter { font-weight: bold; color: #9b59b6; margin-right: 12px; min-width: 25px; }
+        .feedback { margin-top: 20px; padding: 20px; border-radius: 10px; display: none; }
+        .feedback.show { display: block; }
+        .feedback.correct { background: rgba(46, 204, 113, 0.15); border: 1px solid #2ecc71; }
+        .feedback.wrong { background: rgba(231, 76, 60, 0.15); border: 1px solid #e74c3c; }
+        .feedback h3 { margin-bottom: 10px; }
+        .feedback.correct h3 { color: #2ecc71; }
+        .feedback.wrong h3 { color: #e74c3c; }
+        .btn-container { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
+        .btn { padding: 12px 30px; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(155, 89, 182, 0.4); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.15); }
+        .results { text-align: center; padding: 40px; display: none; }
+        .results.show { display: block; }
+        .score-circle { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; font-size: 2.5em; font-weight: bold; background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .score-message { font-size: 1.3em; margin-bottom: 30px; }
+        .review-section { text-align: left; margin-top: 30px; }
+        .review-item { background: rgba(255,255,255,0.05); padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 3px solid; }
+        .review-item.correct { border-color: #2ecc71; }
+        .review-item.wrong { border-color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div style="text-align: left; margin-bottom: 15px;">
+            <a href="quiz.html" style="color: #9b59b6; text-decoration: none; font-weight: bold;">← Back to Quizzes</a>
+        </div>
+        <div class="header">
+            <h1>🧩 Intellectual Disability & Communication Disorders</h1>
+            <p>EPPP Preparation Quiz - 50 Questions</p>
+        </div>
+        <div id="quiz-content">
+            <div class="progress-bar"><div class="progress-fill" id="progress-bar" style="width: 0%"></div></div>
+            <div class="question-counter" id="question-counter">Question 1 of 40</div>
+            <div class="question-box" id="question-box">
+                <div class="question-text" id="question-text"></div>
+                <div class="options" id="options"></div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+            <div class="btn-container">
+                <button class="btn btn-secondary" id="prev-btn" onclick="prevQuestion()">Previous</button>
+                <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()">Submit Answer</button>
+                <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none">Next</button>
+            </div>
+        </div>
+        <div class="results" id="results">
+            <div class="score-circle" id="score-circle">0%</div>
+            <div class="score-message" id="score-message"></div>
+            <div class="btn-container">
+                <button class="btn btn-primary" onclick="restartQuiz()">Restart Quiz</button>
+                <button class="btn btn-secondary" onclick="reviewAnswers()">Review Answers</button>
+            </div>
+            <div class="review-section" id="review-section"></div>
+        </div>
+    </div>
+
+<script>
+const quizData = [
+{q:"A 10-year-old child has an IQ score of 55 and significant deficits in adaptive functioning including self-care, social skills, and academic performance. The onset was noted during the preschool years. What is the MOST appropriate diagnosis?",o:["Intellectual Disability, Moderate Severity","Intellectual Disability, Mild Severity","Global Developmental Delay","Learning Disorder"],a:0,e:"An IQ between 35-55 (with some flexibility) corresponds to Moderate Intellectual Disability. The severity level is determined by both IQ and adaptive functioning deficits across conceptual, social, and practical domains."},
+{q:"A 6-year-old boy began stuttering at age 4. His speech is characterized by sound repetitions, prolongations, and blocks. He avoids speaking in class due to embarrassment. According to DSM-5, what is the MOST likely diagnosis?",o:["Childhood-Onset Fluency Disorder (Stuttering)","Social Anxiety Disorder","Speech Sound Disorder","Unspecified Communication Disorder"],a:0,e:"Childhood-Onset Fluency Disorder (Stuttering) is characterized by disturbances in normal fluency and time patterning of speech, including sound repetitions, prolongations, and blocks. Onset is typically between 2-7 years."},
+{q:"Which of the following is NOT one of the three diagnostic criteria required for Intellectual Disability?",o:["Genetic or chromosomal abnormality","Deficits in intellectual functions","Deficits in adaptive functioning","Onset during the developmental period"],a:0,e:"While genetic factors may cause IDD, they are not a diagnostic criterion. The three required criteria are: (1) deficits in intellectual functions, (2) deficits in adaptive functioning, and (3) onset during the developmental period."},
+{q:"A child with Intellectual Disability has an IQ of 45 and can perform simple daily routines but requires significant support for complex tasks. Which severity level BEST describes this presentation?",o:["Moderate","Mild","Severe","Profound"],a:0,e:"Moderate Intellectual Disability typically presents with IQ scores between 35-55 (with flexibility). Individuals can learn simple routines but need significant support for complex daily living skills and social judgment."},
+{q:"According to research on etiology of Intellectual Disability, approximately what percentage of cases are attributed to chromosomal abnormalities and prenatal toxins?",o:["30%","5%","10%","50%"],a:0,e:"Approximately 30% of intellectual disability cases are attributed to chromosomal abnormalities and prenatal toxins. Other causes include heredity (5%), pregnancy/perinatal problems (10%), acquired medical conditions (5%), environmental factors (15-20%), and unknown causes (30%)."},
+{q:"A 5-year-old child shows sound and syllable repetitions, sound prolongations, and broken words. These symptoms have persisted for 8 months and cause anxiety about speaking. The MOST appropriate diagnosis is:",o:["Childhood-Onset Fluency Disorder (Stuttering)","Normal dysfluency","Speech Sound Disorder","Social Communication Disorder"],a:0,e:"Childhood-Onset Fluency Disorder requires disturbances in normal fluency that are inappropriate for the individual's age, interfere with academic/occupational achievement or social communication, and are not attributable to speech-motor or sensory deficit."},
+{q:"Which severity level of Intellectual Disability is characterized by an IQ range of approximately 20-40 (with flexibility) and the need for pervasive support across all domains?",o:["Severe","Mild","Moderate","Profound"],a:0,e:"Severe Intellectual Disability (IQ 20-40 with flexibility) requires pervasive support. Individuals may learn simple speech, basic self-care, and routines with extensive support, but independent living is not achieved."},
+{q:"A child with Intellectual Disability can acquire academic skills up to approximately the 6th grade level, functions relatively independently in daily life with some support, and shows social immaturity. Which severity level is this?",o:["Mild","Moderate","Severe","Profound"],a:0,e:"Mild Intellectual Disability (IQ 55-70 with flexibility) is characterized by academic skills up to elementary grades, ability to achieve social and vocational skills adequate for minimum self-support with appropriate support."},
+{q:"The prognosis for Childhood-Onset Fluency Disorder (Stuttering) indicates that approximately what percentage of children recover spontaneously or with treatment?",o:["65-85%","25-35%","90-95%","Less than 50%"],a:0,e:"Research indicates that 65-85% of children who stutter recover either spontaneously or with treatment. Early intervention and treatment focusing on reducing stress and habit rehearsal can improve outcomes."},
+{q:"A child with an IQ below 20 requires pervasive support for all activities of daily living, has minimal speech ability, and shows significant motor impairment. Which severity level of Intellectual Disability is this?",o:["Profound","Mild","Moderate","Severe"],a:0,e:"Profound Intellectual Disability (IQ below 20-25 with flexibility) requires pervasive support for all activities. Individuals typically have minimal speech, significant motor impairment, and may have associated medical conditions requiring nursing care."},
+{q:"According to DSM-5, what percentage of Intellectual Disability cases are attributed to hereditary factors?",o:["Approximately 5%","Approximately 30%","Approximately 50%","Approximately 75%"],a:0,e:"Approximately 5% of intellectual disability cases are attributed to hereditary factors. The majority of cases have other origins including chromosomal abnormalities, prenatal/perinatal factors, or unknown causes."},
+{q:"A 7-year-old child with previously normal speech development begins to stutter after a traumatic family event. The stuttering includes part-word repetitions and speech blocks. What is the BEST treatment approach?",o:["Reducing stress and anxiety; habit rehearsal therapy","Immediate speech suppression techniques","Medication to reduce anxiety","Avoidance of speaking situations"],a:0,e:"Evidence-based treatment for stuttering includes reducing stress (which can exacerbate symptoms) and habit rehearsal therapy. Creating a relaxed speaking environment and practicing fluent speech patterns are key interventions."},
+{q:"Which of the following is considered a pregnancy/perinatal cause of Intellectual Disability, accounting for approximately 10% of cases?",o:["Fetal alcohol syndrome","Single gene mutations","Traumatic brain injury after birth","Lead poisoning in early childhood"],a:0,e:"Fetal alcohol syndrome and other pregnancy/perinatal factors account for approximately 10% of intellectual disability cases. These include maternal infections, malnutrition, and complications during delivery."},
+{q:"A child shows significant difficulty with language comprehension and expression, affecting both spoken and written communication. The deficits significantly impact academic achievement and social interaction. These symptoms began in early development. The MOST likely diagnosis is:",o:["Language Disorder","Speech Sound Disorder","Childhood-Onset Fluency Disorder","Autism Spectrum Disorder"],a:0,e:"Language Disorder involves persistent difficulties in the acquisition and use of language across modalities (spoken, written, sign) due to deficits in comprehension or production. It is distinct from Speech Sound Disorder (phonological) and requires onset in early developmental period."},
+{q:"Approximately what percentage of Intellectual Disability cases have unknown etiology?",o:["30%","5%","10%","50%"],a:0,e:"Approximately 30% of intellectual disability cases have unknown etiology despite comprehensive evaluation. This highlights the complex, multifactorial nature of intellectual disability development."},
+{q:"A child is diagnosed with Intellectual Disability secondary to Down syndrome. According to DSM-5 specifiers, what additional information should be documented?",o:["Both severity level and etiology (e.g., 'Associated with Down syndrome')","Only the IQ score","Only the severity level","Whether the child is in special education"],a:0,e:"DSM-5 recommends specifying both severity level (mild, moderate, severe, profound) and etiology when known (e.g., associated with a genetic syndrome, medical condition, or environmental factor)."},
+{q:"Which communication disorder is characterized by persistent difficulty with speech sound production that interferes with speech intelligibility or prevents verbal communication?",o:["Speech Sound Disorder","Language Disorder","Childhood-Onset Fluency Disorder","Social (Pragmatic) Communication Disorder"],a:0,e:"Speech Sound Disorder involves difficulty with phonological production of speech sounds. It is distinct from Language Disorder (which involves grammar, vocabulary) and Stuttering (which involves fluency disruptions)."},
+{q:"A child with Intellectual Disability shows onset of symptoms at age 12 following a traumatic brain injury from a car accident. According to DSM-5, can Intellectual Disability be diagnosed?",o:["No, onset must be during the developmental period (before age 18)","Yes, if adaptive functioning deficits are present","Yes, with the specifier 'acquired'","No, this would be Major Neurocognitive Disorder"],a:0,e:"Intellectual Disability requires onset during the developmental period (conception through age 18). Cognitive deficits with onset after age 18 due to injury would be classified as Major or Mild Neurocognitive Disorder."},
+{q:"Environmental deprivation as a cause of Intellectual Disability accounts for approximately what percentage of cases?",o:["15-20%","5%","30%","Less than 5%"],a:0,e:"Environmental factors (including deprivation, neglect, and inadequate stimulation) account for approximately 15-20% of intellectual disability cases. This highlights the importance of early intervention and supportive environments."},
+{q:"A 4-year-old child shows inconsistent use of speech sounds for their age, substituting /w/ for /r/ and /l/. Speech is sometimes difficult to understand. The deficits are not attributable to hearing loss or neurological conditions. What is the MOST likely diagnosis?",o:["Speech Sound Disorder","Normal developmental variation","Childhood Apraxia of Speech","Language Disorder"],a:0,e:"Speech Sound Disorder involves difficulty with phonological production of speech sounds that interferes with intelligibility. Some errors are age-appropriate, but persistent patterns that interfere with communication warrant diagnosis."},
+{q:"Which of the following is TRUE regarding the assessment of Intellectual Disability?",o:["Both IQ testing AND adaptive functioning assessment are required","IQ score alone is sufficient for diagnosis","Adaptive functioning deficits are only considered in severe cases","Clinical judgment should not consider standardized test results"],a:0,e:"DSM-5 requires BOTH deficits in intellectual functions (typically IQ ≤70) AND deficits in adaptive functioning for diagnosis. Neither measure alone is sufficient, and clinical judgment integrating standardized assessment is essential."},
+{q:"A child who stutters shows visible tension and struggle when attempting to speak, and actively avoids speaking situations. According to treatment principles, the FIRST step should be:",o:["Creating a relaxed, accepting communication environment","Immediately correcting the child's speech","Having the child speak more slowly through forced timing","Encouraging the child to 'try harder' to speak fluently"],a:0,e:"Initial treatment for stuttering focuses on reducing communication stress and creating an accepting environment. Pressure to speak fluently often exacerbates symptoms. Therapy includes parent training and fluency-shaping techniques."},
+{q:"Acquired medical conditions causing Intellectual Disability account for approximately what percentage of cases?",o:["5%","30%","50%","15-20%"],a:0,e:"Acquired medical conditions (such as infections, traumatic brain injury, or hypoxia occurring during the developmental period) account for approximately 5% of intellectual disability cases."},
+{q:"A child shows difficulty understanding and using verbal and nonverbal communication for social purposes, including greeting, sharing information, and adjusting communication to match context. Language structure is intact. This presentation is MOST consistent with:",o:["Social (Pragmatic) Communication Disorder","Autism Spectrum Disorder","Language Disorder","Speech Sound Disorder"],a:0,e:"Social (Pragmatic) Communication Disorder involves difficulty with the social use of verbal and nonverbal communication. Unlike Autism Spectrum Disorder, restricted/repetitive behaviors are not present. Language structure is intact, ruling out Language Disorder."},
+{q:"The concept of 'habit rehearsal' in treating Childhood-Onset Fluency Disorder refers to:",o:["Practicing fluent speech patterns through repeated exercises","Suppressing the urge to speak until fluency is achieved","Avoiding situations that trigger stuttering","Using punishment for dysfluent speech"],a:0,e:"Habit rehearsal involves practicing fluent speech patterns through repeated exercises in controlled settings, gradually transferring these skills to natural speaking situations. This behavioral approach builds fluent speech habits."},
+{q:"Which of the following is an early indicator of Intellectual Disability that may be noticed before formal diagnosis?",o:["Delayed developmental milestones","Hyperactivity","Selective eating","Separation anxiety"],a:0,e:"Delayed developmental milestones (sitting, walking, talking, toilet training) are often early indicators of intellectual disability. These delays prompt further evaluation that may lead to diagnosis."},
+{q:"For a diagnosis of Language Disorder, the disturbance must NOT be attributable to:",o:["Hearing or other sensory impairment, motor dysfunction, or another medical condition","Lack of educational opportunity","Bilingual upbringing","Cultural or linguistic diversity"],a:0,e:"Language Disorder cannot be diagnosed if the language difficulties are attributable to hearing impairment, other sensory impairment, motor dysfunction, or another medical or neurological condition. Environmental deprivation must also be ruled out."},
+{q:"A 25-year-old adult with Mild Intellectual Disability lives independently with minimal support, works in a sheltered workshop, and has several friends. What is the MOST likely long-term prognosis with continued support?",o:["Can achieve semi-independent living with ongoing community support","Will require institutional care","Will likely develop dementia by age 40","Will show significant cognitive decline over time"],a:0,e:"Individuals with Mild Intellectual Disability can often achieve semi-independent living with appropriate support services. They may work in competitive or supported employment, maintain relationships, and participate in community life."},
+{q:"Which risk factor is MOST commonly associated with acquired causes of Intellectual Disability during early childhood?",o:["Traumatic brain injury","Genetic mutations","Advanced maternal age","Paternal substance use"],a:0,e:"Traumatic brain injury, infections (meningitis, encephalitis), and seizures are common acquired causes of intellectual disability during childhood. These account for approximately 5% of all IDD cases."},
+{q:"The 'developmental period' for onset of Intellectual Disability is defined as:",o:["Conception through age 18","Birth through age 5","Birth through age 12","Prenatal period only"],a:0,e:"The developmental period is defined as conception through age 18. Onset of intellectual deficits after age 18 would be classified differently (as neurocognitive disorder), even if the cause originated earlier."},
+{q:"In treating Childhood-Onset Fluency Disorder, 'reducing stress' as an intervention principle refers to:",o:["Decreasing communicative and environmental pressure","Eliminating all speaking situations that might cause anxiety","Using medication to reduce anxiety symptoms","Avoiding discussion of the stuttering with the child"],a:0,e:"Reducing stress involves modifying the communication environment to decrease pressure on the child. This includes speaking slowly, allowing time for responses, and not finishing sentences for the child. It does not mean avoiding all challenging situations."},
+{q:"Which of the following intellectual functions is assessed when determining deficits for Intellectual Disability diagnosis?",o:["Reasoning, problem solving, planning, abstract thinking, judgment, academic learning","Only verbal comprehension and expression","Only mathematical calculation ability","Only memory functions"],a:0,e:"Intellectual functions include reasoning, problem solving, planning, abstract thinking, judgment, academic learning, and learning from experience. Comprehensive assessment examines multiple cognitive domains, not just single abilities."},
+{q:"A child who stutters demonstrates the following: whole-word repetitions ('I-I-I want'), interjections ('um, uh'), and revisions. These are classified as:",o:["Secondary (accessory) behaviors","Primary stuttering behaviors","Compensatory strategies","Normal developmental dysfluencies"],a:0,e:"While whole-word repetitions can be primary behaviors, interjections and revisions are often secondary behaviors that develop as the child attempts to manage or conceal stuttering. Primary behaviors include part-word repetitions, prolongations, and blocks."},
+{q:"The three domains of adaptive functioning assessed for Intellectual Disability are:",o:["Conceptual, social, and practical","Academic, occupational, and recreational","Verbal, nonverbal, and motor","Cognitive, emotional, and physical"],a:0,e:"DSM-5 specifies three domains of adaptive functioning: conceptual (language, reading, math, reasoning), social (empathy, interpersonal communication, friendship), and practical (self-care, job responsibilities, money management)."},
+{q:"Which statement about recovery from Childhood-Onset Fluency Disorder is MOST accurate?",o:["Most children recover spontaneously or with treatment by adulthood","Recovery is rare without intensive long-term therapy","Stuttering always worsens during adolescence","Children never recover completely once stuttering begins"],a:0,e:"Research indicates 65-85% of children recover from stuttering, either spontaneously or with treatment. Recovery is more likely with early onset (before age 3.5), female gender, and strong phonological/ language skills."},
+{q:"An 8-year-old with Intellectual Disability shows strengths in visual-motor skills but significant weaknesses in language and abstract reasoning. This uneven profile:",o:["Is common in Intellectual Disability and has implications for intervention","Rules out Intellectual Disability","Indicates a misdiagnosis of Autism Spectrum Disorder","Suggests the diagnosis should be Language Disorder only"],a:0,e:"Uneven cognitive profiles are common in intellectual disability. Identifying relative strengths (such as visual-motor skills) is important for educational planning and vocational guidance."},
+{q:"Which of the following is NOT a typical primary behavior of Childhood-Onset Fluency Disorder?",o:["Whole-word repetitions without tension","Sound repetitions","Sound prolongations","Blocks (inability to produce sounds)"],a:0,e:"Whole-word repetitions without tension are often normal developmental dysfluencies. Primary stuttering behaviors include part-word/sound repetitions, sound prolongations, and blocks with visible tension."},
+{q:"A comprehensive assessment for Intellectual Disability should include all EXCEPT:",o:["Assessment of physical attractiveness","Intellectual assessment (IQ testing)","Adaptive behavior assessment","Medical and genetic evaluation"],a:0,e:"Physical attractiveness is irrelevant to diagnostic assessment. Comprehensive evaluation includes intellectual assessment, adaptive behavior assessment, medical/genetic evaluation, and assessment of co-occurring conditions."},
+{q:"The presence of self-injurious behavior in a child with Intellectual Disability:",o:["May occur and requires behavioral intervention","Rules out Intellectual Disability","Indicates the severity level is always profound","Is best treated with physical restraint"],a:0,e:"Self-injurious behavior can occur at any severity level of intellectual disability and requires behavioral assessment and intervention. It does not indicate severity level or rule out the diagnosis."},
+{q:"For a child with mild articulation difficulties that do not significantly impact communication or academic performance, the MOST appropriate approach is:",o:["Monitoring and parent education","Immediate intensive speech therapy","Pharmacological intervention","Diagnosis of Speech Sound Disorder"],a:0,e:"Mild articulation difficulties that don't significantly impact functioning may be monitored with parent education about facilitating speech development. A diagnosis is only warranted when there is significant interference with communication or academic/vocational achievement."},
+{q:"Motor deficits are associated with Intellectual Disability in what percentage of cases?",o:["Approximately 25-30% of moderate to severe cases","All cases of Intellectual Disability","Only profound cases","Less than 5% of all cases"],a:0,e:"Motor deficits and cerebral palsy occur in approximately 25-30% of individuals with moderate to severe intellectual disability. They are less common in mild cases but can affect individuals at all severity levels."},
+{q:"A child demonstrates persistent echolalia and scripted language in social situations but can produce grammatically complex sentences when discussing preferred topics. This presentation is MOST consistent with:",o:["Language Disorder with associated Autism Spectrum Disorder","Pure Language Disorder","Speech Sound Disorder","Normal language development"],a:0,e:"This pattern suggests social communication deficits characteristic of Autism Spectrum Disorder with accompanying language features. Pure Language Disorder would not show this pattern of context-dependent variability."},
+{q:"The prognosis for individuals with Intellectual Disability who receive early intervention:",o:["Is significantly improved compared to those without intervention","Is unchanged by intervention efforts","Depends solely on the etiology","Is uniformly poor regardless of severity"],a:0,e:"Early intervention significantly improves outcomes for individuals with intellectual disability. Intensive educational, behavioral, and family support can enhance adaptive functioning, independence, and quality of life."}
+];
+
+let currentQuestion = 0, score = 0, answers = [], selectedOption = null, answered = false;
+
+function loadQuestion() {
+    answered = false; selectedOption = null;
+    const q = quizData[currentQuestion];
+    document.getElementById('question-text').textContent = q.q;
+    document.getElementById('question-counter').textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+    document.getElementById('progress-bar').style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+    document.getElementById('feedback').classList.remove('show');
+    document.getElementById('submit-btn').style.display = 'block';
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('submit-btn').disabled = true;
+    const optionsContainer = document.getElementById('options');
+    optionsContainer.innerHTML = '';
+    q.o.forEach((opt, idx) => {
+        const div = document.createElement('div');
+        div.className = 'option';
+        div.innerHTML = `<span class="option-letter">${String.fromCharCode(65 + idx)}.</span> ${opt}`;
+        div.onclick = () => selectOption(idx);
+        optionsContainer.appendChild(div);
+    });
+    document.getElementById('prev-btn').disabled = currentQuestion === 0;
+}
+
+function selectOption(idx) {
+    if (answered) return;
+    selectedOption = idx;
+    document.querySelectorAll('.option').forEach((el, i) => el.classList.toggle('selected', i === idx));
+    document.getElementById('submit-btn').disabled = false;
+}
+
+function submitAnswer() {
+    if (selectedOption === null) return;
+    answered = true;
+    const q = quizData[currentQuestion];
+    const correct = selectedOption === q.a;
+    if (correct) score++;
+    answers[currentQuestion] = { selected: selectedOption, correct: correct };
+    document.querySelectorAll('.option').forEach((el, i) => {
+        el.classList.remove('selected');
+        if (i === q.a) el.classList.add('correct');
+        else if (i === selectedOption && !correct) el.classList.add('wrong');
+    });
+    const feedback = document.getElementById('feedback');
+    feedback.className = 'feedback show ' + (correct ? 'correct' : 'wrong');
+    feedback.innerHTML = `<h3>${correct ? '✓ Correct!' : '✗ Incorrect'}</h3><p>${q.e}</p>`;
+    document.getElementById('submit-btn').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'block';
+    if (currentQuestion === quizData.length - 1) document.getElementById('next-btn').textContent = 'Finish Quiz';
+    localStorage.setItem('iddCommProgress', JSON.stringify({ currentQuestion, answers, score }));
+}
+
+function nextQuestion() {
+    if (currentQuestion < quizData.length - 1) { currentQuestion++; loadQuestion(); }
+    else showResults();
+}
+
+function prevQuestion() {
+    if (currentQuestion > 0) { currentQuestion--; loadQuestion(); }
+}
+
+function showResults() {
+    document.getElementById('quiz-content').style.display = 'none';
+    document.getElementById('results').classList.add('show');
+    const percentage = Math.round((score / quizData.length) * 100);
+    document.getElementById('score-circle').textContent = percentage + '%';
+    let message = percentage >= 80 ? 'Excellent work! You\'re well prepared for the EPPP!' : percentage >= 60 ? 'Good job! Keep studying to improve your score.' : 'Keep practicing! Review the material and try again.';
+    document.getElementById('score-message').textContent = `You scored ${score} out of ${quizData.length}. ${message}`;
+    localStorage.removeItem('iddCommProgress');
+}
+
+function restartQuiz() {
+    currentQuestion = 0; score = 0; answers = [];
+    document.getElementById('quiz-content').style.display = 'block';
+    document.getElementById('results').classList.remove('show');
+    document.getElementById('next-btn').textContent = 'Next';
+    loadQuestion();
+}
+
+function reviewAnswers() {
+    const reviewSection = document.getElementById('review-section');
+    reviewSection.innerHTML = '<h3>Review Your Answers</h3>';
+    quizData.forEach((q, idx) => {
+        const ans = answers[idx];
+        const item = document.createElement('div');
+        item.className = 'review-item ' + (ans && ans.correct ? 'correct' : 'wrong');
+        item.innerHTML = `<strong>Question ${idx + 1}:</strong> ${ans && ans.correct ? '✓' : '✗'}<br>${q.q}<br><em>Correct answer: ${String.fromCharCode(65 + q.a)}. ${q.o[q.a]}</em>`;
+        reviewSection.appendChild(item);
+    });
+}
+
+const saved = localStorage.getItem('iddCommProgress');
+if (saved) {
+    const data = JSON.parse(saved);
+    currentQuestion = data.currentQuestion;
+    answers = data.answers || [];
+    score = data.score || 0;
+}
+loadQuestion();
+</script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSM-5 Overview & Classification - EPPP Quiz</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        .quiz-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(78, 205, 196, 0.5);
+        }
+        .header h1 { color: #4ecdc4; font-size: 1.8em; margin-bottom: 10px; }
+        .header p { color: #888; font-size: 0.95em; }
+        .progress-bar { width: 100%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; margin: 20px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #4ecdc4, #556270); transition: width 0.3s ease; }
+        .question-counter { text-align: center; color: #4ecdc4; font-weight: bold; margin-bottom: 20px; }
+        .question-box { background: rgba(255,255,255,0.08); padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 4px solid #4ecdc4; }
+        .question-text { font-size: 1.15em; line-height: 1.6; color: #f0f0f0; margin-bottom: 15px; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); padding: 15px 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; }
+        .option:hover { background: rgba(78, 205, 196, 0.15); border-color: #4ecdc4; }
+        .option.selected { background: rgba(78, 205, 196, 0.25); border-color: #4ecdc4; }
+        .option.correct { background: rgba(46, 204, 113, 0.3); border-color: #2ecc71; }
+        .option.wrong { background: rgba(231, 76, 60, 0.3); border-color: #e74c3c; }
+        .option-letter { font-weight: bold; color: #4ecdc4; margin-right: 12px; min-width: 25px; }
+        .feedback { margin-top: 20px; padding: 20px; border-radius: 10px; display: none; }
+        .feedback.show { display: block; }
+        .feedback.correct { background: rgba(46, 204, 113, 0.15); border: 1px solid #2ecc71; }
+        .feedback.wrong { background: rgba(231, 76, 60, 0.15); border: 1px solid #e74c3c; }
+        .feedback h3 { margin-bottom: 10px; }
+        .feedback.correct h3 { color: #2ecc71; }
+        .feedback.wrong h3 { color: #e74c3c; }
+        .btn-container { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
+        .btn { padding: 12px 30px; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(135deg, #4ecdc4, #556270); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(78, 205, 196, 0.4); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.15); }
+        .results { text-align: center; padding: 40px; display: none; }
+        .results.show { display: block; }
+        .score-circle { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; font-size: 2.5em; font-weight: bold; background: linear-gradient(135deg, #4ecdc4, #556270); }
+        .score-message { font-size: 1.3em; margin-bottom: 30px; }
+        .review-section { text-align: left; margin-top: 30px; }
+        .review-item { background: rgba(255,255,255,0.05); padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 3px solid; }
+        .review-item.correct { border-color: #2ecc71; }
+        .review-item.wrong { border-color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div style="text-align: left; margin-bottom: 15px;">
+            <a href="quiz.html" style="color: #4ecdc4; text-decoration: none; font-weight: bold;">← Back to Quizzes</a>
+        </div>
+        <div class="header">
+            <h1>🧠 DSM-5 Overview & Classification</h1>
+            <p>EPPP Preparation Quiz - 50 Questions</p>
+        </div>
+        <div id="quiz-content">
+            <div class="progress-bar"><div class="progress-fill" id="progress-bar" style="width: 0%"></div></div>
+            <div class="question-counter" id="question-counter">Question 1 of 40</div>
+            <div class="question-box" id="question-box">
+                <div class="question-text" id="question-text"></div>
+                <div class="options" id="options"></div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+            <div class="btn-container">
+                <button class="btn btn-secondary" id="prev-btn" onclick="prevQuestion()">Previous</button>
+                <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()">Submit Answer</button>
+                <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none">Next</button>
+            </div>
+        </div>
+        <div class="results" id="results">
+            <div class="score-circle" id="score-circle">0%</div>
+            <div class="score-message" id="score-message"></div>
+            <div class="btn-container">
+                <button class="btn btn-primary" onclick="restartQuiz()">Restart Quiz</button>
+                <button class="btn btn-secondary" onclick="reviewAnswers()">Review Answers</button>
+            </div>
+            <div class="review-section" id="review-section"></div>
+        </div>
+    </div>
+
+<script>
+const quizData = [
+{q:"A 45-year-old client presents with symptoms that meet most but not all criteria for Major Depressive Disorder. The symptoms cause significant distress but don't fit the full diagnostic picture. According to DSM-5 classification principles, what is the MOST appropriate diagnosis?",o:["Other Specified Depressive Disorder","Unspecified Depressive Disorder","Adjustment Disorder with Depressed Mood","Persistent Depressive Disorder (Dysthymia)"],a:0,e:"Other Specified Disorder is used when symptoms cause significant distress/impairment but don't meet full criteria for a specific disorder, AND the clinician wishes to specify WHY criteria weren't met. This differs from Unspecified (used when clinician doesn't specify the reason)."},
+{q:"A psychologist is documenting a case where a child shows clear signs of Autism Spectrum Disorder but the full diagnostic assessment cannot be completed due to the family's sudden relocation. Which diagnostic notation should be used?",o:["Autism Spectrum Disorder, Unspecified","Autism Spectrum Disorder, Other Specified","Autism Spectrum Disorder, Provisional","Social (Pragmatic) Communication Disorder"],a:2,e:"A Provisional diagnosis is used when there is a strong presumption that the full criteria will be met, but insufficient information is available to make a firm diagnosis."},
+{q:"The DSM-5, published in 2013, differs from previous editions in its approach to mental disorder classification. Which BEST describes the DSM-5's organizational approach?",o:["Dimensional approach with spectrum-based diagnoses","Purely categorical approach with discrete diagnostic boundaries","Categorical approach with some dimensional elements","Completely atheoretical with no organizational structure"],a:2,e:"While DSM-5 maintains a primarily categorical approach, it incorporates some dimensional elements (e.g., severity specifiers, cross-cutting symptom measures)."},
+{q:"A 28-year-old woman presents with a pattern of unstable relationships, impulsivity, and chronic feelings of emptiness. Her symptoms began in early adulthood and are consistent across multiple contexts. This presentation falls under which major DSM-5 diagnostic category?",o:["Personality Disorders","Bipolar and Related Disorders","Trauma- and Stressor-Related Disorders","Dissociative Disorders"],a:0,e:"The description matches Borderline Personality Disorder. Key differentiators: symptoms are pervasive across contexts, stable over time, and represent personality traits rather than episodic mood episodes."},
+{q:"A psychiatrist notes that a patient's symptoms are consistent with a mood disorder but chooses not to specify which subtype. The clinical picture is unclear. What diagnosis should be recorded?",o:["Other Specified Mood Disorder","Unspecified Mood Disorder","Mood Disorder Due to Another Medical Condition","Substance/Medication-Induced Mood Disorder"],a:1,e:"Unspecified Disorder is used when symptoms cause clinically significant distress but the clinician chooses NOT to specify the reason that criteria are not met, or has insufficient information."},
+{q:"In DSM-5 classification, where would a diagnosis of Gender Dysphoria be located?",o:["Sexual Dysfunctions","Paraphilic Disorders","Its own separate category","Elimination Disorders"],a:2,e:"Gender Dysphoria has its own separate chapter in DSM-5. This represents a significant change from DSM-IV where it was classified under Sexual Disorders."},
+{q:"A clinician is evaluating a child with persistent difficulty falling asleep, staying asleep, and early morning awakenings causing significant daytime impairment. This would be classified under which major DSM-5 category?",o:["Sleep-Wake Disorders","Neurodevelopmental Disorders","Anxiety Disorders","Somatic Symptom and Related Disorders"],a:0,e:"Sleep-Wake Disorders is the appropriate category for primary sleep disturbances including insomnia, hypersomnolence, narcolepsy, and other sleep-related disorders."},
+{q:"The DSM-5 organizational structure places disorders in chapters based on:",o:["Etiological factors and underlying causes","Developmental lifespan considerations and symptom similarity","Treatment response categories","Prevalence rates from epidemiological studies"],a:1,e:"DSM-5 organizes disorders based on developmental/lifespan considerations (starting with neurodevelopmental disorders) and symptom similarity."},
+{q:"A 35-year-old man reports persistent difficulty discarding possessions regardless of their value, resulting in cluttered living spaces. This falls under which diagnostic category?",o:["Obsessive-Compulsive and Related Disorders","Hoarding Disorder, Other Specified","Neurocognitive Disorders","Personality Disorders"],a:0,e:"Hoarding Disorder is classified under Obsessive-Compulsive and Related Disorders in DSM-5. This represents a change from DSM-IV where it was considered a symptom of OCD."},
+{q:"According to DSM-5, when making a provisional diagnosis, the clinician is indicating that:",o:["The diagnosis is suspected but definitive criteria are not yet met","The symptoms are mild and don't meet full severity criteria","The diagnosis is temporary and expected to resolve within 6 months","The patient has both symptoms and full syndrome criteria met"],a:0,e:"A provisional diagnosis indicates strong presumption that full criteria will ultimately be met, but not enough information is currently available to be certain."},
+{q:"A patient presents with involuntary motor movements and vocalizations that began in childhood. These symptoms wax and wane in severity. This presentation is classified in which chapter of DSM-5?",o:["Neurodevelopmental Disorders","Movement Disorders","Neurocognitive Disorders","Tic Disorders, a separate category"],a:0,e:"Tourette's Disorder and other tic disorders are classified under Neurodevelopmental Disorders in DSM-5. This reflects their typical childhood onset and neurodevelopmental nature."},
+{q:"The difference between 'Other Specified' and 'Unspecified' disorders in DSM-5 is primarily:",o:["Whether the clinician documents why criteria weren't met","The severity level of symptoms","The duration of symptom presentation","Whether symptoms cause functional impairment"],a:0,e:"'Other Specified' requires the clinician to specify why full criteria weren't met, while 'Unspecified' means the clinician chooses not to indicate why criteria weren't met."},
+{q:"A 42-year-old woman presents with recurrent episodes of binge eating without compensatory behaviors. She feels distressed about her eating. The appropriate diagnosis would be found in which category?",o:["Feeding and Eating Disorders","Obsessive-Compulsive and Related Disorders","Other Specified Feeding or Eating Disorder","Somatic Symptom and Related Disorders"],a:0,e:"Binge-Eating Disorder is a distinct diagnosis under Feeding and Eating Disorders in DSM-5. This category includes anorexia, bulimia, binge-eating disorder, pica, rumination disorder, and ARFID."},
+{q:"A clinician evaluating a veteran notes symptoms of flashbacks, avoidance, negative mood, and hyperarousal after combat exposure. Which major diagnostic category encompasses these symptoms?",o:["Trauma- and Stressor-Related Disorders","Anxiety Disorders","Dissociative Disorders","Obsessive-Compulsive and Related Disorders"],a:0,e:"PTSD is classified under Trauma- and Stressor-Related Disorders in DSM-5, moved from the Anxiety Disorders category in DSM-IV."},
+{q:"In DSM-5, where would Factitious Disorder be classified?",o:["Somatic Symptom and Related Disorders","Personality Disorders","Dissociative Disorders","Its own separate category"],a:0,e:"Factitious Disorder is classified under Somatic Symptom and Related Disorders in DSM-5, along with somatic symptom disorder, illness anxiety disorder, and conversion disorder."},
+{q:"A 55-year-old man presents with progressive memory impairment, difficulty with complex tasks, and personality changes developing gradually over several years. This would be classified under:",o:["Neurocognitive Disorders","Major Neurocognitive Disorder","Neurodevelopmental Disorders","Personality Disorders"],a:0,e:"Neurocognitive Disorders is the category for acquired (not developmental) cognitive decline, including delirium and major/mild neurocognitive disorders (formerly dementia)."},
+{q:"The DSM-5 chapter on Disruptive, Impulse-Control, and Conduct Disorders includes all EXCEPT:",o:["Autism Spectrum Disorder","Oppositional Defiant Disorder","Conduct Disorder","Intermittent Explosive Disorder"],a:0,e:"Autism Spectrum Disorder is classified under Neurodevelopmental Disorders. The Disruptive, Impulse-Control category includes ODD, Conduct Disorder, IED, Kleptomania, and Pyromania."},
+{q:"A patient presents with episodes of detachment from reality, feeling as if in a dream. These episodes cause significant distress but they know they're not real. This falls under which category?",o:["Dissociative Disorders","Psychotic Disorders","Anxiety Disorders","Neurocognitive Disorders"],a:0,e:"Depersonalization/Derealization Disorder is classified under Dissociative Disorders. The key feature is intact reality testing, differentiating it from psychotic disorders."},
+{q:"According to DSM-5, when should a diagnosis of Unspecified Mental Disorder be used?",o:["When symptoms suggest a mental disorder but don't meet any specific category","When the clinician is too busy to make a specific diagnosis","When symptoms are mild and don't require treatment","When the patient has multiple comorbid conditions"],a:0,e:"Unspecified Mental Disorder is used when symptoms characteristic of a mental disorder cause clinically significant distress but don't meet full criteria for any specific disorder, and the clinician chooses not to specify why."},
+{q:"The DSM-5 category of Substance-Related and Addictive Disorders includes:",o:["Both substance use disorders and gambling disorder","Only alcohol and drug use disorders","Substance use, gambling, and internet gaming disorders","Only substances with physiological dependence potential"],a:0,e:"DSM-5's Substance-Related and Addictive Disorders includes substance use disorders (for 10 classes of substances) and Gambling Disorder. Internet Gaming Disorder is listed in Section III for further study."},
+{q:"A 16-year-old regularly uses marijuana and experiences withdrawal symptoms when stopping. He continues use despite failing grades and legal problems. Which diagnostic category applies?",o:["Substance-Related and Addictive Disorders","Disruptive, Impulse-Control, and Conduct Disorders","Neurodevelopmental Disorders","Personality Disorders"],a:0,e:"This describes Cannabis Use Disorder, classified under Substance-Related and Addictive Disorders."},
+{q:"In DSM-5, Paraphilic Disorders are distinguished from paraphilias by which requirement?",o:["The presence of distress or harm to others","The duration of at least 6 months","The need for a formal psychological assessment","The presence of comorbid psychiatric conditions"],a:0,e:"DSM-5 distinguishes paraphilias (atypical sexual interests) from Paraphilic Disorders (requiring distress or harm to others)."},
+{q:"A 6-year-old child presents with persistent bedwetting at night despite being toilet-trained during the day. No medical cause is found. This falls under which diagnostic category?",o:["Elimination Disorders","Neurodevelopmental Disorders","Feeding and Eating Disorders","Sleep-Wake Disorders"],a:0,e:"Enuresis (and encopresis) are classified under Elimination Disorders in DSM-5."},
+{q:"The DSM-5 category of Sexual Dysfunctions includes all EXCEPT:",o:["Gender Dysphoria","Erectile Disorder","Female Orgasmic Disorder","Premature (Early) Ejaculation"],a:0,e:"Gender Dysphoria has its own separate chapter in DSM-5, not under Sexual Dysfunctions."},
+{q:"A clinician is documenting symptoms that clearly represent a mental disorder but wishes to indicate that the presentation is atypical. The term 'atypical' in DSM-5 would most likely be captured through:",o:["The Other Specified designation","Using specifiers and subtypes","Recording comorbid conditions","Chronic vs. episodic course markers"],a:0,e:"Other Specified Disorder allows clinicians to communicate the specific reason criteria weren't met (e.g., 'atypical presentation') while acknowledging the clinical significance."},
+{q:"The Schizophrenia Spectrum and Other Psychotic Disorders category in DSM-5 includes all EXCEPT:",o:["Bipolar I Disorder","Schizophrenia","Delusional Disorder","Schizoaffective Disorder"],a:0,e:"Bipolar I Disorder is classified under Bipolar and Related Disorders, not Schizophrenia Spectrum."},
+{q:"A 30-year-old man presents with excessive anxiety about multiple domains (work, health, family) for over 6 months. He finds it difficult to control the worry. This falls under which category?",o:["Anxiety Disorders","Obsessive-Compulsive and Related Disorders","Trauma- and Stressor-Related Disorders","Somatic Symptom and Related Disorders"],a:0,e:"Generalized Anxiety Disorder falls under Anxiety Disorders in DSM-5."},
+{q:"According to DSM-5 principles, which statement about diagnostic categories is MOST accurate?",o:["Diagnostic boundaries are clearly defined with little overlap","Many disorders share symptoms and may represent overlapping conditions","Categories are mutually exclusive and cannot co-occur","Dimensional assessment has completely replaced categorical diagnosis"],a:1,e:"DSM-5 acknowledges significant symptom overlap between disorders and high rates of comorbidity. The categorical system has limitations."},
+{q:"A child shows persistent pattern of angry/irritable mood, argumentative/defiant behavior, and vindictiveness toward authority figures lasting at least 6 months. This falls under:",o:["Disruptive, Impulse-Control, and Conduct Disorders","Neurodevelopmental Disorders","Bipolar and Related Disorders","Personality Disorders"],a:0,e:"Oppositional Defiant Disorder is classified under Disruptive, Impulse-Control, and Conduct Disorders."},
+{q:"The DSM-5 organizational chapter that includes disorders such as Separation Anxiety Disorder, Selective Mutism, and Specific Phobia is:",o:["Anxiety Disorders","Neurodevelopmental Disorders","Trauma- and Stressor-Related Disorders","Obsessive-Compulsive and Related Disorders"],a:0,e:"These disorders are all classified under Anxiety Disorders in DSM-5."},
+{q:"In DSM-5, the specifier 'in partial remission' indicates that:",o:["Some but not all diagnostic criteria are still met","The disorder is responding to treatment","Symptoms have decreased by at least 50%","The patient is asymptomatic but at risk for relapse"],a:0,e:"'In partial remission' indicates that some but not all diagnostic criteria are still met, or there is a period of spontaneous remission lasting less than the required duration."},
+{q:"A clinician evaluating a patient for depression notes the specifier 'with melancholic features.' This specifier is MOST likely to appear in the context of:",o:["Major Depressive Disorder","Persistent Depressive Disorder","Adjustment Disorder","Other Specified Depressive Disorder"],a:0,e:"Specifiers like 'with melancholic features' are used for Major Depressive Disorder and Bipolar I/II Disorder (depressive episodes)."},
+{q:"The DSM-5 was designed to be compatible with which international classification system?",o:["ICD-10 and ICD-11","DSM-IV-TR only","WHO Mental Health Gap Action Programme","APA Practice Guidelines"],a:0,e:"DSM-5 was designed for compatibility with ICD-10 (and later ICD-11) to facilitate international communication and research."},
+{q:"A patient meets criteria for multiple personality disorders. According to DSM-5, how should this be diagnosed?",o:["Diagnose all that apply; personality disorders can co-occur","Diagnose only the most severe one","Diagnose the one with earliest onset","This is impossible; personality disorders are mutually exclusive"],a:0,e:"DSM-5 explicitly allows for multiple personality disorder diagnoses when criteria are met. High comorbidity among personality disorders is common."},
+{q:"The DSM-5 category of Depressive Disorders includes all EXCEPT:",o:["Bipolar II Disorder","Major Depressive Disorder","Persistent Depressive Disorder","Premenstrual Dysphoric Disorder"],a:0,e:"Bipolar II Disorder is classified under Bipolar and Related Disorders, not Depressive Disorders."},
+{q:"A clinician needs to indicate that a patient's Major Depressive Disorder episode began within 4 weeks postpartum. The appropriate specifier would be:",o:["With peripartum onset","With postnatal features","With onset during pregnancy","With hormonal etiology"],a:0,e:"'With peripartum onset' is the specifier used when a Major Depressive or Manic/Hypomanic episode occurs during pregnancy or within 4 weeks following delivery."},
+{q:"In DSM-5, the distinction between 'early onset' and 'late onset' for personality disorders typically refers to:",o:["Age at which personality disorder traits first become evident","Age at formal diagnosis","Age when symptoms become most severe","Age of first psychiatric hospitalization"],a:0,e:"For personality disorders, age specifiers refer to when the pattern of behavior first becomes evident."},
+{q:"Which of the following is a required element for virtually all DSM-5 diagnoses?",o:["Clinically significant distress or impairment in functioning","Documented family history of mental illness","Exclusion of medical causes through laboratory testing","Symptoms present continuously without remission"],a:0,e:"Nearly all DSM-5 diagnoses require that symptoms cause clinically significant distress or impairment in social, occupational, or other important areas of functioning."},
+{q:"A patient with a known medical condition presents with psychiatric symptoms that are directly caused by that condition. According to DSM-5, these would be coded as:",o:["Mental Disorder Due to Another Medical Condition","Psychological Factors Affecting Other Medical Conditions","Somatic Symptom Disorder","Unspecified Mental Disorder"],a:0,e:"When psychiatric symptoms are the direct physiological consequence of a medical condition, the diagnosis is Mental Disorder Due to Another Medical Condition."},
+{q:"The DSM-5 approach to diagnosing Autism Spectrum Disorder differs from DSM-IV in that DSM-5:",o:["Uses a single umbrella diagnosis rather than separate subtypes","Requires onset after age 3","Excludes individuals with intellectual disability","Requires language delays for all diagnoses"],a:0,e:"DSM-5 consolidated Autistic Disorder, Asperger's Disorder, and PDD-NOS into a single Autism Spectrum Disorder diagnosis with severity specifiers."}
+];
+
+let currentQuestion = 0;
+let score = 0;
+let answers = [];
+let selectedOption = null;
+let answered = false;
+
+function loadQuestion() {
+    answered = false;
+    selectedOption = null;
+    const q = quizData[currentQuestion];
+    document.getElementById('question-text').textContent = q.q;
+    document.getElementById('question-counter').textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+    document.getElementById('progress-bar').style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+    document.getElementById('feedback').classList.remove('show');
+    document.getElementById('submit-btn').style.display = 'block';
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('submit-btn').disabled = true;
+    
+    const optionsContainer = document.getElementById('options');
+    optionsContainer.innerHTML = '';
+    q.o.forEach((opt, idx) => {
+        const div = document.createElement('div');
+        div.className = 'option';
+        div.innerHTML = `<span class="option-letter">${String.fromCharCode(65 + idx)}.</span> ${opt}`;
+        div.onclick = () => selectOption(idx);
+        optionsContainer.appendChild(div);
+    });
+    
+    document.getElementById('prev-btn').disabled = currentQuestion === 0;
+}
+
+function selectOption(idx) {
+    if (answered) return;
+    selectedOption = idx;
+    document.querySelectorAll('.option').forEach((el, i) => {
+        el.classList.toggle('selected', i === idx);
+    });
+    document.getElementById('submit-btn').disabled = false;
+}
+
+function submitAnswer() {
+    if (selectedOption === null) return;
+    answered = true;
+    const q = quizData[currentQuestion];
+    const correct = selectedOption === q.a;
+    if (correct) score++;
+    answers[currentQuestion] = { selected: selectedOption, correct: correct };
+    
+    document.querySelectorAll('.option').forEach((el, i) => {
+        el.classList.remove('selected');
+        if (i === q.a) el.classList.add('correct');
+        else if (i === selectedOption && !correct) el.classList.add('wrong');
+    });
+    
+    const feedback = document.getElementById('feedback');
+    feedback.className = 'feedback show ' + (correct ? 'correct' : 'wrong');
+    feedback.innerHTML = `<h3>${correct ? '✓ Correct!' : '✗ Incorrect'}</h3><p>${q.e}</p>`;
+    
+    document.getElementById('submit-btn').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'block';
+    
+    if (currentQuestion === quizData.length - 1) {
+        document.getElementById('next-btn').textContent = 'Finish Quiz';
+    }
+    
+    localStorage.setItem('dsm5OverviewProgress', JSON.stringify({ currentQuestion, answers, score }));
+}
+
+function nextQuestion() {
+    if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function prevQuestion() {
+    if (currentQuestion > 0) {
+        currentQuestion--;
+        loadQuestion();
+    }
+}
+
+function showResults() {
+    document.getElementById('quiz-content').style.display = 'none';
+    document.getElementById('results').classList.add('show');
+    const percentage = Math.round((score / quizData.length) * 100);
+    document.getElementById('score-circle').textContent = percentage + '%';
+    let message = '';
+    if (percentage >= 80) message = 'Excellent work! You\'re well prepared for the EPPP!';
+    else if (percentage >= 60) message = 'Good job! Keep studying to improve your score.';
+    else message = 'Keep practicing! Review the material and try again.';
+    document.getElementById('score-message').textContent = `You scored ${score} out of ${quizData.length}. ${message}`;
+    localStorage.removeItem('dsm5OverviewProgress');
+}
+
+function restartQuiz() {
+    currentQuestion = 0;
+    score = 0;
+    answers = [];
+    document.getElementById('quiz-content').style.display = 'block';
+    document.getElementById('results').classList.remove('show');
+    document.getElementById('next-btn').textContent = 'Next';
+    loadQuestion();
+}
+
+function reviewAnswers() {
+    const reviewSection = document.getElementById('review-section');
+    reviewSection.innerHTML = '<h3>Review Your Answers</h3>';
+    quizData.forEach((q, idx) => {
+        const ans = answers[idx];
+        const item = document.createElement('div');
+        item.className = 'review-item ' + (ans && ans.correct ? 'correct' : 'wrong');
+        item.innerHTML = `<strong>Question ${idx + 1}:</strong> ${ans && ans.correct ? '✓' : '✗'}<br>${q.q}<br><em>Correct answer: ${String.fromCharCode(65 + q.a)}. ${q.o[q.a]}</em>`;
+        reviewSection.appendChild(item);
+    });
+}
+
+// Load progress on startup
+const saved = localStorage.getItem('dsm5OverviewProgress');
+if (saved) {
+    const data = JSON.parse(saved);
+    currentQuestion = data.currentQuestion;
+    answers = data.answers || [];
+    score = data.score || 0;
+}
+
+loadQuestion();
+</script>
+</body>
+</html>
