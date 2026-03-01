@@ -76,8 +76,8 @@
         </div>
         <div class="header">
             <h1>🧠 Memory & Forgetting</h1>
-            <p>Memory Systems, Forgetting Theories & Amnesia</p>
-            <p>25 EPPP-Style Questions | Easy → Hard</p>
+            <p>Memory Systems, Forgetting Theories & Cognitive Processes</p>
+            <p>25 EPPP-Style Questions | Easy → Medium → Hard</p>
         </div>
         <div id="quiz-content">
             <div class="progress-bar"><div class="progress-fill" id="progress-bar" style="width: 0%"></div></div>
@@ -106,155 +106,158 @@
 
     <script>
         const questions = [
+            // EASY (1-8)
             {
-                q: "A 72-year-old man can remember childhood events vividly but cannot remember what he ate for breakfast. This pattern suggests:",
-                options: ["Anterograde amnesia affecting recent memory consolidation","Retrograde amnesia disrupting all memory formation","Normal aging with equal impairment across all memory types","Procedural memory deficit impacting daily routines"],
-                correct: 0,
-                explanation: "Anterograde amnesia impairs the ability to form new memories after onset, while older memories remain intact. The hippocampus, crucial for consolidating new declarative memories, is often affected in conditions like Alzheimer's disease."
-            },
-            {
-                q: "A student studies for a psychology exam in her quiet bedroom but takes the test in a noisy classroom. According to encoding specificity principle, her recall will likely be:",
-                options: ["Enhanced due to increased arousal from environmental change","Impaired due to mismatch between encoding and retrieval contexts","Unaffected because memory traces are stored independent of context","Improved because varied environments strengthen memory consolidation"],
+                q: "A student repeats a phone number over and over to keep it in mind before dialing. This is an example of:",
+                options: ["Elaborative rehearsal","Maintenance rehearsal","Chunking","Semantic processing"],
                 correct: 1,
-                explanation: "The encoding specificity principle states that memory is enhanced when retrieval context matches encoding context. Godden and Baddeley's (1975) divers study showed better recall when learning and testing environments matched."
+                explanation: "Maintenance rehearsal involves simply repeating information with little or no processing to keep it in short-term memory. This contrasts with elaborative rehearsal, which involves relating new information to existing knowledge."
             },
             {
-                q: "A woman cannot remember the details of a traumatic car accident she experienced three years ago. According to Freud, this exemplifies:",
-                options: ["Retroactive interference from subsequent experiences","Repression as a defense mechanism protecting from anxiety","Decay theory as memories fade over time","Encoding failure due to high stress during the event"],
+                q: "The brief storage of visual stimuli that lasts no more than a few seconds is known as:",
+                options: ["Echoic store","Iconic store","Working memory","Long-term memory"],
                 correct: 1,
-                explanation: "Freud proposed repression as a defense mechanism where threatening memories are pushed into the unconscious. While repression remains controversial, motivated forgetting is recognized as a way people avoid recalling distressing information."
+                explanation: "The iconic store is the sensory memory store for visual stimuli. The echoic store is the sensory store for auditory information. Both provide very brief storage (a few seconds) of sensory stimuli."
             },
             {
-                q: "A 28-year-old patient with Korsakoff's syndrome confabulates when asked about recent events. This occurs because:",
-                options: ["Confabulation replaces genuine memories to protect self-esteem","The patient is deliberately fabricating stories to deceive others","Thiamine deficiency has damaged memory encoding and retrieval processes","Implicit memory remains intact while explicit memory fails completely"],
+                q: "According to the information processing model, short-term memory can hold approximately how many distinct units of information?",
+                options: ["3 to 5 items","5 to 9 items","10 to 12 items","Unlimited capacity"],
+                correct: 1,
+                explanation: "Short-term memory has an average capacity of between 5 and 9 (7±2) distinct units. The ability to hold larger amounts is due to chunking related items together."
+            },
+            {
+                q: "A person vividly remembers exactly where they were and what they were doing when they heard about a major national tragedy. This is an example of:",
+                options: ["Semantic memory","Procedural memory","Flashbulb memory","Prospective memory"],
                 correct: 2,
-                explanation: "Korsakoff's syndrome, caused by thiamine (B1) deficiency often from chronic alcoholism, damages the mammillary bodies, thalamus, and hippocampus. Confabulation reflects the brain's attempt to fill memory gaps with fabricated but plausible content."
+                explanation: "Flashbulb memories are vivid, detailed images of what one was doing at the time a dramatic event occurred. They are stored in episodic (autobiographical) memory."
             },
             {
-                q: "A child learns Spanish, then later learns French. When tested on Spanish vocabulary, she incorrectly responds with French words. This demonstrates:",
-                options: ["Proactive interference from earlier Spanish learning","Retroactive interference from more recent French learning","Output interference during the retrieval process","Decay of the Spanish memory trace over time"],
+                q: "When recalling a grocery list immediately after hearing it, a person remembers the first and last items better than those in the middle. This is called:",
+                options: ["The spacing effect","The serial position effect","Levels of processing effect","The recency principle"],
                 correct: 1,
-                explanation: "Retroactive interference occurs when newly learned information (French) disrupts retrieval of previously learned information (Spanish). This is why sequential learning of similar material often produces confusion between the two."
+                explanation: "The serial position effect occurs when items at the beginning (primacy effect) and end (recency effect) of a list are recalled better than those in the middle."
             },
             {
-                q: "A patient with bilateral medial temporal lobe damage can still learn to solve a mirror-tracing task despite having no conscious memory of previous practice sessions. This demonstrates preserved:",
-                options: ["Explicit/declarative memory through alternative pathways","Implicit/procedural memory independent of conscious awareness","Working memory capacity despite hippocampal damage","Semantic memory despite episodic memory impairment"],
+                q: "A therapist asks a client to remember to take their medication at 8 PM every night. This type of memory is called:",
+                options: ["Retrospective memory","Prospective memory","Implicit memory","Semantic memory"],
                 correct: 1,
-                explanation: "Patient H.M. and similar cases demonstrated that procedural/implicit memory (skills, habits, priming) relies on different neural circuits (basal ganglia, cerebellum, motor cortex) than declarative memory, remaining intact despite medial temporal lobe damage."
+                explanation: "Prospective memory is the capacity to remember to do things in the future. It is a component of long-term memory responsible for remembering future intentions."
             },
             {
-                q: "A witness to a crime initially describes the perpetrator as having a beard. After seeing photos of bearded suspects, she becomes convinced the perpetrator had no beard. This change is best explained by:",
-                options: ["Retrograde amnesia altering original memory traces","The misinformation effect contaminating original memories","Source monitoring error confusing imagined with real events","Proactive interference from subsequent similar experiences"],
+                q: "General knowledge about facts, rules, and concepts that is independent of any personal context is known as:",
+                options: ["Episodic memory","Procedural memory","Semantic memory","Working memory"],
+                correct: 2,
+                explanation: "Semantic memory stores general knowledge, facts, rules, and concepts. It is independent of personal context, unlike episodic memory which stores personally experienced events."
+            },
+            {
+                q: "According to interference theory, when previously learned information makes it harder to learn new material, this is called:",
+                options: ["Retroactive interference","Proactive interference","Cue-dependent forgetting","Trace decay"],
                 correct: 1,
-                explanation: "The misinformation effect (Loftus) demonstrates how post-event information can alter original memories. Suggestive questioning, misleading information, or exposure to related stimuli can change or replace original memory traces."
+                explanation: "Proactive interference occurs when prior (old) learning interferes with the learning or recall of subsequent material. Retroactive interference is when new learning interferes with recall of old material."
             },
+            // MEDIUM (9-17)
             {
-                q: "A man cannot remember anything from his life before age 5. This phenomenon, known as infantile amnesia, is BEST explained by:",
-                options: ["Complete memory loss due to rapid brain development","Immature hippocampus and lack of linguistic encoding systems","Repression of traumatic early childhood experiences","Insufficient rehearsal of early memories causing trace decay"],
+                q: "A student studies for an exam in a quiet library but takes the test in a noisy classroom. According to encoding specificity, their recall will likely be:",
+                options: ["Enhanced due to the change in environment","Impaired due to mismatch between encoding and retrieval contexts","Unaffected because memory traces are context-independent","Improved because multiple contexts strengthen memory"],
                 correct: 1,
-                explanation: "Infantile amnesia results from multiple factors: immature hippocampal and prefrontal structures, lack of language to encode experiences, and underdeveloped sense of self. Research by Bauer and others shows early memories exist but are not accessible to conscious recall."
+                explanation: "Encoding specificity states that recall is better when the cues present at retrieval match those present during encoding. A mismatch between study and test environments impairs recall."
             },
             {
-                q: "During a phone call, a man forgets the phone number he just looked up as soon as he begins dialing. This illustrates the limited capacity of:",
-                options: ["Sensory memory decaying within milliseconds","Short-term/working memory lasting approximately 20-30 seconds","Long-term memory requiring elaborative rehearsal","Implicit memory systems for motor sequences"],
+                q: "A driver can operate a vehicle while holding a conversation because driving has become automatic through repetition. This demonstrates:",
+                options: ["Elaborative rehearsal","Procedural memory for skills and habits","Semantic memory for traffic rules","Working memory capacity"],
                 correct: 1,
-                explanation: "Short-term/working memory has limited capacity (7±2 items) and duration (without rehearsal). Information not rehearsed or encoded into long-term memory decays quickly, which is why phone numbers are forgotten immediately after use."
+                explanation: "Procedural memory stores information about how to do things (learning how) and is used to acquire, retain, and employ perceptual, cognitive, and motor skills and habits."
             },
             {
-                q: "A 65-year-old shows normal performance on recognition memory tests but poor performance on free recall tests. This pattern indicates:",
-                options: ["Anterograde amnesia with preserved implicit memory","Age-related decline in retrieval processes but intact storage","Early Alzheimer's disease affecting only episodic memory","Retrograde amnesia sparing only semantic knowledge"],
+                q: "When asked to recall a word list, a person remembers the first words better than middle words because those items:",
+                options: ["Are still in short-term memory","Have been rehearsed and stored in long-term memory","Were processed at the semantic level","Benefited from maintenance rehearsal only"],
                 correct: 1,
-                explanation: "Normal aging often shows a retrieval deficit pattern: recognition (which provides cues) remains intact while free recall (which requires self-generated retrieval) declines. This suggests memories are stored but retrieval mechanisms are less efficient."
+                explanation: "The primacy effect occurs because words at the beginning of a list have already been rehearsed and transferred to long-term memory, making them more resistant to forgetting."
             },
             {
-                q: "A soldier who experienced combat cannot remember the first two weeks after a nearby explosion. This memory gap represents:",
-                options: ["Anterograde amnesia from hippocampal damage due to blast injury","Retrograde amnesia for events immediately preceding the trauma","Psychogenic dissociative amnesia without biological cause","Post-traumatic stress blocking conscious access to memories"],
+                q: "A student learns material while happy but is tested while anxious. According to state-dependent learning, their recall will likely be:",
+                options: ["Enhanced due to emotional arousal","Impaired due to mismatch between emotional states","Unaffected by emotional states","Improved because varied emotions strengthen encoding"],
                 correct: 1,
-                explanation: "Retrograde amnesia affects memories formed shortly before trauma. The explosion likely caused a concussion/MTBI affecting memory consolidation processes, creating a temporary gap for events that hadn't fully consolidated before injury."
+                explanation: "State-dependent learning shows that recall of information is sometimes better when the learner is in the same emotional state during learning and recall. Mismatched emotional states impair retrieval."
             },
             {
-                q: "A student who crams for an exam remembers the material well immediately but forgets most of it two weeks later. This rapid forgetting follows:",
-                options: ["A linear decay curve with constant forgetting rate","Ebbinghaus's forgetting curve with rapid initial loss then stabilization","A quadratic function peaking at 24 hours post-learning","Trace decay theory predicting complete memory loss after 30 days"],
+                q: "A person trying to remember an actor's name can almost recall it but cannot quite retrieve it. According to cue-dependent forgetting, this 'tip of the tongue' phenomenon results from:",
+                options: ["Trace decay over time","Inadequate retrieval cues","Retroactive interference from similar names","Proactive interference from earlier learning"],
                 correct: 1,
-                explanation: "Ebbinghaus's forgetting curve shows most forgetting occurs within the first 24 hours, then levels off. Cramming produces fragile memories without adequate consolidation; distributed practice creates more durable memory traces."
+                explanation: "Cue-dependent forgetting occurs when cues needed to retrieve information from long-term memory are insufficient or incomplete. The tip of the tongue phenomenon is believed to be due to inadequate retrieval cues."
             },
             {
-                q: "A patient with damage to the cerebellum has difficulty learning new motor skills but can remember factual information normally. This dissociation demonstrates:",
-                options: ["The cerebellum's role in procedural/implicit memory","Hippocampal compensation for cerebellar damage","Selective anterograde amnesia for motor information only","Preserved working memory despite long-term memory deficits"],
-                correct: 0,
-                explanation: "The cerebellum, along with basal ganglia and motor cortex, is essential for procedural memory (skills, habits, conditioning). This is distinct from declarative memory systems mediated by medial temporal lobe structures."
-            },
-            {
-                q: "A woman accurately recalls many events from ages 15-25 but fewer from other life periods. This 'reminiscence bump' is attributed to:",
-                options: ["Neurological pruning eliminating childhood memories","Identity formation and novel experiences during transitional periods","Peak cognitive capacity during early adulthood years","Selective rehearsal of formative memories throughout life"],
-                correct: 1,
-                explanation: "The reminisciscence bump (ages 10-30) reflects the confluence of identity formation, major life transitions, and novel experiences. Events during periods of significant life change are encoded more deeply and rehearsed more frequently."
-            },
-            {
-                q: "A person taking benzodiazepines experiences anterograde amnesia for events occurring after taking the medication. This occurs because benzodiazepines:",
-                options: ["Destroy existing memory traces in the hippocampus","Enhance GABA activity disrupting memory consolidation","Block dopamine receptors preventing reward-based learning","Stimulate acetylcholine causing excessive memory encoding"],
-                correct: 1,
-                explanation: "Benzodiazepines enhance GABAergic inhibition, particularly affecting hippocampal function necessary for transferring information from short-term to long-term memory. This produces temporary anterograde amnesia without affecting existing memories."
-            },
-            {
-                q: "A patient with damage to the left frontal lobe can recall past events but cannot form new future-oriented plans. This suggests:",
-                options: ["Episodic and prospective memory share neural substrates","Frontal damage only affects executive function, not memory","Semantic memory is preserved while episodic memory fails","The patient has developed confabulation to compensate"],
-                correct: 0,
-                explanation: "Prospective memory (remembering to perform future actions) and episodic memory share frontal and medial temporal circuits. Both require self-projection in time—remembering the past and imagining the future rely on similar neural processes."
-            },
-            {
-                q: "A witness identifies a suspect from a lineup where the suspect was the only one matching the perpetrator's description (wearing a red jacket). This identification is questionable due to:",
-                options: ["Retroactive interference from viewing the lineup","The relative judgment process and lack of foils","Proactive interference from initial crime scene memory","Trace decay since the crime occurred"],
-                correct: 1,
-                explanation: "Relative judgment occurs when witnesses select the person who most resembles their memory rather than someone who actually matches it. Poorly constructed lineups without appropriate foils increase false identification rates."
-            },
-            {
-                q: "A man with dissociative fugue suddenly travels to a new city, assumes a new identity, and cannot recall his previous life. His memories remain intact but inaccessible, suggesting:",
-                options: ["Organic hippocampal damage preventing memory retrieval","Motivated forgetting serving psychological protection","Normal forgetting curve affecting autobiographical memories","Retrograde amnesia from traumatic brain injury"],
-                correct: 1,
-                explanation: "Dissociative fugue involves psychogenic (psychological rather than neurological) memory disruption. The memories remain stored but are blocked from consciousness, often triggered by severe stress or trauma as a protective mechanism."
-            },
-            {
-                q: "A patient learns a list of words including 'bed, rest, awake, tired, dream.' Later, she falsely recalls 'sleep' was on the list. This demonstrates:",
-                options: ["Proactive interference from semantic associations","The DRM (Deese-Roediger-McDermott) paradigm showing false memory creation","Retroactive interference from subsequent similar words","Source monitoring error confusing different word lists"],
-                correct: 1,
-                explanation: "The DRM paradigm shows that semantic activation during encoding creates false memories for related but non-presented words. The word 'sleep' was strongly activated by associates, leading to false recognition or recall."
-            },
-            {
-                q: "A woman with early Alzheimer's can remember how to play piano (learned decades ago) but cannot remember meeting her new caregiver 10 minutes ago. This dissociation reflects:",
-                options: ["Greater vulnerability of recent memories in Alzheimer's disease","Relative preservation of remote versus recent episodic memories","Intact procedural memory despite impaired episodic memory","All of the above accurately describe this pattern"],
+                q: "In Baddeley's working memory model, which component directs attention to relevant information and suppresses irrelevant information?",
+                options: ["The phonological loop","The visuo-spatial sketchpad","The episodic buffer","The central executive"],
                 correct: 3,
-                explanation: "Alzheimer's typically affects recent episodic memories first while sparing remote memories and procedural skills. This reflects the temporal gradient of retrograde amnesia and the differential neural substrates of memory types."
+                explanation: "The central executive is described by Baddeley as an attentional control system. It is responsible for directing attention to relevant information, suppressing irrelevant information, and coordinating the three subsystems."
             },
             {
-                q: "A student remembers concepts better when she generates examples herself rather than reading provided examples. This advantage of self-generation illustrates:",
-                options: ["The generation effect enhancing memory through deeper processing","Levels of processing theory requiring semantic encoding","State-dependent learning matching internal states","Elaborative rehearsal creating more memory traces"],
-                correct: 0,
-                explanation: "The generation effect shows that actively producing information (vs. passively reading) creates stronger memory traces. Self-generation requires more cognitive effort and creates distinctive processing that enhances later retrieval."
-            },
-            {
-                q: "A man with hippocampal damage from encephalitis can recall facts about his childhood (semantic memory) but cannot remember specific episodes from that time (episodic memory). This suggests:",
-                options: ["Semantic and episodic memory are completely independent systems","The hippocampus is necessary for episodic but not semantic memory consolidation","Semantic memories become independent of the hippocampus over time","Both B and C accurately describe this dissociation"],
-                correct: 3,
-                explanation: "Tulving's multiple memory systems theory and patient cases show that while episodic memory depends on the hippocampus, semantic memories can become consolidated in neocortical regions and survive hippocampal damage, especially older semantic knowledge."
-            },
-            {
-                q: "During a robbery, a bank teller focuses on the perpetrator's weapon rather than his face. Later, she has poor memory for the robber's appearance. This is an example of:",
-                options: ["Weapon focus effect drawing attention to threat-relevant stimuli","Retrograde amnesia from traumatic stress during the event","Source monitoring error confusing actual and imagined features","Decay of memory trace due to lack of rehearsal"],
-                correct: 0,
-                explanation: "The weapon focus effect demonstrates that threat-relevant stimuli (weapons) capture attention at the expense of peripheral details. Emotional arousal narrows attention focus, reducing encoding of non-threat information like facial features."
-            },
-            {
-                q: "A patient with damage to the anterior thalamic nuclei shows memory impairment despite intact hippocampus. This demonstrates:",
-                options: ["The extended hippocampal system including thalamic connections","That thalamic damage only affects sensory memory","Redundant memory systems allowing compensation","Selective impairment of implicit memory only"],
-                correct: 0,
-                explanation: "The Papez circuit (hippocampus → fornix → mammillary bodies → anterior thalamus → cingulate cortex) forms an extended memory system. Damage to any component disrupts memory consolidation, explaining why thalamic damage produces amnesia."
-            },
-            {
-                q: "A 70-year-old with mild cognitive impairment shows disproportionate impairment in prospective memory (remembering future intentions) compared to retrospective memory. This pattern:",
-                options: ["Is normal for aging and not clinically significant","Suggests possible conversion to Alzheimer's disease","Indicates isolated frontal lobe dysfunction","Reflects depression masquerading as cognitive impairment"],
+                q: "A student relates new psychology concepts to their personal experiences and existing knowledge about human behavior. This strategy represents:",
+                options: ["Maintenance rehearsal","Elaborative rehearsal","The method of loci","State-dependent learning"],
                 correct: 1,
-                explanation: "Prospective memory impairment is often an early indicator of Alzheimer's disease, as it requires intact frontal and medial temporal function. Disproportionate prospective memory deficits may predict conversion from MCI to dementia."
+                explanation: "Elaborative rehearsal involves relating new information to existing information. Information is more likely to be transferred from short-term to long-term memory with elaborative rehearsal than with maintenance rehearsal."
+            },
+            {
+                q: "An eyewitness to a crime remembers seeing a weapon that was never actually present. This distortion is best explained by:",
+                options: ["Trace decay over time","Schema-based construction of memory","Sensory memory failure","Working memory overload"],
+                correct: 1,
+                explanation: "Many distortions in memory result from interpreting information through existing schemas. Constructing memories by combining new information with existing knowledge can cause inaccuracies and systematic biases."
+            },
+            {
+                q: "According to Ebbinghaus's forgetting curve, forgetting of nonsense syllables occurs:",
+                options: ["At a constant rate over time","Most rapidly during the first 4-5 days, then tapers off","Only after 30 days have passed","Primarily due to proactive interference"],
+                correct: 1,
+                explanation: "Ebbinghaus (1885) found that the rote learning of nonsense syllables is followed by a predictable forgetting curve in which most forgetting occurs during the first 4-5 days and then gradually tapers off."
+            },
+            // HARD (18-25)
+            {
+                q: "A 75-year-old man has difficulty remembering to take his medication at specific times but can still recall facts from his childhood and perform routine household tasks. This pattern suggests:",
+                options: ["Primarily episodic memory impairment with preserved semantic and procedural memory","Primarily semantic memory impairment with preserved episodic and procedural memory","Primarily procedural memory impairment with preserved episodic and semantic memory","Equal impairment across all memory systems"],
+                correct: 0,
+                explanation: "Episodic (autobiographical) memory is affected more by normal aging than semantic and procedural memory. Prospective memory (remembering future intentions) is particularly vulnerable in aging."
+            },
+            {
+                q: "A student memorizes a speech by mentally placing each paragraph in a different room of their childhood home. This memory technique is called:",
+                options: ["The keyword method","The method of loci","Elaborative rehearsal","State-dependent learning"],
+                correct: 1,
+                explanation: "The method of loci is a visual mnemonic device involving associating items to be remembered with a series of places already in memory. It is classified as a visual mnemonic strategy."
+            },
+            {
+                q: "During a dichotic listening task, a participant is asked to repeat speech presented to one ear while ignoring the other. According to filter theory, this demonstrates:",
+                options: ["The serial position effect","Selective attention based on physical characteristics","State-dependent learning","The distinction between procedural and declarative memory"],
+                correct: 1,
+                explanation: "Filter theory of selective attention (bottleneck theory) explains how information is transferred from sensory memory to short-term memory based on physical characteristics, as demonstrated by split-span listening tasks."
+            },
+            {
+                q: "A student learns vocabulary words by creating vivid mental images that connect each new word to a familiar English word. This imagery technique is called:",
+                options: ["The method of loci","The keyword method","Elaborative rehearsal","Semantic processing"],
+                correct: 1,
+                explanation: "The keyword method is an imagery technique for paired associate tasks in which two words must be linked. It involves creating a visual association between a familiar word (keyword) and the new word to be learned."
+            },
+            {
+                q: "In the levels of processing model, which level of processing produces the greatest amount of recall?",
+                options: ["Structural (shallow) processing","Phonemic processing","Semantic (deep) processing","Maintenance rehearsal"],
+                correct: 2,
+                explanation: "The levels of processing model distinguishes between structural, phonemic, and semantic levels of processing. The semantic level is the deepest level of processing and produces the greatest amount of recall."
+            },
+            {
+                q: "According to the multi-component model of working memory, which subsystem temporarily integrates auditory, visual, and spatial information into a unified representation?",
+                options: ["The phonological loop","The visuo-spatial sketchpad","The episodic buffer","The central executive"],
+                correct: 2,
+                explanation: "The episodic buffer is a subsystem of working memory that temporarily integrates auditory, visual, and spatial information. It serves as a temporary storage system that combines information from different sources."
+            },
+            {
+                q: "A person who learned to ride a bicycle as a child can still ride decades later despite not having ridden in years. According to trace decay theory, this persistence occurs because:",
+                options: ["Procedural memories do not produce engrams","The engram for well-learned motor skills decays more slowly than other memories","Regular rehearsal has maintained the memory trace","Procedural memories are stored in short-term memory permanently"],
+                correct: 1,
+                explanation: "Trace decay theory proposes that learning produces a physiological change (engram, or memory trace) that decays over time. Well-learned procedural skills may have more robust engrams that resist decay, or the skill may have been overlearned to the point of automaticity."
+            },
+            {
+                q: "According to feature integration theory, when searching for a red circle among blue circles and red squares, initial processing of color and shape occurs in which stage?",
+                options: ["The attentive stage, where features are bound together","The preattentive stage, where features are processed separately","The semantic stage, where meaning is extracted","The encoding stage, where information enters short-term memory"],
+                correct: 1,
+                explanation: "Feature integration theory proposes that initial visual processing involves a preattentive stage where features like color and shape are processed separately and in parallel, followed by an attentive stage where features are bound together into coherent objects."
             }
         ];
 
