@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory & Forgetting Quiz - The Nest</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        .quiz-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 245, 255, 0.5);
+        }
+        .header h1 { color: #00f5ff; font-size: 1.8em; margin-bottom: 10px; }
+        .header p { color: #888; font-size: 0.95em; }
+        .back-link { text-align: left; margin-bottom: 15px; }
+        .back-link a { color: #00f5ff; text-decoration: none; font-weight: bold; }
+        .progress-bar { width: 100%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; margin: 20px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #00f5ff, #ff006e); transition: width 0.3s ease; }
+        .question-counter { text-align: center; color: #00f5ff; font-weight: bold; margin-bottom: 20px; }
+        .question-box { background: rgba(255,255,255,0.08); padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 4px solid #00f5ff; }
+        .question-text { font-size: 1.15em; line-height: 1.6; color: #f0f0f0; margin-bottom: 15px; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { 
+            background: rgba(255,255,255,0.05); 
+            border: 2px solid rgba(255,255,255,0.1); 
+            padding: 15px 20px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            display: flex; 
+            align-items: center;
+            color: #f0f0f0;
+        }
+        .option:hover { background: rgba(0, 245, 255, 0.15); border-color: #00f5ff; }
+        .option.selected { background: rgba(0, 245, 255, 0.25); border-color: #00f5ff; }
+        .option.correct { background: rgba(57, 255, 20, 0.3); border-color: #39ff14; }
+        .option.wrong { background: rgba(255, 0, 110, 0.3); border-color: #ff006e; }
+        .option-letter { font-weight: bold; color: #00f5ff; margin-right: 12px; min-width: 25px; }
+        .feedback { margin-top: 20px; padding: 20px; border-radius: 10px; display: none; color: #f0f0f0; line-height: 1.6; }
+        .feedback.show { display: block; }
+        .feedback.correct { background: rgba(57, 255, 20, 0.15); border: 1px solid #39ff14; }
+        .feedback.wrong { background: rgba(255, 0, 110, 0.15); border: 1px solid #ff006e; }
+        .btn-container { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
+        .btn { padding: 12px 30px; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(135deg, #00f5ff, #ff006e); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0, 245, 255, 0.4); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.2); }
+        .results { text-align: center; padding: 40px; display: none; }
+        .results.show { display: block; }
+        .score-circle { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; font-size: 2.5em; font-weight: bold; color: white; background: linear-gradient(135deg, #00f5ff, #ff006e); }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="back-link">
+            <a href="quiz.html">← Back to Quizzes</a>
+        </div>
+        <div class="header">
+            <h1>🧠 Memory & Forgetting</h1>
+            <p>Memory Systems, Forgetting Theories & Amnesia</p>
+            <p>25 EPPP-Style Questions | Easy → Hard</p>
+        </div>
+        <div id="quiz-content">
+            <div class="progress-bar"><div class="progress-fill" id="progress-bar" style="width: 0%"></div></div>
+            <div class="question-counter" id="question-counter">Question 1 of 25</div>
+            <div class="question-box" id="question-box">
+                <div class="question-text" id="question-text"></div>
+                <div class="options" id="options"></div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+            <div class="btn-container">
+                <button class="btn btn-secondary" id="prev-btn" onclick="prevQuestion()">Previous</button>
+                <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()">Submit Answer</button>
+                <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none">Next</button>
+            </div>
+        </div>
+        <div class="results" id="results">
+            <div class="score-circle" id="score-circle">0%</div>
+            <h2 id="score-message"></h2>
+            <p id="score-details" style="color: #888; margin: 15px 0;"></p>
+            <div class="btn-container">
+                <button class="btn btn-primary" onclick="restartQuiz()">Restart Quiz</button>
+                <a href="quiz.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center;">Back to All Quizzes</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                q: "A 72-year-old man can remember childhood events vividly but cannot remember what he ate for breakfast. This pattern suggests:",
+                options: ["Anterograde amnesia affecting recent memory consolidation","Retrograde amnesia disrupting all memory formation","Normal aging with equal impairment across all memory types","Procedural memory deficit impacting daily routines"],
+                correct: 0,
+                explanation: "Anterograde amnesia impairs the ability to form new memories after onset, while older memories remain intact. The hippocampus, crucial for consolidating new declarative memories, is often affected in conditions like Alzheimer's disease."
+            },
+            {
+                q: "A student studies for a psychology exam in her quiet bedroom but takes the test in a noisy classroom. According to encoding specificity principle, her recall will likely be:",
+                options: ["Enhanced due to increased arousal from environmental change","Impaired due to mismatch between encoding and retrieval contexts","Unaffected because memory traces are stored independent of context","Improved because varied environments strengthen memory consolidation"],
+                correct: 1,
+                explanation: "The encoding specificity principle states that memory is enhanced when retrieval context matches encoding context. Godden and Baddeley's (1975) divers study showed better recall when learning and testing environments matched."
+            },
+            {
+                q: "A woman cannot remember the details of a traumatic car accident she experienced three years ago. According to Freud, this exemplifies:",
+                options: ["Retroactive interference from subsequent experiences","Repression as a defense mechanism protecting from anxiety","Decay theory as memories fade over time","Encoding failure due to high stress during the event"],
+                correct: 1,
+                explanation: "Freud proposed repression as a defense mechanism where threatening memories are pushed into the unconscious. While repression remains controversial, motivated forgetting is recognized as a way people avoid recalling distressing information."
+            },
+            {
+                q: "A 28-year-old patient with Korsakoff's syndrome confabulates when asked about recent events. This occurs because:",
+                options: ["Confabulation replaces genuine memories to protect self-esteem","The patient is deliberately fabricating stories to deceive others","Thiamine deficiency has damaged memory encoding and retrieval processes","Implicit memory remains intact while explicit memory fails completely"],
+                correct: 2,
+                explanation: "Korsakoff's syndrome, caused by thiamine (B1) deficiency often from chronic alcoholism, damages the mammillary bodies, thalamus, and hippocampus. Confabulation reflects the brain's attempt to fill memory gaps with fabricated but plausible content."
+            },
+            {
+                q: "A child learns Spanish, then later learns French. When tested on Spanish vocabulary, she incorrectly responds with French words. This demonstrates:",
+                options: ["Proactive interference from earlier Spanish learning","Retroactive interference from more recent French learning","Output interference during the retrieval process","Decay of the Spanish memory trace over time"],
+                correct: 1,
+                explanation: "Retroactive interference occurs when newly learned information (French) disrupts retrieval of previously learned information (Spanish). This is why sequential learning of similar material often produces confusion between the two."
+            },
+            {
+                q: "A patient with bilateral medial temporal lobe damage can still learn to solve a mirror-tracing task despite having no conscious memory of previous practice sessions. This demonstrates preserved:",
+                options: ["Explicit/declarative memory through alternative pathways","Implicit/procedural memory independent of conscious awareness","Working memory capacity despite hippocampal damage","Semantic memory despite episodic memory impairment"],
+                correct: 1,
+                explanation: "Patient H.M. and similar cases demonstrated that procedural/implicit memory (skills, habits, priming) relies on different neural circuits (basal ganglia, cerebellum, motor cortex) than declarative memory, remaining intact despite medial temporal lobe damage."
+            },
+            {
+                q: "A witness to a crime initially describes the perpetrator as having a beard. After seeing photos of bearded suspects, she becomes convinced the perpetrator had no beard. This change is best explained by:",
+                options: ["Retrograde amnesia altering original memory traces","The misinformation effect contaminating original memories","Source monitoring error confusing imagined with real events","Proactive interference from subsequent similar experiences"],
+                correct: 1,
+                explanation: "The misinformation effect (Loftus) demonstrates how post-event information can alter original memories. Suggestive questioning, misleading information, or exposure to related stimuli can change or replace original memory traces."
+            },
+            {
+                q: "A man cannot remember anything from his life before age 5. This phenomenon, known as infantile amnesia, is BEST explained by:",
+                options: ["Complete memory loss due to rapid brain development","Immature hippocampus and lack of linguistic encoding systems","Repression of traumatic early childhood experiences","Insufficient rehearsal of early memories causing trace decay"],
+                correct: 1,
+                explanation: "Infantile amnesia results from multiple factors: immature hippocampal and prefrontal structures, lack of language to encode experiences, and underdeveloped sense of self. Research by Bauer and others shows early memories exist but are not accessible to conscious recall."
+            },
+            {
+                q: "During a phone call, a man forgets the phone number he just looked up as soon as he begins dialing. This illustrates the limited capacity of:",
+                options: ["Sensory memory decaying within milliseconds","Short-term/working memory lasting approximately 20-30 seconds","Long-term memory requiring elaborative rehearsal","Implicit memory systems for motor sequences"],
+                correct: 1,
+                explanation: "Short-term/working memory has limited capacity (7±2 items) and duration (without rehearsal). Information not rehearsed or encoded into long-term memory decays quickly, which is why phone numbers are forgotten immediately after use."
+            },
+            {
+                q: "A 65-year-old shows normal performance on recognition memory tests but poor performance on free recall tests. This pattern indicates:",
+                options: ["Anterograde amnesia with preserved implicit memory","Age-related decline in retrieval processes but intact storage","Early Alzheimer's disease affecting only episodic memory","Retrograde amnesia sparing only semantic knowledge"],
+                correct: 1,
+                explanation: "Normal aging often shows a retrieval deficit pattern: recognition (which provides cues) remains intact while free recall (which requires self-generated retrieval) declines. This suggests memories are stored but retrieval mechanisms are less efficient."
+            },
+            {
+                q: "A soldier who experienced combat cannot remember the first two weeks after a nearby explosion. This memory gap represents:",
+                options: ["Anterograde amnesia from hippocampal damage due to blast injury","Retrograde amnesia for events immediately preceding the trauma","Psychogenic dissociative amnesia without biological cause","Post-traumatic stress blocking conscious access to memories"],
+                correct: 1,
+                explanation: "Retrograde amnesia affects memories formed shortly before trauma. The explosion likely caused a concussion/MTBI affecting memory consolidation processes, creating a temporary gap for events that hadn't fully consolidated before injury."
+            },
+            {
+                q: "A student who crams for an exam remembers the material well immediately but forgets most of it two weeks later. This rapid forgetting follows:",
+                options: ["A linear decay curve with constant forgetting rate","Ebbinghaus's forgetting curve with rapid initial loss then stabilization","A quadratic function peaking at 24 hours post-learning","Trace decay theory predicting complete memory loss after 30 days"],
+                correct: 1,
+                explanation: "Ebbinghaus's forgetting curve shows most forgetting occurs within the first 24 hours, then levels off. Cramming produces fragile memories without adequate consolidation; distributed practice creates more durable memory traces."
+            },
+            {
+                q: "A patient with damage to the cerebellum has difficulty learning new motor skills but can remember factual information normally. This dissociation demonstrates:",
+                options: ["The cerebellum's role in procedural/implicit memory","Hippocampal compensation for cerebellar damage","Selective anterograde amnesia for motor information only","Preserved working memory despite long-term memory deficits"],
+                correct: 0,
+                explanation: "The cerebellum, along with basal ganglia and motor cortex, is essential for procedural memory (skills, habits, conditioning). This is distinct from declarative memory systems mediated by medial temporal lobe structures."
+            },
+            {
+                q: "A woman accurately recalls many events from ages 15-25 but fewer from other life periods. This 'reminiscence bump' is attributed to:",
+                options: ["Neurological pruning eliminating childhood memories","Identity formation and novel experiences during transitional periods","Peak cognitive capacity during early adulthood years","Selective rehearsal of formative memories throughout life"],
+                correct: 1,
+                explanation: "The reminisciscence bump (ages 10-30) reflects the confluence of identity formation, major life transitions, and novel experiences. Events during periods of significant life change are encoded more deeply and rehearsed more frequently."
+            },
+            {
+                q: "A person taking benzodiazepines experiences anterograde amnesia for events occurring after taking the medication. This occurs because benzodiazepines:",
+                options: ["Destroy existing memory traces in the hippocampus","Enhance GABA activity disrupting memory consolidation","Block dopamine receptors preventing reward-based learning","Stimulate acetylcholine causing excessive memory encoding"],
+                correct: 1,
+                explanation: "Benzodiazepines enhance GABAergic inhibition, particularly affecting hippocampal function necessary for transferring information from short-term to long-term memory. This produces temporary anterograde amnesia without affecting existing memories."
+            },
+            {
+                q: "A patient with damage to the left frontal lobe can recall past events but cannot form new future-oriented plans. This suggests:",
+                options: ["Episodic and prospective memory share neural substrates","Frontal damage only affects executive function, not memory","Semantic memory is preserved while episodic memory fails","The patient has developed confabulation to compensate"],
+                correct: 0,
+                explanation: "Prospective memory (remembering to perform future actions) and episodic memory share frontal and medial temporal circuits. Both require self-projection in time—remembering the past and imagining the future rely on similar neural processes."
+            },
+            {
+                q: "A witness identifies a suspect from a lineup where the suspect was the only one matching the perpetrator's description (wearing a red jacket). This identification is questionable due to:",
+                options: ["Retroactive interference from viewing the lineup","The relative judgment process and lack of foils","Proactive interference from initial crime scene memory","Trace decay since the crime occurred"],
+                correct: 1,
+                explanation: "Relative judgment occurs when witnesses select the person who most resembles their memory rather than someone who actually matches it. Poorly constructed lineups without appropriate foils increase false identification rates."
+            },
+            {
+                q: "A man with dissociative fugue suddenly travels to a new city, assumes a new identity, and cannot recall his previous life. His memories remain intact but inaccessible, suggesting:",
+                options: ["Organic hippocampal damage preventing memory retrieval","Motivated forgetting serving psychological protection","Normal forgetting curve affecting autobiographical memories","Retrograde amnesia from traumatic brain injury"],
+                correct: 1,
+                explanation: "Dissociative fugue involves psychogenic (psychological rather than neurological) memory disruption. The memories remain stored but are blocked from consciousness, often triggered by severe stress or trauma as a protective mechanism."
+            },
+            {
+                q: "A patient learns a list of words including 'bed, rest, awake, tired, dream.' Later, she falsely recalls 'sleep' was on the list. This demonstrates:",
+                options: ["Proactive interference from semantic associations","The DRM (Deese-Roediger-McDermott) paradigm showing false memory creation","Retroactive interference from subsequent similar words","Source monitoring error confusing different word lists"],
+                correct: 1,
+                explanation: "The DRM paradigm shows that semantic activation during encoding creates false memories for related but non-presented words. The word 'sleep' was strongly activated by associates, leading to false recognition or recall."
+            },
+            {
+                q: "A woman with early Alzheimer's can remember how to play piano (learned decades ago) but cannot remember meeting her new caregiver 10 minutes ago. This dissociation reflects:",
+                options: ["Greater vulnerability of recent memories in Alzheimer's disease","Relative preservation of remote versus recent episodic memories","Intact procedural memory despite impaired episodic memory","All of the above accurately describe this pattern"],
+                correct: 3,
+                explanation: "Alzheimer's typically affects recent episodic memories first while sparing remote memories and procedural skills. This reflects the temporal gradient of retrograde amnesia and the differential neural substrates of memory types."
+            },
+            {
+                q: "A student remembers concepts better when she generates examples herself rather than reading provided examples. This advantage of self-generation illustrates:",
+                options: ["The generation effect enhancing memory through deeper processing","Levels of processing theory requiring semantic encoding","State-dependent learning matching internal states","Elaborative rehearsal creating more memory traces"],
+                correct: 0,
+                explanation: "The generation effect shows that actively producing information (vs. passively reading) creates stronger memory traces. Self-generation requires more cognitive effort and creates distinctive processing that enhances later retrieval."
+            },
+            {
+                q: "A man with hippocampal damage from encephalitis can recall facts about his childhood (semantic memory) but cannot remember specific episodes from that time (episodic memory). This suggests:",
+                options: ["Semantic and episodic memory are completely independent systems","The hippocampus is necessary for episodic but not semantic memory consolidation","Semantic memories become independent of the hippocampus over time","Both B and C accurately describe this dissociation"],
+                correct: 3,
+                explanation: "Tulving's multiple memory systems theory and patient cases show that while episodic memory depends on the hippocampus, semantic memories can become consolidated in neocortical regions and survive hippocampal damage, especially older semantic knowledge."
+            },
+            {
+                q: "During a robbery, a bank teller focuses on the perpetrator's weapon rather than his face. Later, she has poor memory for the robber's appearance. This is an example of:",
+                options: ["Weapon focus effect drawing attention to threat-relevant stimuli","Retrograde amnesia from traumatic stress during the event","Source monitoring error confusing actual and imagined features","Decay of memory trace due to lack of rehearsal"],
+                correct: 0,
+                explanation: "The weapon focus effect demonstrates that threat-relevant stimuli (weapons) capture attention at the expense of peripheral details. Emotional arousal narrows attention focus, reducing encoding of non-threat information like facial features."
+            },
+            {
+                q: "A patient with damage to the anterior thalamic nuclei shows memory impairment despite intact hippocampus. This demonstrates:",
+                options: ["The extended hippocampal system including thalamic connections","That thalamic damage only affects sensory memory","Redundant memory systems allowing compensation","Selective impairment of implicit memory only"],
+                correct: 0,
+                explanation: "The Papez circuit (hippocampus → fornix → mammillary bodies → anterior thalamus → cingulate cortex) forms an extended memory system. Damage to any component disrupts memory consolidation, explaining why thalamic damage produces amnesia."
+            },
+            {
+                q: "A 70-year-old with mild cognitive impairment shows disproportionate impairment in prospective memory (remembering future intentions) compared to retrospective memory. This pattern:",
+                options: ["Is normal for aging and not clinically significant","Suggests possible conversion to Alzheimer's disease","Indicates isolated frontal lobe dysfunction","Reflects depression masquerading as cognitive impairment"],
+                correct: 1,
+                explanation: "Prospective memory impairment is often an early indicator of Alzheimer's disease, as it requires intact frontal and medial temporal function. Disproportionate prospective memory deficits may predict conversion from MCI to dementia."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let selectedOption = null;
+        let answers = [];
+        let submitted = false;
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.q;
+            document.getElementById('question-counter').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            const letters = ['A', 'B', 'C', 'D'];
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                if (answers[currentQuestion] === idx) {
+                    btn.classList.add('selected');
+                    selectedOption = idx;
+                }
+                btn.innerHTML = `<span class="option-letter">${letters[idx]}.</span> ${opt}`;
+                btn.onclick = () => selectOption(idx);
+                optionsDiv.appendChild(btn);
+            });
+            
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback';
+            feedback.innerHTML = '';
+            
+            if (answers[currentQuestion] !== undefined) {
+                showFeedback();
+            } else {
+                submitted = false;
+                document.getElementById('submit-btn').style.display = 'inline-block';
+                document.getElementById('submit-btn').disabled = false;
+                document.getElementById('next-btn').style.display = 'none';
+            }
+            
+            document.getElementById('prev-btn').disabled = currentQuestion === 0;
+        }
+
+        function selectOption(idx) {
+            if (submitted) return;
+            selectedOption = idx;
+            const options = document.querySelectorAll('.option');
+            options.forEach((opt, i) => {
+                opt.classList.toggle('selected', i === idx);
+            });
+        }
+
+        function submitAnswer() {
+            if (selectedOption === null) return;
+            submitted = true;
+            answers[currentQuestion] = selectedOption;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach((opt, i) => {
+                opt.disabled = true;
+                if (i === questions[currentQuestion].correct) {
+                    opt.classList.add('correct');
+                } else if (i === selectedOption && i !== questions[currentQuestion].correct) {
+                    opt.classList.add('wrong');
+                }
+            });
+            
+            showFeedback();
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+
+        function showFeedback() {
+            const q = questions[currentQuestion];
+            const feedback = document.getElementById('feedback');
+            const isCorrect = answers[currentQuestion] === q.correct;
+            
+            feedback.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
+            feedback.innerHTML = `<strong>${isCorrect ? 'Correct!' : 'Incorrect.'}</strong><br>${q.explanation}`;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                selectedOption = null;
+                submitted = false;
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                selectedOption = answers[currentQuestion] !== undefined ? answers[currentQuestion] : null;
+                submitted = answers[currentQuestion] !== undefined;
+                loadQuestion();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('results').classList.add('show');
+            
+            let correct = 0;
+            answers.forEach((ans, idx) => {
+                if (ans === questions[idx].correct) correct++;
+            });
+            
+            const percentage = Math.round((correct / questions.length) * 100);
+            document.getElementById('score-circle').textContent = `${percentage}%`;
+            document.getElementById('score-details').textContent = `You got ${correct} out of ${questions.length} questions correct.`;
+            
+            let message = '';
+            if (percentage >= 90) message = 'Outstanding! Excellent understanding of memory & forgetting!';
+            else if (percentage >= 75) message = 'Great job! Strong grasp of the material.';
+            else if (percentage >= 60) message = 'Good effort! Review the explanations to strengthen understanding.';
+            else message = 'Keep studying! Focus on the concepts in the explanations.';
+            
+            document.getElementById('score-message').textContent = message;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            selectedOption = null;
+            answers = [];
+            submitted = false;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('results').classList.remove('show');
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
