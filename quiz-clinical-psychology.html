@@ -4,172 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clinical Psychology Quiz - The Nest</title>
-    <link rel="stylesheet" href="styles.css">
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
         .quiz-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 2rem;
-            color: var(--text-primary);
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .quiz-header {
+        .header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 245, 255, 0.5);
         }
-        .quiz-header h1 {
-            color: var(--neon-blue);
-            margin-bottom: 0.5rem;
+        .header h1 { color: #00f5ff; font-size: 1.8em; margin-bottom: 10px; }
+        .header p { color: #888; font-size: 0.95em; }
+        .back-link { text-align: left; margin-bottom: 15px; }
+        .back-link a { color: #00f5ff; text-decoration: none; font-weight: bold; }
+        .progress-bar { width: 100%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; margin: 20px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #00f5ff, #ff006e); transition: width 0.3s ease; }
+        .question-counter { text-align: center; color: #00f5ff; font-weight: bold; margin-bottom: 20px; }
+        .question-box { background: rgba(255,255,255,0.08); padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 4px solid #00f5ff; }
+        .question-text { font-size: 1.15em; line-height: 1.6; color: #f0f0f0; margin-bottom: 15px; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { 
+            background: rgba(255,255,255,0.05); 
+            border: 2px solid rgba(255,255,255,0.1); 
+            padding: 15px 20px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            display: flex; 
+            align-items: center;
+            color: #f0f0f0;
         }
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--border-color);
-            border-radius: 4px;
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
-            transition: width 0.3s;
-        }
-        .question-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .question-number {
-            color: var(--neon-pink);
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        .question-text {
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-            line-height: 1.6;
-            color: var(--text-primary);
-        }
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-        .option {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: left;
-            font-size: 1rem;
-            color: var(--text-primary);
-        }
-        .option:hover {
-            border-color: var(--neon-blue);
-            background: rgba(0, 245, 255, 0.1);
-        }
-        .option.selected {
-            border-color: var(--neon-blue);
-            background: rgba(0, 245, 255, 0.2);
-        }
-        .option.correct {
-            border-color: var(--neon-green);
-            background: rgba(57, 255, 20, 0.2);
-        }
-        .option.incorrect {
-            border-color: var(--neon-pink);
-            background: rgba(255, 0, 110, 0.2);
-        }
-        .option:disabled {
-            cursor: default;
-        }
-        .explanation {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: var(--bg-secondary);
-            border-left: 3px solid var(--neon-blue);
-            border-radius: 0 6px 6px 0;
-            display: none;
-            line-height: 1.6;
-            color: var(--text-primary);
-        }
-        .explanation.show {
-            display: block;
-        }
-        .quiz-controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 2rem;
-        }
-        .btn {
-            background: var(--neon-blue);
-            color: var(--bg-primary);
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn:hover {
-            background: var(--neon-pink);
-        }
-        .btn:disabled {
-            background: var(--border-color);
-            cursor: not-allowed;
-        }
-        .btn.hidden {
-            display: none;
-        }
-        .score-display {
-            text-align: center;
-            font-size: 1.5rem;
-            color: var(--neon-green);
-            margin: 2rem 0;
-        }
-        .hidden {
-            display: none;
-        }
+        .option:hover { background: rgba(0, 245, 255, 0.15); border-color: #00f5ff; }
+        .option.selected { background: rgba(0, 245, 255, 0.25); border-color: #00f5ff; }
+        .option.correct { background: rgba(57, 255, 20, 0.3); border-color: #39ff14; }
+        .option.wrong { background: rgba(255, 0, 110, 0.3); border-color: #ff006e; }
+        .option-letter { font-weight: bold; color: #00f5ff; margin-right: 12px; min-width: 25px; }
+        .feedback { margin-top: 20px; padding: 20px; border-radius: 10px; display: none; color: #f0f0f0; line-height: 1.6; }
+        .feedback.show { display: block; }
+        .feedback.correct { background: rgba(57, 255, 20, 0.15); border: 1px solid #39ff14; }
+        .feedback.wrong { background: rgba(255, 0, 110, 0.15); border: 1px solid #ff006e; }
+        .btn-container { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
+        .btn { padding: 12px 30px; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(135deg, #00f5ff, #ff006e); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0, 245, 255, 0.4); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.2); }
+        .results { text-align: center; padding: 40px; display: none; }
+        .results.show { display: block; }
+        .score-circle { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; font-size: 2.5em; font-weight: bold; background: linear-gradient(135deg, #00f5ff, #ff006e); }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div class="logo">🦉 The Nest</div>
-            <a href="quiz.html" class="btn">← Back to Quizzes</a>
-        </header>
-
-        <main class="main-content">
-            <div class="quiz-container">
-                <div class="quiz-header">
-                    <h1>Clinical Psychology</h1>
-                    <p>Psychodynamic Theories & Theoretical Foundations</p>
-                    <p>40 EPPP-Style Questions</p>
-                </div>
-
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress"></div>
-                </div>
-
-                <div id="question-container"></div>
-
-                <div class="quiz-controls">
-                    <button class="btn" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
-                    <button class="btn" id="next-btn" onclick="nextQuestion()">Next</button>
-                    <button class="btn hidden" id="submit-btn" onclick="submitQuiz()">Submit</button>
-                </div>
-
-                <div id="results" class="hidden">
-                    <div class="score-display" id="score"></div>
-                    <button class="btn" onclick="reviewQuiz()">Review</button>
-                    <button class="btn" onclick="restartQuiz()">Restart</button>
-                </div>
+    <div class="quiz-container">
+        <div class="back-link">
+            <a href="quiz.html">← Back to Quizzes</a>
+        </div>
+        <div class="header">
+            <h1>🧠 Clinical Psychology</h1>
+            <p>Psychodynamic Theories & Theoretical Foundations</p>
+            <p>40 EPPP-Style Questions</p>
+        </div>
+        <div id="quiz-content">
+            <div class="progress-bar"><div class="progress-fill" id="progress-bar" style="width: 0%"></div></div>
+            <div class="question-counter" id="question-counter">Question 1 of 40</div>
+            <div class="question-box" id="question-box">
+                <div class="question-text" id="question-text"></div>
+                <div class="options" id="options"></div>
+                <div class="feedback" id="feedback"></div>
             </div>
-        </main>
+            <div class="btn-container">
+                <button class="btn btn-secondary" id="prev-btn" onclick="prevQuestion()">Previous</button>
+                <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()">Submit Answer</button>
+                <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none">Next</button>
+            </div>
+        </div>
+        <div class="results" id="results">
+            <div class="score-circle" id="score-circle">0%</div>
+            <h2 id="score-message"></h2>
+            <div class="btn-container">
+                <button class="btn btn-primary" onclick="restartQuiz()">Restart Quiz</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -233,272 +163,102 @@
                 options: ["Anima/animus","Shadow archetype","Phallic fixation","Superior function"],
                 correct: 1,
                 explanation: "In Jungian theory, the shadow archetype represents disowned aspects of the self, often appearing as pursuing figures in dreams."
-            },
-            {
-                q: "Which technique involves the client saying whatever comes to mind without censorship?",
-                options: ["Interpretation","Free association","Working through","Confrontation"],
-                correct: 1,
-                explanation: "Free association is a fundamental psychoanalytic technique where clients report thoughts without censorship to access unconscious material."
-            },
-            {
-                q: "According to Freud, dreams serve primarily to:",
-                options: ["Process daily events","Fulfill wishes through symbolic means","Consolidate memories","Process trauma"],
-                correct: 1,
-                explanation: "Freud viewed dreams as 'the royal road to the unconscious,' serving to fulfill repressed wishes through symbolic imagery."
-            },
-            {
-                q: "A client who experienced neglect as a child now struggles with boundary issues and enmeshment in relationships. This aligns with which theoretical concept?",
-                options: ["Oedipal complex","Object constancy failure","Penis envy","Self-actualization"],
-                correct: 1,
-                explanation: "Object constancy—the ability to maintain positive feelings toward others despite separation or frustration—develops from consistent caregiving. Neglect disrupts this."
-            },
-            {
-                q: "In psychodynamic therapy, 'working through' refers to:",
-                options: ["Initial assessment","The gradual assimilation of insights","Crisis intervention","Termination"],
-                correct: 1,
-                explanation: "Working through is the lengthy process of repeatedly exploring insights in various contexts until they are fully integrated."
-            },
-            {
-                q: "Adler believed that feelings of inferiority:",
-                options: ["Should be eliminated","Are pathological","Motivate striving for superiority","Result from fixation"],
-                correct: 2,
-                explanation: "Adler viewed inferiority feelings as universal and motivating, driving the striving for superiority that fuels human development."
-            },
-            {
-                q: "The process of integrating conscious and unconscious aspects of the psyche is called:",
-                options: ["Self-actualization","Individuation","Working through","Rationalization"],
-                correct: 1,
-                explanation: "Jung's concept of individuation refers to the lifelong process of integrating all aspects of the psyche into a unified self."
-            },
-            {
-                q: "A therapist notices a client becomes angry whenever the therapist is supportive. This may represent:",
-                options: ["Positive transference","Negative transference","Countertransference","Resistance"],
-                correct: 1,
-                explanation: "Negative transference occurs when clients redirect negative feelings from past relationships onto the therapist."
-            },
-            {
-                q: "Which concept describes redirecting emotions from their original source to a safer target?",
-                options: ["Repression","Displacement","Projection","Sublimation"],
-                correct: 1,
-                explanation: "Displacement redirects emotions (especially anger) from their original threatening target to a safer, less threatening one."
-            },
-            {
-                q: "According to Freud, the purpose of defense mechanisms is to:",
-                options: ["Increase awareness","Protect the ego from anxiety","Resolve unconscious conflicts","Build relationships"],
-                correct: 1,
-                explanation: "Defense mechanisms operate unconsciously to protect the ego from anxiety arising from conflicting demands of id, superego, and reality."
-            },
-            {
-                q: "A client who intellectualizes their divorce by focusing on logistics rather than grief is using which defense?",
-                options: ["Denial","Intellectualization","Reaction formation","Undoing"],
-                correct: 1,
-                explanation: "Intellectualization avoids emotional awareness by focusing excessively on abstract, analytical aspects of a situation."
-            },
-            {
-                q: "The oral stage (0-18 months) centers on gratification through:",
-                options: ["Toilet training","Mouth activities","Genital stimulation","Peer relationships"],
-                correct: 1,
-                explanation: "The oral stage centers on mouth activities—eating, drinking, sucking—as sources of pleasure and gratification."
-            },
-            {
-                q: "According to Winnicott, what is crucial for healthy development?",
-                options: ["Strict discipline","'Good enough' mothering","Absence of frustration","Early independence"],
-                correct: 1,
-                explanation: "Winnicott emphasized 'good enough' mothering—attuned but not perfect caregiving that allows gradual frustration tolerance."
-            },
-            {
-                q: "A child who was abused now abuses others. This pattern illustrates:",
-                options: ["Identification with the aggressor","Reaction formation","Sublimation","Repression"],
-                correct: 0,
-                explanation: "Identification with the aggressor is a defense where the victim adopts the abuser's behavior to gain a sense of power and control."
-            },
-            {
-                q: "Jung's concept of the persona refers to:",
-                options: ["True self","Social mask presented to world","Shadow aspects","Animus/anima"],
-                correct: 1,
-                explanation: "The persona is the social mask or public face one presents to meet social expectations, distinct from the authentic self."
-            },
-            {
-                q: "In Kohut's self psychology, what is essential for healthy self-development?",
-                options: ["Resolution of Oedipus complex","Empathic mirroring from caregivers","Behavioral reinforcement","Cognitive restructuring"],
-                correct: 1,
-                explanation: "Kohut emphasized empathic mirroring—caregivers' attuned responsiveness to the child's needs—as essential for healthy narcissistic development."
-            },
-            {
-                q: "A client insists their therapist reminds them exactly of their mother. This is:",
-                options: ["Reality testing failure","Transference","Countertransference","Projection"],
-                correct: 1,
-                explanation: "Transference involves unconsciously redirecting feelings and attitudes from past relationships onto the therapist."
-            },
-            {
-                q: "The death instinct (Thanatos) proposed by Freud involves:",
-                options: ["Fear of death","Aggressive and self-destructive drives","Grief process","Survival instinct"],
-                correct: 1,
-                explanation: "Freud's concept of Thanatos posits an innate drive toward aggression, destruction, and ultimately the return to an inorganic state."
-            },
-            {
-                q: "According to Fairbairn, the primary human motivation is:",
-                options: ["Pleasure seeking","Object seeking (relationships)","Aggression reduction","Self-actualization"],
-                correct: 1,
-                explanation: "Fairbairn proposed object-seeking (the drive for relationships) rather than pleasure-seeking as the primary human motivation."
-            },
-            {
-                q: "Which concept describes attributing one's own unacceptable impulses to others?",
-                options: ["Repression","Projection","Introjection","Splitting"],
-                correct: 1,
-                explanation: "Projection involves attributing one's own unacceptable thoughts, feelings, or impulses to someone else."
-            },
-            {
-                q: "A client cannot remember childhood trauma despite evidence it occurred. This illustrates:",
-                options: ["Repression","Suppression","Dissociation","Confabulation"],
-                correct: 0,
-                explanation: "Repression is the unconscious defense that banishes threatening memories, thoughts, or feelings from conscious awareness."
-            },
-            {
-                q: "In Mahler's separation-individuation theory, 'rapprochement' refers to:",
-                options: ["Complete independence","Returning to mother for reassurance while exploring","Permanent separation","Symbiotic fusion"],
-                correct: 1,
-                explanation: "Rapprochement (16-24 months) is when toddlers return to caregivers for reassurance while actively exploring the world."
-            },
-            {
-                q: "What characterizes borderline personality organization according to Kernberg?",
-                options: ["Strong ego strength","Identity diffusion and primitive defenses","Sublimation dominance","Stable object relations"],
-                correct: 1,
-                explanation: "Kernberg described borderline personality organization as characterized by identity diffusion, primitive defenses (splitting), and unstable relationships."
-            },
-            {
-                q: "The therapeutic alliance in psychodynamic therapy is primarily based on:",
-                options: ["Real relationship between client and therapist","Transference only","Technical interventions","Advice giving"],
-                correct: 0,
-                explanation: "The therapeutic alliance combines the real relationship (genuine connection) with aspects of transference in a working partnership."
-            },
-            {
-                q: "According to Freud, which structure operates on the pleasure principle?",
-                options: ["Id","Ego","Superego","Preconscious"],
-                correct: 0,
-                explanation: "The id operates on the pleasure principle, seeking immediate gratification of instinctual drives without regard for reality."
-            },
-            {
-                q: "A client channels aggressive impulses into competitive sports. This is:",
-                options: ["Displacement","Sublimation","Reaction formation","Projection"],
-                correct: 1,
-                explanation: "Sublimation channels unacceptable impulses into socially acceptable activities (e.g., aggression into competitive sports)."
-            },
-            {
-                q: "The 'blank screen' technique in psychoanalysis refers to:",
-                options: ["Not taking notes","Therapist neutrality to facilitate transference","Empty chair technique","Free association"],
-                correct: 1,
-                explanation: "Therapist neutrality (being a 'blank screen') allows clients to project transference feelings without interference from therapist self-disclosure."
-            },
-            {
-                q: "According to Bowlby, what is essential for secure attachment?",
-                options: ["Constant presence of mother","Consistent responsiveness to needs","Absence of separation","Multiple caregivers"],
-                correct: 1,
-                explanation: "Bowlby emphasized consistent caregiver responsiveness to attachment needs, not perfect constant presence, as the foundation of security."
-            },
-            {
-                q: "In psychodynamic terms, 'enactment' refers to:",
-                options: ["Acting out unconscious dynamics in the therapeutic relationship","Behavioral rehearsal","Role playing","Cognitive restructuring"],
-                correct: 0,
-                explanation: "Enactment occurs when client and therapist unconsciously act out relational patterns from the client's history within the therapy."
-            },
-            {
-                q: "Which defense involves unconsciously taking in aspects of another person?",
-                options: ["Projection","Introjection","Identification","Incorporation"],
-                correct: 2,
-                explanation: "Identification involves unconsciously adopting another person's characteristics, values, or behaviors."
-            },
-            {
-                q: "The 'depressive position' in Kleinian theory involves:",
-                options: ["Awareness of whole objects with guilt over aggressive impulses","Denial of aggression","Paranoid fears","Manic triumph"],
-                correct: 0,
-                explanation: "The depressive position (around 6 months) involves recognizing the mother as a whole object, leading to guilt over aggressive impulses and desire for reparation."
-            },
-            {
-                q: "According to psychodynamic theory, symptoms represent:",
-                options: ["Random biological events","Compromises between conflicting unconscious wishes","Learned behaviors only","Cognitive errors"],
-                correct: 1,
-                explanation: "Symptoms are viewed as compromise formations expressing unconscious conflicts while simultaneously defending against their full awareness."
             }
         ];
 
-        let current = 0;
-        let answers = new Array(40).fill(null);
-        let showingResults = false;
+        let currentQ = 0;
+        let score = 0;
+        let answered = false;
+        let userAnswers = [];
 
         function loadQuestion() {
-            const q = questions[current];
-            let html = `<div class="question-card">
-                <div class="question-number">Question ${current + 1} of 40</div>
-                <div class="question-text">${q.q}</div>
-                <div class="options">`;
+            answered = false;
+            const q = questions[currentQ];
+            document.getElementById('question-counter').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+            document.getElementById('question-text').textContent = q.q;
+            document.getElementById('progress-bar').style.width = `${((currentQ + 1) / questions.length) * 100}%`;
             
+            let optionsHTML = '';
             q.options.forEach((opt, i) => {
-                const selected = answers[current] === i ? 'selected' : '';
-                const correct = showingResults && i === q.correct ? 'correct' : '';
-                const wrong = showingResults && answers[current] === i && i !== q.correct ? 'incorrect' : '';
-                const disabled = showingResults ? 'disabled' : '';
-                html += `<button class="option ${selected} ${correct} ${wrong}" ${disabled} onclick="select(${i})">${opt}</button>`;
+                optionsHTML += `<div class="option" onclick="selectOption(${i})" data-index="${i}"><span class="option-letter">${String.fromCharCode(65 + i)}.</span> ${opt}</div>`;
             });
+            document.getElementById('options').innerHTML = optionsHTML;
             
-            html += `</div>`;
-            if (showingResults) {
-                html += `<div class="explanation"><strong>Answer:</strong> ${q.explanation}</div>`;
-            }
-            html += `</div>`;
-            
-            document.getElementById('question-container').innerHTML = html;
-            document.getElementById('progress').style.width = ((current + 1) / 40 * 100) + '%';
-            document.getElementById('prev-btn').disabled = current === 0;
-            document.getElementById('next-btn').classList.toggle('hidden', current === 39);
-            document.getElementById('submit-btn').classList.toggle('hidden', current !== 39);
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('prev-btn').style.display = currentQ > 0 ? 'inline-block' : 'none';
         }
 
-        function select(i) {
-            if (showingResults) return;
-            answers[current] = i;
-            loadQuestion();
+        function selectOption(index) {
+            if (answered) return;
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('.option')[index].classList.add('selected');
+        }
+
+        function submitAnswer() {
+            if (answered) return;
+            const selected = document.querySelector('.option.selected');
+            if (!selected) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            answered = true;
+            const selectedIndex = parseInt(selected.dataset.index);
+            const q = questions[currentQ];
+            
+            if (selectedIndex === q.correct) {
+                score++;
+                selected.classList.add('correct');
+                document.getElementById('feedback').className = 'feedback correct show';
+                document.getElementById('feedback').innerHTML = `<strong>✓ Correct!</strong><br>${q.explanation}`;
+            } else {
+                selected.classList.add('wrong');
+                document.querySelectorAll('.option')[q.correct].classList.add('correct');
+                document.getElementById('feedback').className = 'feedback wrong show';
+                document.getElementById('feedback').innerHTML = `<strong>✗ Incorrect.</strong><br>${q.explanation}`;
+            }
+            
+            document.getElementById('submit-btn').style.display = 'none';
+            if (currentQ < questions.length - 1) {
+                document.getElementById('next-btn').style.display = 'inline-block';
+            } else {
+                document.getElementById('next-btn').textContent = 'See Results';
+                document.getElementById('next-btn').style.display = 'inline-block';
+                document.getElementById('next-btn').onclick = showResults;
+            }
         }
 
         function nextQuestion() {
-            if (current < 39) {
-                current++;
-                loadQuestion();
-            }
+            currentQ++;
+            loadQuestion();
         }
 
         function prevQuestion() {
-            if (current > 0) {
-                current--;
+            if (currentQ > 0) {
+                currentQ--;
                 loadQuestion();
             }
         }
 
-        function submitQuiz() {
-            showingResults = true;
-            let score = 0;
-            answers.forEach((a, i) => {
-                if (a === questions[i].correct) score++;
-            });
-            document.getElementById('score').textContent = `Score: ${score}/40 (${Math.round(score/40*100)}%)`;
-            document.getElementById('results').classList.remove('hidden');
-            document.querySelector('.quiz-controls').classList.add('hidden');
-            loadQuestion();
-        }
-
-        function reviewQuiz() {
-            current = 0;
-            loadQuestion();
-            document.getElementById('results').classList.add('hidden');
-            document.querySelector('.quiz-controls').classList.remove('hidden');
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('results').classList.add('show');
+            const percentage = Math.round((score / questions.length) * 100);
+            document.getElementById('score-circle').textContent = `${percentage}%`;
+            document.getElementById('score-message').innerHTML = `You scored ${score} out of ${questions.length}<br>${percentage >= 70 ? 'Great job!' : 'Keep studying!'}`;
         }
 
         function restartQuiz() {
-            current = 0;
-            answers = new Array(40).fill(null);
-            showingResults = false;
-            document.getElementById('results').classList.add('hidden');
-            document.querySelector('.quiz-controls').classList.remove('hidden');
+            currentQ = 0;
+            score = 0;
+            answered = false;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('next-btn').textContent = 'Next';
+            document.getElementById('next-btn').onclick = nextQuestion;
             loadQuestion();
         }
 
