@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Theory Quiz - The Nest</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        .quiz-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 245, 255, 0.5);
+        }
+        .header h1 { color: #00f5ff; font-size: 1.8em; margin-bottom: 10px; }
+        .header p { color: #888; font-size: 0.95em; }
+        .back-link { text-align: left; margin-bottom: 15px; }
+        .back-link a { color: #00f5ff; text-decoration: none; font-weight: bold; }
+        .progress-bar { width: 100%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; margin: 20px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #00f5ff, #ff006e); transition: width 0.3s ease; }
+        .question-counter { text-align: center; color: #00f5ff; font-weight: bold; margin-bottom: 20px; }
+        .question-box { background: rgba(255,255,255,0.08); padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 4px solid #00f5ff; }
+        .question-text { font-size: 1.15em; line-height: 1.6; color: #f0f0f0; margin-bottom: 15px; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { 
+            background: rgba(255,255,255,0.05); 
+            border: 2px solid rgba(255,255,255,0.1); 
+            padding: 15px 20px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            display: flex; 
+            align-items: center;
+            color: #f0f0f0;
+        }
+        .option:hover { background: rgba(0, 245, 255, 0.15); border-color: #00f5ff; }
+        .option.selected { background: rgba(0, 245, 255, 0.25); border-color: #00f5ff; }
+        .option.correct { background: rgba(57, 255, 20, 0.3); border-color: #39ff14; }
+        .option.wrong { background: rgba(255, 0, 110, 0.3); border-color: #ff006e; }
+        .option-letter { font-weight: bold; color: #00f5ff; margin-right: 12px; min-width: 25px; }
+        .feedback { margin-top: 20px; padding: 20px; border-radius: 10px; display: none; color: #f0f0f0; line-height: 1.6; }
+        .feedback.show { display: block; }
+        .feedback.correct { background: rgba(57, 255, 20, 0.15); border: 1px solid #39ff14; }
+        .feedback.wrong { background: rgba(255, 0, 110, 0.15); border: 1px solid #ff006e; }
+        .btn-container { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
+        .btn { padding: 12px 30px; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(135deg, #00f5ff, #ff006e); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0, 245, 255, 0.4); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.2); }
+        .results { text-align: center; padding: 40px; display: none; }
+        .results.show { display: block; }
+        .score-circle { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; font-size: 2.5em; font-weight: bold; color: white; background: linear-gradient(135deg, #00f5ff, #ff006e); }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="back-link">
+            <a href="quiz.html">← Back to Quizzes</a>
+        </div>
+        <div class="header">
+            <h1>🎯 Learning Theory</h1>
+            <p>Classical & Operant Conditioning</p>
+            <p>25 EPPP-Style Questions | Easy → Medium → Hard</p>
+        </div>
+        <div id="quiz-content">
+            <div class="progress-bar"><div class="progress-fill" id="progress-bar" style="width: 0%"></div></div>
+            <div class="question-counter" id="question-counter">Question 1 of 25</div>
+            <div class="question-box" id="question-box">
+                <div class="question-text" id="question-text"></div>
+                <div class="options" id="options"></div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+            <div class="btn-container">
+                <button class="btn btn-secondary" id="prev-btn" onclick="prevQuestion()">Previous</button>
+                <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()">Submit Answer</button>
+                <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none">Next</button>
+            </div>
+        </div>
+        <div class="results" id="results">
+            <div class="score-circle" id="score-circle">0%</div>
+            <h2 id="score-message"></h2>
+            <p id="score-details" style="color: #888; margin: 15px 0;"></p>
+            <div class="btn-container">
+                <button class="btn btn-primary" onclick="restartQuiz()">Restart Quiz</button>
+                <a href="quiz.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center;">Back to All Quizzes</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            // EASY (1-8)
+            {
+                q: "In Pavlov's classic experiment, the meat powder that naturally caused dogs to salivate is called the:",
+                options: ["Conditioned stimulus","Unconditioned stimulus","Conditioned response","Neutral stimulus"],
+                correct: 1,
+                explanation: "The unconditioned stimulus (US) is a stimulus that naturally and automatically triggers a response without prior learning. Meat powder naturally elicits salivation in dogs."
+            },
+            {
+                q: "A child learns to fear the dentist's office after experiencing pain during a procedure. In this example, the pain serves as the:",
+                options: ["Conditioned stimulus","Neutral stimulus","Unconditioned stimulus","Conditioned response"],
+                correct: 2,
+                explanation: "The pain from the dental procedure is the unconditioned stimulus (US) because it naturally and automatically elicits fear/anxiety without any prior conditioning."
+            },
+            {
+                q: "After repeated pairings of a bell with food, Pavlov's dogs began to salivate at the sound of the bell alone. The salivation to the bell is the:",
+                options: ["Unconditioned response","Conditioned response","Unconditioned stimulus","Neutral response"],
+                correct: 1,
+                explanation: "The conditioned response (CR) is the learned response to a previously neutral stimulus. After conditioning, the bell (CS) elicits salivation (CR)."
+            },
+            {
+                q: "A therapist uses systematic desensitization to help a client overcome a fear of flying. This technique is based on which principle?",
+                options: ["Positive reinforcement","Reciprocal inhibition","Negative punishment","Trace conditioning"],
+                correct: 1,
+                explanation: "Systematic desensitization, developed by Wolpe, is based on reciprocal inhibition—the principle that anxiety can be inhibited by an incompatible relaxation response."
+            },
+            {
+                q: "In operant conditioning, when a behavior increases because it results in the removal of an unpleasant stimulus, this is called:",
+                options: ["Positive reinforcement","Negative reinforcement","Positive punishment","Negative punishment"],
+                correct: 1,
+                explanation: "Negative reinforcement increases behavior through the removal or termination of an unpleasant stimulus. The behavior increases to escape or avoid the aversive stimulus."
+            },
+            {
+                q: "A parent takes away a teenager's phone privileges after they fail to complete their homework. This is an example of:",
+                options: ["Positive reinforcement","Negative reinforcement","Positive punishment","Negative punishment"],
+                correct: 3,
+                explanation: "Negative punishment decreases behavior by removing a desirable stimulus. Taking away the phone (removing a positive stimulus) is intended to decrease the failure to complete homework."
+            },
+            {
+                q: "According to Thorndike's Law of Effect, responses followed by satisfying consequences are:",
+                options: ["Less likely to be repeated","More likely to be repeated","Immediately forgotten","Permanently fixed in memory"],
+                correct: 1,
+                explanation: "Thorndike's Law of Effect states that any response followed by a 'satisfying state of affairs' is likely to be repeated, while responses followed by annoying consequences are less likely to recur."
+            },
+            {
+                q: "In Watson's Little Albert experiment, the loud noise served as the:",
+                options: ["Conditioned stimulus","Unconditioned stimulus","Conditioned response","Neutral stimulus"],
+                correct: 1,
+                explanation: "The loud noise was the unconditioned stimulus (US) because it naturally elicited the startle/fear response (UR) in Albert without any prior learning."
+            },
+            // MEDIUM (9-17)
+            {
+                q: "A client who was attacked by a dog now fears all animals with fur, including cats and rabbits. This is an example of:",
+                options: ["Stimulus discrimination","Stimulus generalization","Higher-order conditioning","Experimental neurosis"],
+                correct: 1,
+                explanation: "Stimulus generalization occurs when a conditioned response is elicited not only by the conditioned stimulus but also by stimuli similar to it. The fear generalizes from dogs to other furry animals."
+            },
+            {
+                q: "A psychologist trains a rat to press a lever only when a specific tone is played, but not when similar tones are played. This demonstrates:",
+                options: ["Stimulus generalization","Stimulus discrimination","Spontaneous recovery","Trace conditioning"],
+                correct: 1,
+                explanation: "Stimulus discrimination is the ability to distinguish between the conditioned stimulus and similar stimuli and respond only to the specific CS. It is established through discrimination training."
+            },
+            {
+                q: "A person who quits smoking after imagining cigarettes paired with nausea is undergoing:",
+                options: ["Systematic desensitization","In vivo aversive therapy","Covert sensitization","Flooding"],
+                correct: 2,
+                explanation: "Covert sensitization is a form of aversive counterconditioning where the client imagines engaging in the maladaptive behavior and then imagines an aversive consequence, rather than experiencing it in real life."
+            },
+            {
+                q: "In delay conditioning, the conditioned stimulus:",
+                options: ["Is presented after the unconditioned stimulus","Precedes and overlaps with the unconditioned stimulus","Is presented and withdrawn before the unconditioned stimulus","Is never paired with the unconditioned stimulus"],
+                correct: 1,
+                explanation: "Delay conditioning is a form of forward conditioning where the CS precedes and overlaps with the presentation of the US. This temporal arrangement typically produces strong conditioning."
+            },
+            {
+                q: "A dog that had been conditioned to salivate to a tone stops salivating after the tone is repeatedly presented without food. This illustrates:",
+                options: ["Spontaneous recovery","Classical extinction","Stimulus generalization","Higher-order conditioning"],
+                correct: 1,
+                explanation: "Classical extinction occurs when the conditioned stimulus is repeatedly presented without the unconditioned stimulus, leading to a gradual decrease and eventual disappearance of the conditioned response."
+            },
+            {
+                q: "Several months after extinction, the dog from the previous scenario suddenly salivates again when hearing the tone. This phenomenon is called:",
+                options: ["Reconditioning","Spontaneous recovery","Stimulus generalization","Trace conditioning"],
+                correct: 1,
+                explanation: "Spontaneous recovery is the reappearance of a previously extinguished conditioned response after a rest period. It demonstrates that extinction suppresses rather than eliminates the learned response."
+            },
+            {
+                q: "A therapist treats a client's phobia by having them confront their most feared situation directly and continuously without allowing escape. This technique is called:",
+                options: ["Systematic desensitization","Graduated exposure","Flooding","Counterconditioning"],
+                correct: 2,
+                explanation: "Flooding involves prolonged exposure to the most anxiety-arousing stimuli while preventing the usual avoidance response. It is based on classical extinction principles."
+            },
+            {
+                q: "According to the two-factor theory of learning, avoidance behaviors in phobias are maintained by:",
+                options: ["Classical extinction","Positive reinforcement","Negative reinforcement","Observational learning"],
+                correct: 2,
+                explanation: "The two-factor theory proposes that phobias develop through classical conditioning (CS paired with US) but are maintained through negative reinforcement—avoiding the feared stimulus reduces anxiety, which reinforces the avoidance behavior."
+            },
+            {
+                q: "In a therapy session, a client develops anxiety when trying to discriminate between two very similar stimuli. This reaction is known as:",
+                options: ["Stimulus generalization","Experimental neurosis","Trace conditioning","Backward conditioning"],
+                correct: 1,
+                explanation: "Experimental neurosis refers to the disturbed behavior that can occur when organisms are required to make increasingly difficult discriminations between similar stimuli, often producing anxiety-like symptoms."
+            },
+            // HARD (18-25)
+            {
+                q: "A rat is conditioned to fear a tone that predicts electric shock. Later, a light is paired with the tone, and the rat learns to fear the light even though it was never paired directly with shock. This illustrates:",
+                options: ["Stimulus generalization","Higher-order conditioning","Blocking","Overshadowing"],
+                correct: 1,
+                explanation: "Higher-order (second-order) conditioning occurs when a second neutral stimulus is paired with an already-established conditioned stimulus, allowing the second stimulus to acquire conditioned response properties without ever being paired with the US."
+            },
+            {
+                q: "In a conditioning experiment, a tone is already established as a predictor of shock. When a light is added and presented simultaneously with the tone, the rat fails to learn that the light also predicts shock. This is an example of:",
+                options: ["Overshadowing","Blocking","Higher-order conditioning","Trace conditioning"],
+                correct: 1,
+                explanation: "Blocking occurs when a previously established CS prevents or blocks conditioning to a new stimulus when they are presented together. The tone already predicts shock, so the light adds no new predictive information."
+            },
+            {
+                q: "A bright light and a soft tone are repeatedly presented together before being paired with food. After conditioning, the animal shows a strong response to the light but a weak response to the tone. This demonstrates:",
+                options: ["Blocking","Stimulus discrimination","Overshadowing","Second-order conditioning"],
+                correct: 2,
+                explanation: "Overshadowing occurs when two neutral stimuli are presented together before the US, but one stimulus (typically more salient) overshadows the other, resulting in weaker conditioning to the less salient stimulus."
+            },
+            {
+                q: "A client receiving treatment for alcoholism is given a nausea-inducing drug each time they drink. The drug serves as:",
+                options: ["A positive reinforcer","A negative reinforcer","An unconditioned stimulus for nausea","A conditioned stimulus for nausea"],
+                correct: 2,
+                explanation: "In aversive counterconditioning for alcoholism, the nausea-inducing drug is an unconditioned stimulus (US) that naturally elicits nausea (UR). The alcohol becomes the conditioned stimulus that comes to elicit nausea (CR)."
+            },
+            {
+                q: "A therapist uses Wolpe's systematic desensitization with a client who has a phobia of bridges. Which of the following is the final stage of this procedure?",
+                options: ["Relaxation training","Construction of anxiety hierarchy","Desensitization in imagination","In vivo desensitization"],
+                correct: 3,
+                explanation: "Systematic desensitization has four stages: (1) relaxation training, (2) construction of anxiety hierarchy, (3) desensitization in imagination, and (4) in vivo desensitization (exposure to real-life anxiety-provoking situations)."
+            },
+            {
+                q: "Research on exposure therapy for anxiety disorders has found that:",
+                options: ["Brief, spaced exposures are more effective than prolonged continuous exposure","Self-directed exposure is less effective than therapist-directed exposure","Massed (prolonged continuous) exposure is usually more effective than brief exposures","High anxiety provocation during exposure is necessary for successful outcomes"],
+                correct: 2,
+                explanation: "Research indicates that prolonged continuous (massed) exposure is typically more effective than several brief exposures. Additionally, self-directed exposure is as effective as therapist-directed, and high anxiety provocation may not be necessary for success."
+            },
+            {
+                q: "According to the principles of classical conditioning, which temporal arrangement of CS and US is LEAST likely to produce a strong conditioned response?",
+                options: ["Delay conditioning","Trace conditioning","Simultaneous conditioning","Backward conditioning"],
+                correct: 3,
+                explanation: "Backward conditioning, where the US is presented before the CS, does not usually produce a strong conditioned response. Forward conditioning arrangements (delay and trace) are most effective."
+            },
+            {
+                q: "A researcher finds that subjects who were pre-exposed to a tone before it was paired with shock show slower acquisition of the conditioned fear response than subjects who had no pre-exposure. This demonstrates the effect of:",
+                options: ["Latent inhibition","Spontaneous recovery","Stimulus generalization","Higher-order conditioning"],
+                correct: 0,
+                explanation: "Pre-exposure to the CS before conditioning trials slows down the acquisition of the conditioned response. This phenomenon, known as latent inhibition, occurs because the pre-exposed stimulus has already been learned to be irrelevant before conditioning begins."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let selectedOption = null;
+        let answers = [];
+        let submitted = false;
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.q;
+            document.getElementById('question-counter').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            const letters = ['A', 'B', 'C', 'D'];
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                if (answers[currentQuestion] === idx) {
+                    btn.classList.add('selected');
+                    selectedOption = idx;
+                }
+                btn.innerHTML = `<span class="option-letter">${letters[idx]}.</span> ${opt}`;
+                btn.onclick = () => selectOption(idx);
+                optionsDiv.appendChild(btn);
+            });
+            
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback';
+            feedback.innerHTML = '';
+            
+            if (answers[currentQuestion] !== undefined) {
+                showFeedback();
+            } else {
+                submitted = false;
+                document.getElementById('submit-btn').style.display = 'inline-block';
+                document.getElementById('submit-btn').disabled = false;
+                document.getElementById('next-btn').style.display = 'none';
+            }
+            
+            document.getElementById('prev-btn').disabled = currentQuestion === 0;
+        }
+
+        function selectOption(idx) {
+            if (submitted) return;
+            selectedOption = idx;
+            const options = document.querySelectorAll('.option');
+            options.forEach((opt, i) => {
+                opt.classList.toggle('selected', i === idx);
+            });
+        }
+
+        function submitAnswer() {
+            if (selectedOption === null) return;
+            submitted = true;
+            answers[currentQuestion] = selectedOption;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach((opt, i) => {
+                opt.disabled = true;
+                if (i === questions[currentQuestion].correct) {
+                    opt.classList.add('correct');
+                } else if (i === selectedOption && i !== questions[currentQuestion].correct) {
+                    opt.classList.add('wrong');
+                }
+            });
+            
+            showFeedback();
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+
+        function showFeedback() {
+            const q = questions[currentQuestion];
+            const feedback = document.getElementById('feedback');
+            const isCorrect = answers[currentQuestion] === q.correct;
+            
+            feedback.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
+            feedback.innerHTML = `<strong>${isCorrect ? 'Correct!' : 'Incorrect.'}</strong><br>${q.explanation}`;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                selectedOption = null;
+                submitted = false;
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                selectedOption = answers[currentQuestion] !== undefined ? answers[currentQuestion] : null;
+                submitted = answers[currentQuestion] !== undefined;
+                loadQuestion();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('results').classList.add('show');
+            
+            let correct = 0;
+            answers.forEach((ans, idx) => {
+                if (ans === questions[idx].correct) correct++;
+            });
+            
+            const percentage = Math.round((correct / questions.length) * 100);
+            document.getElementById('score-circle').textContent = `${percentage}%`;
+            document.getElementById('score-details').textContent = `You got ${correct} out of ${questions.length} questions correct.`;
+            
+            let message = '';
+            if (percentage >= 90) message = 'Outstanding! Excellent understanding of learning theory!';
+            else if (percentage >= 75) message = 'Great job! Strong grasp of classical and operant conditioning.';
+            else if (percentage >= 60) message = 'Good effort! Review the explanations to strengthen understanding.';
+            else message = 'Keep studying! Focus on the concepts in the explanations.';
+            
+            document.getElementById('score-message').textContent = message;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            selectedOption = null;
+            answers = [];
+            submitted = false;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('results').classList.remove('show');
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
