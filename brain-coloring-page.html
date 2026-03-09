@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Coloring Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .brain-container {
+            background: white;
+            display: inline-block;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .brain-outline {
+            fill: white;
+            stroke: #333;
+            stroke-width: 3;
+        }
+        .lobe-line {
+            stroke: #333;
+            stroke-width: 2;
+            fill: none;
+        }
+        .label {
+            font-size: 14px;
+            font-weight: bold;
+            fill: #333;
+        }
+        .instruction {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+        }
+        @media print {
+            body { background: white; }
+            .brain-container { box-shadow: none; }
+            .instruction { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <h1>🧠 Brain Coloring Page</h1>
+    <p>Color each lobe and label the parts!</p>
+    
+    <div class="brain-container">
+        <svg width="500" height="600" viewBox="0 0 500 600">
+            <!-- Brain Outline - Left Hemisphere -->
+            <path class="brain-outline" d="M 250 50 
+                C 150 50, 80 120, 80 220
+                C 80 280, 100 330, 130 370
+                C 140 400, 150 430, 160 460
+                C 170 500, 200 530, 250 540
+                L 250 50 Z"/>
+            
+            <!-- Brain Outline - Right Hemisphere -->
+            <path class="brain-outline" d="M 250 50
+                C 350 50, 420 120, 420 220
+                C 420 280, 400 330, 370 370
+                C 360 400, 350 430, 340 460
+                C 330 500, 300 530, 250 540
+                L 250 50 Z"/>
+            
+            <!-- Central Sulcus (divides frontal and parietal) -->
+            <path class="lobe-line" d="M 252 55 Q 240 150 245 250 Q 248 320 255 380"/>
+            
+            <!-- Lateral Sulcus (Sylvian fissure - divides temporal) -->
+            <path class="lobe-line" d="M 130 320 Q 180 340 250 345 Q 320 340 370 320"/>
+            
+            <!-- Parieto-occipital boundary -->
+            <path class="lobe-line" d="M 90 280 Q 120 260 140 250"/>
+            <path class="lobe-line" d="M 410 280 Q 380 260 360 250"/>
+            
+            <!-- Frontal Lobe detail lines -->
+            <path class="lobe-line" d="M 120 150 Q 180 140 240 130"/>
+            <path class="lobe-line" d="M 130 200 Q 190 190 242 180"/>
+            <path class="lobe-line" d="M 380 150 Q 320 140 260 130"/>
+            <path class="lobe-line" d="M 370 200 Q 310 190 258 180"/>
+            
+            <!-- Parietal Lobe detail lines -->
+            <path class="lobe-line" d="M 100 260 Q 150 270 200 265"/>
+            <path class="lobe-line" d="M 400 260 Q 350 270 300 265"/>
+            
+            <!-- Temporal Lobe detail lines -->
+            <path class="lobe-line" d="M 140 380 Q 180 400 220 395 Q 250 390 250 390"/>
+            <path class="lobe-line" d="M 360 380 Q 320 400 280 395 Q 250 390 250 390"/>
+            <path class="lobe-line" d="M 160 440 Q 200 450 240 445"/>
+            <path class="lobe-line" d="M 340 440 Q 300 450 260 445"/>
+            
+            <!-- Occipital Lobe detail -->
+            <path class="lobe-line" d="M 160 480 Q 200 490 240 485"/>
+            <path class="lobe-line" d="M 340 480 Q 300 490 260 485"/>
+            
+            <!-- Cerebellum (at bottom) -->
+            <ellipse cx="200" cy="520" rx="35" ry="25" class="brain-outline"/>
+            <ellipse cx="300" cy="520" rx="35" ry="25" class="brain-outline"/>
+            <path class="lobe-line" d="M 200 505 Q 200 535 200 535"/>
+            <path class="lobe-line" d="M 300 505 Q 300 535 300 535"/>
+            
+            <!-- Brain Stem -->
+            <path class="brain-outline" d="M 235 545 L 235 570 Q 250 580 265 570 L 265 545 Z"/>
+            <path class="lobe-line" d="M 250 545 L 250 575"/>
+            
+            <!-- Labels -->
+            <text x="250" y="30" class="label" text-anchor="middle">FRONTAL LOBE</text>
+            <text x="100" y="240" class="label" text-anchor="middle">PARIETAL</text>
+            <text x="100" y="255" class="label" text-anchor="middle">LOBE</text>
+            <text x="400" y="240" class="label" text-anchor="middle">PARIETAL</text>
+            <text x="400" y="255" class="label" text-anchor="middle">LOBE</text>
+            <text x="120" y="400" class="label" text-anchor="middle">TEMPORAL</text>
+            <text x="120" y="415" class="label" text-anchor="middle">LOBE</text>
+            <text x="380" y="400" class="label" text-anchor="middle">TEMPORAL</text>
+            <text x="380" y="415" class="label" text-anchor="middle">LOBE</text>
+            <text x="250" y="510" class="label" text-anchor="middle">OCCIPITAL LOBE</text>
+            <text x="200" y="585" class="label" text-anchor="middle" font-size="12">CEREBELLUM</text>
+            <text x="300" y="585" class="label" text-anchor="middle" font-size="12">CEREBELLUM</text>
+            <text x="250" y="595" class="label" text-anchor="middle" font-size="10">BRAIN STEM</text>
+            
+            <!-- Color key boxes -->
+            <rect x="20" y="100" width="15" height="15" fill="none" stroke="#333" stroke-width="1"/>
+            <text x="40" y="112" font-size="10" fill="#666">Frontal = Executive Function</text>
+            
+            <rect x="20" y="120" width="15" height="15" fill="none" stroke="#333" stroke-width="1"/>
+            <text x="40" y="132" font-size="10" fill="#666">Parietal = Sensory Integration</text>
+            
+            <rect x="20" y="140" width="15" height="15" fill="none" stroke="#333" stroke-width="1"/>
+            <text x="40" y="152" font-size="10" fill="#666">Temporal = Memory/Audio</text>
+            
+            <rect x="20" y="160" width="15" height="15" fill="none" stroke="#333" stroke-width="1"/>
+            <text x="40" y="172" font-size="10" fill="#666">Occipital = Vision</text>
+        </svg>
+    </div>
+    
+    <p class="instruction">💡 Tip: Right-click and "Print" or save as PDF to use digitally!</p>
+    <p class="instruction">Color code: Frontal (Blue), Parietal (Green), Temporal (Yellow), Occipital (Red), Cerebellum (Purple)</p>
+</body>
+</html>
