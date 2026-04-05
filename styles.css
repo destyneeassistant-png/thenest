@@ -288,6 +288,53 @@ body {
     border-radius: 12px;
 }
 
+.schedule-summary,
+.weekly-day-summary {
+    color: var(--text-secondary);
+    margin-bottom: 0.9rem;
+    line-height: 1.5;
+}
+
+.weekly-plan-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.weekly-day-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.weekly-day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.weekly-day-header span {
+    color: var(--neon-blue);
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+.weekly-day-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.weekly-time {
+    color: var(--neon-pink);
+    font-family: monospace;
+    margin-right: 0.4rem;
+}
+
 .schedule-item {
     display: flex;
     justify-content: space-between;
@@ -649,6 +696,11 @@ body {
     .dashboard {
         grid-template-columns: 1fr;
         padding: 1rem;
+    }
+
+    .weekly-day-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
     
     .pin-pad {

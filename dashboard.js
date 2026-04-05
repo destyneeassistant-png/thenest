@@ -6,6 +6,93 @@ const CONFIG = {
     DB_VERSION: 2
 };
 
+const WEEK_OVERRIDE = {
+    startDate: '2026-04-06',
+    endDate: '2026-04-11',
+    dissertation: {
+        currentPage: 27,
+        targetPage: 40,
+        weeklyHourGoal: 10
+    },
+    weekPlan: [
+        {
+            date: '2026-04-06',
+            dayName: 'Monday',
+            agenda: [
+                { time: '6:30-7:15am', task: 'Moto + meditation' },
+                { time: '7:15-9:15am', task: 'Dissertation Chapter 1 (2h)' },
+                { time: '9:15-10:15am', task: 'Buffer / get ready / admin' },
+                { time: '10:30-11:00am', task: 'Meeting' },
+                { time: '11:00am-5:30pm', task: 'Practicum' },
+                { time: 'Evening', task: 'Homework after getting home' }
+            ],
+            summary: 'Heavy day. Protect the morning dissertation block and do homework at night.'
+        },
+        {
+            date: '2026-04-07',
+            dayName: 'Tuesday',
+            agenda: [
+                { time: '6:30-7:15am', task: 'Moto + meditation' },
+                { time: '7:15-8:45am', task: 'Dissertation (1.5h minimum)' },
+                { time: '8:45-11:30am', task: 'Homework / prep before class' },
+                { time: '12:30-6:30pm', task: 'Class' },
+                { time: 'Evening', task: 'Homework' },
+                { time: 'Optional', task: 'Light yoga if energy allows' }
+            ],
+            summary: 'Class day. Keep expectations realistic but still get the dissertation block done.'
+        },
+        {
+            date: '2026-04-08',
+            dayName: 'Wednesday',
+            agenda: [
+                { time: '6:30-7:15am', task: 'Moto + meditation' },
+                { time: '7:15-8:45am', task: 'Dissertation (1.5h)' },
+                { time: '9:30-10:30am', task: 'Supervision' },
+                { time: '10:30am-5:00pm', task: 'Practicum' },
+                { time: 'Evening', task: 'Homework' },
+                { time: 'Optional', task: 'Short yoga session' }
+            ],
+            summary: 'Another full day. Morning writing matters because the rest gets swallowed.'
+        },
+        {
+            date: '2026-04-09',
+            dayName: 'Thursday',
+            agenda: [
+                { time: '6:30-7:15am', task: 'Moto + meditation' },
+                { time: '7:15-9:30am', task: 'Dissertation block' },
+                { time: '10:00-11:00am', task: 'Therapy' },
+                { time: '11:30am-12:30pm', task: 'Practicum' },
+                { time: 'Afternoon', task: 'Coffee shop homework / dissertation session' },
+                { time: 'Goal', task: 'Reach 3-4 dissertation hours total' },
+                { time: 'Movement', task: 'Gym or yoga' }
+            ],
+            summary: 'This is the big push day. Don\'t waste it.'
+        },
+        {
+            date: '2026-04-10',
+            dayName: 'Friday',
+            agenda: [
+                { time: '12:00-8:00am', task: 'Work shift (from home)' },
+                { time: 'After shift', task: 'Recovery sleep block' },
+                { time: 'Later', task: 'Practicum tasks or dissertation completion/review' },
+                { time: 'Movement', task: 'Gentle yoga only if energy is okay' }
+            ],
+            summary: 'Recovery-adjusted day. Because you work from home, schoolwork may be possible during slow periods.'
+        },
+        {
+            date: '2026-04-11',
+            dayName: 'Saturday',
+            agenda: [
+                { time: '6:30-7:15am', task: 'Moto + meditation' },
+                { time: 'Main priority', task: 'Report writing' },
+                { time: 'Secondary', task: 'Catch-up from dissertation / practicum if needed' },
+                { time: 'Movement', task: 'Gym or yoga if weekly goal still needs a third session' }
+            ],
+            summary: 'Report-writing day with cleanup space.'
+        }
+    ]
+};
+
 // Database class (shared with main app)
 class NestDatabase {
     constructor() {
@@ -47,6 +134,9 @@ class NestDatabase {
                 if (!db.objectStoreNames.contains('notes')) {
                     const notesStore = db.createObjectStore('notes', { keyPath: 'id', autoIncrement: true });
                     notesStore.createIndex('date', 'date', { unique: false });
+                }
+                if (!db.objectStoreNames.contains('weeklyPlans')) {
+                    db.createObjectStore('weeklyPlans', { keyPath: 'weekKey' });
                 }
             };
         });
@@ -145,6 +235,7 @@ class Dashboard {
 
         // Load schedule and calendar first (don't depend on DB)
         this.loadSchedule();
+        this.loadWeeklyPlan();
         console.log('Schedule loaded');
         this.loadCalendar();
         console.log('Calendar loaded');
@@ -271,7 +362,7 @@ class Dashboard {
         const today = new Date().toDateString();
         const logs = await this.db.getTimeLogs(today);
 
-        const totals = { quals: 0, dissertation: 0, reports: 0, class: 0 };
+        const totals = { dissertation: 0, homework: 0, reports: 0, class: 0 };
 
         logs.forEach(log => {
             if (totals[log.category] !== undefined) {
@@ -279,12 +370,12 @@ class Dashboard {
             }
         });
 
-        document.getElementById('quals-time').textContent = this.formatTime(totals.quals);
         document.getElementById('dissertation-time').textContent = this.formatTime(totals.dissertation);
+        document.getElementById('homework-time').textContent = this.formatTime(totals.homework);
         document.getElementById('reports-time').textContent = this.formatTime(totals.reports);
         document.getElementById('class-time').textContent = this.formatTime(totals.class);
 
-        const total = totals.quals + totals.dissertation + totals.reports + totals.class;
+        const total = totals.dissertation + totals.homework + totals.reports + totals.class;
         document.getElementById('total-time').textContent = this.formatTime(total);
     }
 
@@ -295,18 +386,18 @@ class Dashboard {
     }
 
     async loadProgress() {
-        const qualsProgress = await this.db.getProgress('quals') || { value: 0 };
-        const dissProgress = await this.db.getProgress('dissertation') || { value: 0 };
-        const reportProgress = await this.db.getProgress('reports') || { value: 0 };
+        const dissProgress = await this.db.getProgress('dissertation') || { value: WEEK_OVERRIDE.dissertation.currentPage };
+        const dissertationHours = await this.db.getProgress('dissertationHours') || { value: 0 };
+        const movementProgress = await this.db.getProgress('movement') || { value: 0 };
 
-        document.getElementById('quals-progress').style.width = Math.min((qualsProgress.value / 300) * 100, 100) + '%';
-        document.getElementById('quals-progress-text').textContent = `${Math.round((qualsProgress.value / 300) * 100)}%`;
+        document.getElementById('diss-progress').style.width = Math.min((dissProgress.value / WEEK_OVERRIDE.dissertation.targetPage) * 100, 100) + '%';
+        document.getElementById('diss-progress-text').textContent = `${dissProgress.value}/${WEEK_OVERRIDE.dissertation.targetPage}`;
 
-        document.getElementById('diss-progress').style.width = Math.min((dissProgress.value / 20) * 100, 100) + '%';
-        document.getElementById('diss-progress-text').textContent = `${dissProgress.value}/20`;
+        document.getElementById('dissertation-hours-progress').style.width = Math.min((dissertationHours.value / WEEK_OVERRIDE.dissertation.weeklyHourGoal) * 100, 100) + '%';
+        document.getElementById('dissertation-hours-text').textContent = `${dissertationHours.value}/${WEEK_OVERRIDE.dissertation.weeklyHourGoal}h`;
 
-        document.getElementById('report-progress').style.width = Math.min((reportProgress.value / 21) * 100, 100) + '%';
-        document.getElementById('report-progress-text').textContent = `${reportProgress.value}/21`;
+        document.getElementById('movement-progress').style.width = Math.min((movementProgress.value / 3) * 100, 100) + '%';
+        document.getElementById('movement-progress-text').textContent = `${movementProgress.value}/3`;
 
         // Update pie chart with latest progress data
         this.updatePieChart();
@@ -327,10 +418,10 @@ class Dashboard {
         this.pieChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Quals Study', 'Dissertation', 'Reports', 'Remaining'],
+                labels: ['Dissertation Pages', 'Dissertation Hours', 'Movement', 'Remaining'],
                 datasets: [{
                     data: [0, 0, 0, 100],
-                    backgroundColor: [colors.quals, colors.dissertation, colors.reports, colors.remaining],
+                    backgroundColor: [colors.dissertation, colors.quals, colors.reports, colors.remaining],
                     borderColor: '#0a0a0f',
                     borderWidth: 3,
                     hoverOffset: 8
@@ -355,9 +446,9 @@ class Dashboard {
                             label: (context) => {
                                 const label = context.label || '';
                                 const value = context.raw || 0;
-                                if (label === 'Quals Study') return ` ${label}: ${value.toFixed(1)}% (of 300h)`;
-                                if (label === 'Dissertation') return ` ${label}: ${value.toFixed(1)}% (of 20pg)`;
-                                if (label === 'Reports') return ` ${label}: ${value.toFixed(1)}% (of 21h)`;
+                                if (label === 'Dissertation Pages') return ` ${label}: ${value.toFixed(1)}% (of ${WEEK_OVERRIDE.dissertation.targetPage} pages)`;
+                                if (label === 'Dissertation Hours') return ` ${label}: ${value.toFixed(1)}% (of ${WEEK_OVERRIDE.dissertation.weeklyHourGoal}h)`;
+                                if (label === 'Movement') return ` ${label}: ${value.toFixed(1)}% (of 3 sessions)`;
                                 return ` ${label}: ${value.toFixed(1)}%`;
                             }
                         }
@@ -375,125 +466,88 @@ class Dashboard {
         if (!this.pieChart) return;
 
         // Get progress data from database
-        const qualsProgress = await this.db.getProgress('quals') || { value: 0 };
-        const dissProgress = await this.db.getProgress('dissertation') || { value: 0 };
-        const reportProgress = await this.db.getProgress('reports') || { value: 0 };
+        const dissProgress = await this.db.getProgress('dissertation') || { value: WEEK_OVERRIDE.dissertation.currentPage };
+        const dissertationHours = await this.db.getProgress('dissertationHours') || { value: 0 };
+        const movementProgress = await this.db.getProgress('movement') || { value: 0 };
 
         // Calculate percentages based on goals
-        const qualsPercent = Math.min((qualsProgress.value / 300) * 100, 100);
-        const dissPercent = Math.min((dissProgress.value / 20) * 100, 100);
-        const reportPercent = Math.min((reportProgress.value / 21) * 100, 100);
+        const dissPercent = Math.min((dissProgress.value / WEEK_OVERRIDE.dissertation.targetPage) * 100, 100);
+        const hoursPercent = Math.min((dissertationHours.value / WEEK_OVERRIDE.dissertation.weeklyHourGoal) * 100, 100);
+        const movementPercent = Math.min((movementProgress.value / 3) * 100, 100);
 
         // Calculate remaining (to make chart look complete)
-        const totalPercent = qualsPercent + dissPercent + reportPercent;
+        const totalPercent = dissPercent + hoursPercent + movementPercent;
         const remainingPercent = Math.max(0, 100 - (totalPercent / 3));
 
         // Update chart data
-        this.pieChart.data.datasets[0].data = [qualsPercent, dissPercent, reportPercent, remainingPercent];
+        this.pieChart.data.datasets[0].data = [dissPercent, hoursPercent, movementPercent, remainingPercent];
         this.pieChart.update();
 
         // Update custom legend
         const legendContainer = document.getElementById('piechart-legend');
         if (legendContainer) {
             const colors = {
-                quals: '#00f5ff',
+                hours: '#00f5ff',
                 dissertation: '#ff006e',
-                reports: '#39ff14'
+                movement: '#39ff14'
             };
 
             legendContainer.innerHTML = `
                 <div class="piechart-legend-item">
-                    <span class="piechart-legend-color" style="background: ${colors.quals}"></span>
-                    <span class="piechart-legend-label">Quals:</span>
-                    <span class="piechart-legend-value">${qualsProgress.value}h</span>
-                </div>
-                <div class="piechart-legend-item">
                     <span class="piechart-legend-color" style="background: ${colors.dissertation}"></span>
-                    <span class="piechart-legend-label">Dissertation:</span>
-                    <span class="piechart-legend-value">${dissProgress.value}pg</span>
+                    <span class="piechart-legend-label">Dissertation pages:</span>
+                    <span class="piechart-legend-value">${dissProgress.value}/${WEEK_OVERRIDE.dissertation.targetPage}</span>
                 </div>
                 <div class="piechart-legend-item">
-                    <span class="piechart-legend-color" style="background: ${colors.reports}"></span>
-                    <span class="piechart-legend-label">Reports:</span>
-                    <span class="piechart-legend-value">${reportProgress.value}h</span>
+                    <span class="piechart-legend-color" style="background: ${colors.hours}"></span>
+                    <span class="piechart-legend-label">Dissertation hours:</span>
+                    <span class="piechart-legend-value">${dissertationHours.value}/${WEEK_OVERRIDE.dissertation.weeklyHourGoal}h</span>
+                </div>
+                <div class="piechart-legend-item">
+                    <span class="piechart-legend-color" style="background: ${colors.movement}"></span>
+                    <span class="piechart-legend-label">Movement:</span>
+                    <span class="piechart-legend-value">${movementProgress.value}/3</span>
                 </div>
             `;
         }
     }
 
     loadSchedule() {
-        const dayOfWeek = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
-        
-        // Define schedules for each day
-        const schedules = {
-            0: { // Sunday
-                dayName: 'Sunday',
-                items: [
-                    { time: 'All Day', task: 'Heavy Study Day' },
-                    { time: 'Focus', task: 'Quals preparation or dissertation work' }
-                ]
-            },
-            1: { // Monday
-                dayName: 'Monday',
-                items: [
-                    { time: '12:00pm', task: 'Group Supervision' },
-                    { time: '1:00pm', task: 'Client 1' },
-                    { time: '2:00pm', task: 'Client 2' }
-                ]
-            },
-            2: { // Tuesday
-                dayName: 'Tuesday',
-                items: [
-                    { time: '9:00am', task: 'Dissertation Meeting' },
-                    { time: '10:00am', task: 'Class begins' },
-                    { time: '6:30pm', task: 'Class ends' }
-                ]
-            },
-            3: { // Wednesday
-                dayName: 'Wednesday',
-                items: [
-                    { time: '8:30am', task: 'Supervision' },
-                    { time: '10:00am', task: 'Client 1' },
-                    { time: '12:00pm', task: 'Client 2' },
-                    { time: '1:00pm', task: 'Client 3' }
-                ]
-            },
-            4: { // Thursday
-                dayName: 'Thursday',
-                items: [
-                    { time: 'All Day', task: 'OFF DAY' },
-                    { time: 'Focus', task: 'Dissertation/Quals work (no fixed events)' }
-                ]
-            },
-            5: { // Friday
-                dayName: 'Friday',
-                items: [
-                    { time: 'All Day', task: 'OFF DAY' },
-                    { time: 'Focus', task: 'Dissertation/Quals work (no fixed events)' }
-                ]
-            },
-            6: { // Saturday
-                dayName: 'Saturday',
-                items: [
-                    { time: 'All Day', task: 'Heavy Study Day' },
-                    { time: 'Focus', task: 'Intensive study session' }
-                ]
-            }
-        };
-
-        const todaySchedule = schedules[dayOfWeek];
+        const today = new Date().toISOString().slice(0, 10);
+        const todayPlan = WEEK_OVERRIDE.weekPlan.find(day => day.date === today);
         const container = document.getElementById('today-schedule');
-        
-        if (todaySchedule && todaySchedule.items.length > 0) {
-            container.innerHTML = todaySchedule.items.map(item => `
-                <div class="schedule-item">
-                    <span class="time">${item.time}</span>
-                    <span>${item.task}</span>
-                </div>
-            `).join('');
+
+        if (todayPlan) {
+            container.innerHTML = `
+                <div class="schedule-summary">${todayPlan.summary}</div>
+                ${todayPlan.agenda.map(item => `
+                    <div class="schedule-item">
+                        <span class="time">${item.time}</span>
+                        <span>${item.task}</span>
+                    </div>
+                `).join('')}
+            `;
         } else {
-            container.innerHTML = '<p class="no-events">No scheduled events for today.</p>';
+            container.innerHTML = '<p class="no-events">No custom agenda loaded for today yet.</p>';
         }
+    }
+
+    loadWeeklyPlan() {
+        const container = document.getElementById('weekly-plan');
+        if (!container) return;
+
+        container.innerHTML = WEEK_OVERRIDE.weekPlan.map(day => `
+            <div class="weekly-day-card">
+                <div class="weekly-day-header">
+                    <strong>${day.dayName}</strong>
+                    <span>${day.date}</span>
+                </div>
+                <div class="weekly-day-summary">${day.summary}</div>
+                <ul class="weekly-day-list">
+                    ${day.agenda.map(item => `<li><span class="weekly-time">${item.time}</span> ${item.task}</li>`).join('')}
+                </ul>
+            </div>
+        `).join('');
     }
 
     loadCalendar() {
