@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>The Nest - Calendar</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="assets/owl-icon.svg">
+    <style>
+        .calendar-shell {
+            width: min(1500px, 100%);
+            margin: 0 auto;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 280px minmax(0, 1fr);
+            gap: 1rem;
+        }
+
+        .cal-sidebar,
+        .cal-main {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 18px;
+            box-shadow: 0 0 24px rgba(0, 245, 255, 0.08);
+        }
+
+        .cal-sidebar {
+            padding: 1rem;
+            height: fit-content;
+            position: sticky;
+            top: 88px;
+        }
+
+        .cal-main { overflow: hidden; }
+
+        .cal-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+            padding: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .cal-toolbar-left,
+        .cal-toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            flex-wrap: wrap;
+        }
+
+        .cal-title {
+            font-size: clamp(1.1rem, 3vw, 1.6rem);
+            color: var(--neon-blue);
+            min-width: 220px;
+        }
+
+        .cal-btn,
+        .cal-icon-btn,
+        .cal-view-btn {
+            border: 2px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-radius: 999px;
+            padding: .55rem .9rem;
+            cursor: pointer;
+            transition: all .18s ease;
+            font-size: .9rem;
+        }
+
+        .cal-icon-btn { min-width: 42px; padding: .55rem .7rem; }
+        .cal-btn.primary { background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple)); color: #05050a; font-weight: 800; border-color: transparent; }
+        .cal-btn.danger { border-color: var(--neon-pink); color: var(--neon-pink); }
+        .cal-btn:hover,
+        .cal-icon-btn:hover,
+        .cal-view-btn:hover { transform: translateY(-1px); border-color: var(--neon-blue); }
+        .cal-view-btn.active { background: var(--neon-blue); color: #05050a; border-color: var(--neon-blue); font-weight: 800; }
+
+        .cal-search {
+            width: 100%;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: .75rem;
+            margin: .75rem 0 1rem;
+        }
+
+        .sidebar-title { color: var(--neon-blue); font-size: .95rem; text-transform: uppercase; letter-spacing: .08em; margin: 1rem 0 .6rem; }
+        .mini-month { display: grid; grid-template-columns: repeat(7, 1fr); gap: .25rem; }
+        .mini-cell { text-align: center; padding: .35rem .15rem; border-radius: 8px; font-size: .78rem; color: var(--text-secondary); cursor: pointer; }
+        .mini-cell.header { color: var(--text-muted); cursor: default; font-size: .68rem; text-transform: uppercase; }
+        .mini-cell.today { background: var(--neon-blue); color: #05050a; font-weight: 800; }
+        .mini-cell.selected { outline: 2px solid var(--neon-pink); color: var(--text-primary); }
+
+        .cal-list { display: grid; gap: .5rem; }
+        .cal-list-item { border-left: 4px solid var(--neon-blue); background: var(--bg-tertiary); border-radius: 10px; padding: .65rem; cursor: pointer; }
+        .cal-list-item:hover { filter: brightness(1.15); }
+        .cal-list-time { color: var(--text-secondary); font-size: .78rem; }
+        .cal-list-title { font-weight: 700; }
+        .cal-muted { color: var(--text-muted); font-size: .88rem; }
+
+        .calendar-stage { padding: 1rem; min-height: 70vh; }
+        .month-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; }
+        .month-head { background: var(--bg-tertiary); color: var(--text-secondary); padding: .75rem; text-align: center; font-size: .8rem; text-transform: uppercase; border-right: 1px solid var(--border-color); }
+        .month-cell { min-height: 130px; padding: .45rem; border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); background: rgba(26,26,46,.64); cursor: pointer; overflow: hidden; }
+        .month-cell:hover { background: rgba(42,42,62,.9); }
+        .month-cell.other { opacity: .45; }
+        .month-cell.today { box-shadow: inset 0 0 0 2px var(--neon-blue); }
+        .month-date { display: flex; justify-content: space-between; align-items: center; margin-bottom: .35rem; font-size: .82rem; color: var(--text-secondary); }
+        .month-date strong { color: var(--text-primary); }
+        .event-chip { display: block; width: 100%; border: 0; border-left: 3px solid currentColor; text-align: left; border-radius: 6px; padding: .18rem .35rem; margin: .18rem 0; font-size: .72rem; color: var(--neon-blue); background: rgba(0,245,255,.12); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .event-chip:hover { filter: brightness(1.3); }
+
+        .week-grid { display: grid; grid-template-columns: 70px repeat(7, minmax(115px, 1fr)); border: 1px solid var(--border-color); border-radius: 14px; overflow: auto; max-height: 74vh; }
+        .week-corner, .week-day-head, .time-label, .time-slot { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .week-corner, .week-day-head { position: sticky; top: 0; z-index: 2; background: var(--bg-tertiary); }
+        .week-day-head { padding: .8rem .35rem; text-align: center; }
+        .week-day-head.today { background: linear-gradient(135deg, rgba(0,245,255,.85), rgba(131,56,236,.85)); color: #05050a; font-weight: 800; }
+        .time-label { background: var(--bg-secondary); color: var(--text-muted); padding: .45rem; font-size: .74rem; min-height: 62px; }
+        .time-slot { min-height: 62px; padding: .25rem; cursor: pointer; background: rgba(26,26,46,.4); }
+        .time-slot:hover { background: rgba(42,42,62,.95); }
+        .week-event { display: block; width: 100%; border: 0; border-radius: 7px; padding: .25rem .35rem; margin-bottom: .18rem; color: #05050a; font-size: .72rem; font-weight: 700; text-align: left; cursor: pointer; }
+
+        .day-layout { display: grid; grid-template-columns: 90px minmax(0, 1fr); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; }
+        .day-hour { border-bottom: 1px solid var(--border-color); padding: .65rem; color: var(--text-muted); min-height: 70px; }
+        .day-slot { border-bottom: 1px solid var(--border-color); padding: .45rem; min-height: 70px; cursor: pointer; }
+        .day-slot:hover { background: rgba(42,42,62,.9); }
+        .day-event { border-left: 4px solid currentColor; background: rgba(0,245,255,.12); border-radius: 9px; padding: .55rem; margin-bottom: .4rem; cursor: pointer; }
+
+        .agenda-group { margin-bottom: 1rem; }
+        .agenda-date { color: var(--neon-blue); font-weight: 800; padding: .6rem 0; border-bottom: 1px solid var(--border-color); }
+
+        .cal-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.78); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
+        .cal-modal.active { display: flex; }
+        .cal-modal-card { width: min(680px, 100%); max-height: 92vh; overflow: auto; background: var(--bg-secondary); border: 2px solid var(--border-color); border-radius: 18px; box-shadow: 0 0 40px rgba(0,245,255,.2); }
+        .cal-modal-head { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 2px solid var(--border-color); }
+        .cal-form { padding: 1.25rem; display: grid; gap: .9rem; }
+        .cal-form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; }
+        .cal-form label { display: grid; gap: .35rem; color: var(--text-secondary); font-size: .88rem; }
+        .cal-form input, .cal-form select, .cal-form textarea { width: 100%; background: var(--bg-tertiary); color: var(--text-primary); border: 2px solid var(--border-color); border-radius: 10px; padding: .72rem; }
+        .cal-form textarea { min-height: 80px; resize: vertical; }
+        .cal-form input:focus, .cal-form select:focus, .cal-form textarea:focus { outline: none; border-color: var(--neon-blue); }
+        .form-actions { display: flex; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+        .form-actions-right { display: flex; gap: .75rem; }
+
+        @media (max-width: 950px) {
+            .calendar-shell { grid-template-columns: 1fr; }
+            .cal-sidebar { position: static; }
+            .month-cell { min-height: 82px; }
+            .event-chip { font-size: 0; width: 8px; height: 8px; border-radius: 50%; padding: 0; display: inline-block; }
+            .week-grid { grid-template-columns: 48px repeat(7, 92px); }
+            .cal-form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="logo" onclick="window.location.href='dashboard.html'" style="cursor:pointer;" title="Go to Dashboard">
+            <img src="assets/owl-icon.svg" class="owl-icon-small" alt="">
+            <span>The Nest - Calendar</span>
+        </div>
+        <div class="header-date" id="calendar-today-label"></div>
+        <div class="header-actions">
+            <button class="cal-btn" onclick="window.location.href='dashboard.html'">Dashboard</button>
+        </div>
+    </header>
+
+    <main class="calendar-shell">
+        <aside class="cal-sidebar">
+            <button class="cal-btn primary" id="create-event-btn" style="width:100%;">+ Create Event</button>
+            <input class="cal-search" id="calendar-search" placeholder="Search events..." aria-label="Search events">
+
+            <div class="sidebar-title">Mini Calendar</div>
+            <div class="mini-month" id="mini-month"></div>
+
+            <div class="sidebar-title">Upcoming</div>
+            <div class="cal-list" id="upcoming-list"></div>
+
+            <div class="sidebar-title">Tools</div>
+            <div class="cal-list">
+                <button class="cal-btn" id="export-events-btn">Export JSON</button>
+                <label class="cal-btn" style="text-align:center;">
+                    Import JSON
+                    <input type="file" id="import-events-input" accept="application/json" hidden>
+                </label>
+            </div>
+        </aside>
+
+        <section class="cal-main">
+            <div class="cal-toolbar">
+                <div class="cal-toolbar-left">
+                    <button class="cal-icon-btn" id="prev-btn">←</button>
+                    <button class="cal-btn" id="today-btn">Today</button>
+                    <button class="cal-icon-btn" id="next-btn">→</button>
+                    <h1 class="cal-title" id="cal-title">Calendar</h1>
+                </div>
+                <div class="cal-toolbar-right" role="tablist" aria-label="Calendar views">
+                    <button class="cal-view-btn active" data-view="month">Month</button>
+                    <button class="cal-view-btn" data-view="week">Week</button>
+                    <button class="cal-view-btn" data-view="day">Day</button>
+                    <button class="cal-view-btn" data-view="agenda">Agenda</button>
+                </div>
+            </div>
+            <div class="calendar-stage" id="calendar-stage"></div>
+        </section>
+    </main>
+
+    <div class="cal-modal" id="event-modal" aria-hidden="true">
+        <div class="cal-modal-card">
+            <div class="cal-modal-head">
+                <h2 id="modal-title">Create Event</h2>
+                <button class="close-btn" id="close-modal" aria-label="Close">×</button>
+            </div>
+            <form class="cal-form" id="event-form">
+                <input type="hidden" id="event-id">
+                <label>Title
+                    <input id="event-title" required placeholder="Class, dissertation block, meeting...">
+                </label>
+                <div class="cal-form-row">
+                    <label>Date
+                        <input type="date" id="event-date" required>
+                    </label>
+                    <label>Calendar
+                        <select id="event-calendar">
+                            <option value="class">Class</option>
+                            <option value="dissertation">Dissertation</option>
+                            <option value="study">Study</option>
+                            <option value="meeting">Meeting</option>
+                            <option value="clinical">Clinical / Practicum</option>
+                            <option value="wellness">Wellness</option>
+                            <option value="personal">Personal</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="cal-form-row">
+                    <label>Start time
+                        <input type="time" id="event-start" required>
+                    </label>
+                    <label>End time
+                        <input type="time" id="event-end" required>
+                    </label>
+                </div>
+                <div class="cal-form-row">
+                    <label>Repeat
+                        <select id="event-repeat">
+                            <option value="none">Does not repeat</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </label>
+                    <label>Reminder
+                        <select id="event-reminder">
+                            <option value="none">No reminder</option>
+                            <option value="10">10 minutes before</option>
+                            <option value="30">30 minutes before</option>
+                            <option value="60">1 hour before</option>
+                            <option value="1440">1 day before</option>
+                        </select>
+                    </label>
+                </div>
+                <label>Location
+                    <input id="event-location" placeholder="Optional">
+                </label>
+                <label>Notes
+                    <textarea id="event-notes" placeholder="Optional notes, links, prep reminders..."></textarea>
+                </label>
+                <div class="form-actions">
+                    <button type="button" class="cal-btn danger" id="delete-event-btn" style="display:none;">Delete</button>
+                    <div class="form-actions-right">
+                        <button type="button" class="cal-btn" id="cancel-event-btn">Cancel</button>
+                        <button type="submit" class="cal-btn primary">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="calendar.js"></script>
+</body>
+</html>
