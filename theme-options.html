@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#050509">
+    <title>The Nest - Theme Options</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="assets/owl-icon.svg">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: #fff;
+            background: #050509;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 16% 18%, rgba(255,255,255,.13) 0 1px, transparent 2px),
+                radial-gradient(circle at 76% 12%, rgba(255,255,255,.18) 0 1px, transparent 2px),
+                radial-gradient(circle at 42% 84%, rgba(255,255,255,.11) 0 1px, transparent 2px),
+                radial-gradient(circle at var(--star-x, 50%) 22%, rgba(255,255,255,.08), transparent 25rem),
+                var(--page-bg, #050509);
+            pointer-events: none;
+            z-index: -2;
+        }
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(255,255,255,.12);
+            background: rgba(5,5,9,.78);
+            backdrop-filter: blur(14px);
+        }
+        .brand { display: flex; align-items: center; gap: .75rem; font-weight: 800; }
+        .brand img { width: 34px; height: 34px; }
+        .nav-actions { display: flex; gap: .7rem; flex-wrap: wrap; }
+        a, button { font: inherit; }
+        .nav-link, .ghost-btn, .pick-btn {
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: 999px;
+            padding: .72rem 1rem;
+            color: #fff;
+            background: rgba(255,255,255,.06);
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform .2s ease, border-color .2s ease, background .2s ease;
+        }
+        .nav-link:hover, .ghost-btn:hover, .pick-btn:hover { transform: translateY(-2px); border-color: var(--accent, #ff7ab6); }
+        .hero {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 3rem 1.25rem 1rem;
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
+            gap: 2rem;
+            align-items: center;
+        }
+        .eyebrow {
+            color: var(--accent, #ff7ab6);
+            text-transform: uppercase;
+            letter-spacing: .2em;
+            font-weight: 800;
+            font-size: .75rem;
+            margin-bottom: .75rem;
+        }
+        h1 { font-size: clamp(2.2rem, 5vw, 5rem); line-height: .95; letter-spacing: -.06em; }
+        .hero p { color: rgba(255,255,255,.74); font-size: 1.05rem; line-height: 1.75; margin-top: 1.2rem; max-width: 62ch; }
+        .slideshow {
+            max-width: 1180px;
+            margin: 1rem auto 2rem;
+            padding: 0 1.25rem 2rem;
+        }
+        .slide-shell {
+            position: relative;
+            min-height: 620px;
+            border: 1px solid rgba(255,255,255,.14);
+            border-radius: 34px;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+            box-shadow: 0 30px 80px rgba(0,0,0,.45);
+        }
+        .slide {
+            display: none;
+            min-height: 620px;
+            padding: clamp(1.2rem, 3vw, 2.2rem);
+            background:
+                radial-gradient(circle at 75% 8%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 18rem),
+                linear-gradient(135deg, var(--bg1), var(--bg2));
+        }
+        .slide.active { display: grid; grid-template-columns: 1fr 1.1fr; gap: 2rem; align-items: center; }
+        .theme-card {
+            padding: 1.4rem;
+            border-radius: 28px;
+            border: 1px solid color-mix(in srgb, var(--accent) 36%, rgba(255,255,255,.16));
+            background: rgba(0,0,0,.32);
+            backdrop-filter: blur(12px);
+        }
+        .theme-number { color: var(--accent); font-weight: 900; letter-spacing: .18em; font-size: .8rem; }
+        .theme-card h2 { font-size: clamp(1.9rem, 4vw, 3.2rem); line-height: 1; margin: .5rem 0 1rem; }
+        .theme-card p { color: rgba(255,255,255,.76); line-height: 1.75; }
+        .keywords { display: flex; gap: .5rem; flex-wrap: wrap; margin: 1.2rem 0; }
+        .keywords span { border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.07); border-radius: 999px; padding: .45rem .7rem; color: rgba(255,255,255,.82); }
+        .palette { display: grid; grid-template-columns: repeat(5, 1fr); gap: .5rem; margin-top: 1rem; }
+        .swatch { height: 56px; border-radius: 16px; border: 1px solid rgba(255,255,255,.18); box-shadow: inset 0 0 0 1px rgba(0,0,0,.2); }
+        .preview {
+            border-radius: 30px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.14);
+            background: color-mix(in srgb, var(--panel) 86%, black);
+            box-shadow: 0 24px 50px rgba(0,0,0,.38);
+        }
+        .preview-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid rgba(255,255,255,.1); background: rgba(0,0,0,.24); }
+        .dots { display:flex; gap:.38rem; } .dots i { width:10px; height:10px; border-radius:99px; background:var(--accent); display:block; opacity:.8; }
+        .preview-body { padding: 1rem; display: grid; grid-template-columns: .9fr 1.1fr; gap: 1rem; }
+        .mini-widget { border-radius: 18px; padding: 1rem; background: var(--panel); border: 1px solid rgba(255,255,255,.12); min-height: 110px; }
+        .mini-widget h3 { color: var(--accent); margin-bottom: .65rem; font-size: .92rem; }
+        .line { height: 10px; border-radius: 99px; background: rgba(255,255,255,.14); margin: .55rem 0; }
+        .line.short { width: 58%; } .line.mid { width: 76%; }
+        .book-stack { display: flex; flex-direction: column; gap: .45rem; margin-top: .5rem; }
+        .book-stack span { display:block; height: 16px; border-radius: 5px; background: var(--accent2); opacity:.9; }
+        .brain-map { display:grid; grid-template-columns: repeat(3,1fr); gap:.55rem; }
+        .brain-map span { aspect-ratio:1; border-radius: 40% 60% 50% 50%; background: color-mix(in srgb, var(--accent) 82%, white); opacity: .9; }
+        .controls { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-top: 1rem; }
+        .pager { display:flex; gap:.5rem; flex-wrap:wrap; }
+        .pager button { width: 42px; height: 12px; border:0; border-radius:99px; background: rgba(255,255,255,.2); cursor:pointer; }
+        .pager button.active { background: var(--accent); }
+        .pick-btn { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: var(--button-text, #fff); border: 0; font-weight: 800; }
+        .theme-grid { max-width:1180px; margin:0 auto 3rem; padding:0 1.25rem; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; }
+        .theme-tile { padding:1rem; border-radius:22px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); cursor:pointer; color:#fff; text-align:left; }
+        .theme-tile strong { display:block; margin-bottom:.35rem; color:#fff; } .theme-tile span { color:rgba(255,255,255,.67); font-size:.9rem; }
+        @media (max-width: 860px) {
+            .hero, .slide.active, .preview-body { grid-template-columns: 1fr; }
+            .slide-shell, .slide { min-height: auto; }
+            h1 { letter-spacing: -.04em; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand"><img src="assets/owl-icon.svg" alt=""> The Nest Theme Studio</div>
+        <nav class="nav-actions">
+            <a class="nav-link" href="dashboard.html">Dashboard</a>
+            <a class="nav-link" href="calendar.html">Calendar</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div>
+            <p class="eyebrow">Visual slideshow</p>
+            <h1>Pick the next look for The Nest.</h1>
+            <p>I made these around what you said you love: black, space, books, elephants, psychology, plus a brown + pink option. Flip through them and tell me the name or number you want.</p>
+        </div>
+        <div class="theme-card" style="--accent:#ff9ac8; --accent2:#7b4a32; --bg1:#11090c; --bg2:#050303; --panel:#1d1111;">
+            <div class="theme-number">HOW TO PICK</div>
+            <h2>Choose the vibe first.</h2>
+            <p>Don’t worry about perfect shades yet. Tell me something like “Option 3 but darker” or “Option 5 with more pink.” Then I’ll apply the winning theme to the whole app.</p>
+        </div>
+    </section>
+
+    <main class="slideshow">
+        <section class="slide-shell" id="slide-shell">
+            <article class="slide active" data-name="Black Cosmic Library" style="--bg1:#03030a; --bg2:#15102a; --panel:#0d0d18; --accent:#9d7cff; --accent2:#ff7ab6; --button-text:#fff;">
+                <div class="theme-card"><div class="theme-number">OPTION 1</div><h2>Black Cosmic Library</h2><p>Deep black base with violet stars, soft pink highlights, and a quiet library-at-midnight feel. This is the safest “Destynee” option if you want black + space + academic.</p><div class="keywords"><span>black</span><span>space</span><span>books</span><span>calm</span></div><div class="palette"><i class="swatch" style="background:#03030a"></i><i class="swatch" style="background:#15102a"></i><i class="swatch" style="background:#9d7cff"></i><i class="swatch" style="background:#ff7ab6"></i><i class="swatch" style="background:#f4eefc"></i></div></div>
+                <div class="preview"><div class="preview-header"><strong>The Nest</strong><div class="dots"><i></i><i></i><i></i></div></div><div class="preview-body"><div class="mini-widget"><h3>Today’s Agenda</h3><div class="line"></div><div class="line mid"></div><div class="line short"></div></div><div class="mini-widget"><h3>Reading Stack</h3><div class="book-stack"><span></span><span style="width:82%"></span><span style="width:65%"></span></div></div><div class="mini-widget"><h3>Psych Focus</h3><div class="brain-map"><span></span><span></span><span></span></div></div><div class="mini-widget"><h3>Calendar</h3><div class="line mid"></div><div class="line"></div></div></div></div>
+            </article>
+            <article class="slide" data-name="Mocha Rose Study Den" style="--bg1:#120b08; --bg2:#342016; --panel:#241610; --accent:#f2a7b8; --accent2:#9b6a4c; --button-text:#1b0c0e;">
+                <div class="theme-card"><div class="theme-number">OPTION 2</div><h2>Mocha Rose Study Den</h2><p>Brown and pink together: warm, soft, grounded, and a little romantic without looking childish. Think leather chair, pink highlighter, coffee, dissertation pages.</p><div class="keywords"><span>brown</span><span>pink</span><span>books</span><span>warm</span></div><div class="palette"><i class="swatch" style="background:#120b08"></i><i class="swatch" style="background:#342016"></i><i class="swatch" style="background:#9b6a4c"></i><i class="swatch" style="background:#f2a7b8"></i><i class="swatch" style="background:#fff2e8"></i></div></div>
+                <div class="preview"><div class="preview-header"><strong>The Nest</strong><div class="dots"><i></i><i></i><i></i></div></div><div class="preview-body"><div class="mini-widget"><h3>Dissertation</h3><div class="line"></div><div class="line short"></div></div><div class="mini-widget"><h3>Bookshelf</h3><div class="book-stack"><span></span><span style="width:72%"></span><span style="width:88%"></span></div></div><div class="mini-widget"><h3>Progress</h3><div class="line mid"></div><div class="line"></div></div><div class="mini-widget"><h3>Notes</h3><div class="line short"></div><div class="line"></div></div></div></div>
+            </article>
+            <article class="slide" data-name="Elephant Moon Archive" style="--bg1:#080806; --bg2:#23231f; --panel:#151511; --accent:#c9b79c; --accent2:#7f8c8d; --button-text:#080806;">
+                <div class="theme-card"><div class="theme-number">OPTION 3</div><h2>Elephant Moon Archive</h2><p>Black, charcoal, moon-gray, ivory, and warm archive paper. Elegant, wise, elephant-inspired without putting cartoon elephants everywhere.</p><div class="keywords"><span>black</span><span>elephants</span><span>archive</span><span>wise</span></div><div class="palette"><i class="swatch" style="background:#080806"></i><i class="swatch" style="background:#23231f"></i><i class="swatch" style="background:#7f8c8d"></i><i class="swatch" style="background:#c9b79c"></i><i class="swatch" style="background:#f2eadc"></i></div></div>
+                <div class="preview"><div class="preview-header"><strong>The Nest</strong><div class="dots"><i></i><i></i><i></i></div></div><div class="preview-body"><div class="mini-widget"><h3>Memory Cue</h3><div class="line"></div><div class="line mid"></div></div><div class="mini-widget"><h3>Archive</h3><div class="book-stack"><span></span><span style="width:80%"></span><span style="width:55%"></span></div></div><div class="mini-widget"><h3>Calendar</h3><div class="line short"></div><div class="line"></div></div><div class="mini-widget"><h3>Focus</h3><div class="brain-map"><span></span><span></span><span></span></div></div></div></div>
+            </article>
+            <article class="slide" data-name="Neuro Noir" style="--bg1:#030305; --bg2:#101214; --panel:#0b0d10; --accent:#00d8ff; --accent2:#ff4fa3; --button-text:#001014;">
+                <div class="theme-card"><div class="theme-number">OPTION 4</div><h2>Neuro Noir</h2><p>Black, electric cyan, and hot psychology pink. More futuristic, more command-center. Best if you want The Nest to feel powerful and sharp.</p><div class="keywords"><span>black</span><span>psychology</span><span>futuristic</span><span>bold</span></div><div class="palette"><i class="swatch" style="background:#030305"></i><i class="swatch" style="background:#101214"></i><i class="swatch" style="background:#00d8ff"></i><i class="swatch" style="background:#ff4fa3"></i><i class="swatch" style="background:#e9fbff"></i></div></div>
+                <div class="preview"><div class="preview-header"><strong>The Nest</strong><div class="dots"><i></i><i></i><i></i></div></div><div class="preview-body"><div class="mini-widget"><h3>Brain Map</h3><div class="brain-map"><span></span><span></span><span></span></div></div><div class="mini-widget"><h3>Study Timer</h3><div class="line"></div><div class="line mid"></div></div><div class="mini-widget"><h3>Quiz</h3><div class="line short"></div><div class="line"></div></div><div class="mini-widget"><h3>Progress</h3><div class="line"></div><div class="line mid"></div></div></div></div>
+            </article>
+            <article class="slide" data-name="Rose Nebula Desk" style="--bg1:#09040a; --bg2:#271122; --panel:#150b15; --accent:#ff8fb3; --accent2:#b86bff; --button-text:#210012;">
+                <div class="theme-card"><div class="theme-number">OPTION 5</div><h2>Rose Nebula Desk</h2><p>Black space background, pink nebula glow, and purple accents. Pretty but still academic. This is the most feminine-space option.</p><div class="keywords"><span>black</span><span>pink</span><span>space</span><span>pretty</span></div><div class="palette"><i class="swatch" style="background:#09040a"></i><i class="swatch" style="background:#271122"></i><i class="swatch" style="background:#ff8fb3"></i><i class="swatch" style="background:#b86bff"></i><i class="swatch" style="background:#fff0f7"></i></div></div>
+                <div class="preview"><div class="preview-header"><strong>The Nest</strong><div class="dots"><i></i><i></i><i></i></div></div><div class="preview-body"><div class="mini-widget"><h3>Agenda</h3><div class="line"></div><div class="line short"></div></div><div class="mini-widget"><h3>Notes</h3><div class="book-stack"><span></span><span style="width:78%"></span><span style="width:64%"></span></div></div><div class="mini-widget"><h3>Calendar</h3><div class="line mid"></div><div class="line"></div></div><div class="mini-widget"><h3>Study</h3><div class="brain-map"><span></span><span></span><span></span></div></div></div></div>
+            </article>
+        </section>
+        <div class="controls">
+            <button class="ghost-btn" id="prev">← Previous</button>
+            <div class="pager" id="pager"></div>
+            <button class="ghost-btn" id="next">Next →</button>
+            <button class="pick-btn" id="copy-choice">Copy Current Theme Name</button>
+        </div>
+    </main>
+
+    <section class="theme-grid" id="theme-grid"></section>
+
+    <script>
+        const slides = Array.from(document.querySelectorAll('.slide'));
+        const pager = document.getElementById('pager');
+        const grid = document.getElementById('theme-grid');
+        let current = 0;
+
+        slides.forEach((slide, index) => {
+            const dot = document.createElement('button');
+            dot.title = slide.dataset.name;
+            dot.addEventListener('click', () => show(index));
+            pager.appendChild(dot);
+
+            const tile = document.createElement('button');
+            tile.className = 'theme-tile';
+            tile.innerHTML = `<strong>Option ${index + 1}: ${slide.dataset.name}</strong><span>Jump to this theme</span>`;
+            tile.addEventListener('click', () => show(index));
+            grid.appendChild(tile);
+        });
+
+        function show(index) {
+            current = (index + slides.length) % slides.length;
+            slides.forEach((slide, i) => slide.classList.toggle('active', i === current));
+            Array.from(pager.children).forEach((dot, i) => dot.classList.toggle('active', i === current));
+            document.documentElement.style.setProperty('--accent', getComputedStyle(slides[current]).getPropertyValue('--accent'));
+            document.documentElement.style.setProperty('--star-x', `${20 + current * 13}%`);
+        }
+
+        document.getElementById('prev').addEventListener('click', () => show(current - 1));
+        document.getElementById('next').addEventListener('click', () => show(current + 1));
+        document.addEventListener('keydown', event => {
+            if (event.key === 'ArrowLeft') show(current - 1);
+            if (event.key === 'ArrowRight') show(current + 1);
+        });
+        document.getElementById('copy-choice').addEventListener('click', async () => {
+            const choice = `Option ${current + 1}: ${slides[current].dataset.name}`;
+            try {
+                await navigator.clipboard.writeText(choice);
+                alert(`${choice} copied. Send that to Sonya.`);
+            } catch {
+                alert(choice);
+            }
+        });
+        show(0);
+    </script>
+</body>
+</html>

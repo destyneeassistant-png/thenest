@@ -558,6 +558,74 @@ body {
     background: var(--border-color);
 }
 
+/* Calendar Hub + Theme Studio */
+.calendar-hub-widget,
+.theme-studio-widget {
+    grid-column: span 2;
+    background:
+        radial-gradient(circle at top left, rgba(255, 0, 110, 0.18), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(0, 245, 255, 0.14), transparent 30%),
+        var(--bg-secondary);
+}
+
+.calendar-hub-widget {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.widget-kicker {
+    color: var(--neon-pink);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+}
+
+.calendar-hub-copy p:not(.widget-kicker),
+.theme-studio-widget p:not(.widget-kicker) {
+    color: var(--text-secondary);
+    max-width: 680px;
+}
+
+.calendar-hub-actions {
+    display: flex;
+    gap: 0.75rem;
+    min-width: 300px;
+}
+
+.primary-hub-action,
+.hub-secondary-link,
+.theme-studio-btn {
+    width: auto;
+    min-width: 150px;
+}
+
+.theme-studio-widget {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+@media (max-width: 900px) {
+    .calendar-hub-widget,
+    .theme-studio-widget {
+        grid-column: span 1;
+    }
+
+    .calendar-hub-widget,
+    .calendar-hub-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .calendar-hub-actions {
+        min-width: 0;
+    }
+}
+
 /* Calendar Widget */
 .calendar-header {
     display: flex;
