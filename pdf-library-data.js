@@ -6,12 +6,6 @@ const PDF_LIBRARY = [
         "size": 42211
     },
     {
-        "title": "DESISTANCE SECTION SOURCE SHEET EXPANDED",
-        "filename": "DESISTANCE-SECTION-SOURCE-SHEET-EXPANDED.pdf",
-        "href": "assets/pdfs/DESISTANCE-SECTION-SOURCE-SHEET-EXPANDED.pdf",
-        "size": 34765
-    },
-    {
         "title": "DESISTANCE SECTION SOURCE SHEET UPDATED",
         "filename": "DESISTANCE-SECTION-SOURCE-SHEET-UPDATED.pdf",
         "href": "assets/pdfs/DESISTANCE-SECTION-SOURCE-SHEET-UPDATED.pdf",
@@ -46,12 +40,6 @@ const PDF_LIBRARY = [
         "filename": "Lit_Review_Outline_GLMPsych_Update.pdf",
         "href": "assets/pdfs/Lit_Review_Outline_GLMPsych_Update.pdf",
         "size": 9476
-    },
-    {
-        "title": "Lit Review Outline Updated",
-        "filename": "Lit_Review_Outline_Updated.pdf",
-        "href": "assets/pdfs/Lit_Review_Outline_Updated.pdf",
-        "size": 9164
     },
     {
         "title": "SCHEMA THERAPY FORENSIC REFERENCE SHEETS",
@@ -96,28 +84,10 @@ const PDF_LIBRARY = [
         "size": 8949
     },
     {
-        "title": "COMPLETE INTEGRATED SCHEDULE",
-        "filename": "COMPLETE-INTEGRATED-SCHEDULE.pdf",
-        "href": "assets/pdfs/COMPLETE-INTEGRATED-SCHEDULE.pdf",
-        "size": 5075
-    },
-    {
-        "title": "DETAILED SCHEDULE FULL",
-        "filename": "DETAILED-SCHEDULE-FULL.pdf",
-        "href": "assets/pdfs/DETAILED-SCHEDULE-FULL.pdf",
-        "size": 12364
-    },
-    {
         "title": "FEBRUARY CALENDAR 2026",
         "filename": "FEBRUARY-CALENDAR-2026.pdf",
         "href": "assets/pdfs/FEBRUARY-CALENDAR-2026.pdf",
         "size": 5296
-    },
-    {
-        "title": "Quals Daily Study Plan",
-        "filename": "quals-daily-study-plan.pdf",
-        "href": "assets/pdfs/quals-daily-study-plan.pdf",
-        "size": 21170
     },
     {
         "title": "QUALS DISSERTATION COMBINED SCHEDULE",
@@ -126,34 +96,10 @@ const PDF_LIBRARY = [
         "size": 12339
     },
     {
-        "title": "QUALS SCHEDULE 10PAGES DAY",
-        "filename": "QUALS-SCHEDULE-10PAGES-DAY.pdf",
-        "href": "assets/pdfs/QUALS-SCHEDULE-10PAGES-DAY.pdf",
-        "size": 8739
-    },
-    {
-        "title": "Quals Study Plan UPDATED",
-        "filename": "quals-study-plan-UPDATED.pdf",
-        "href": "assets/pdfs/quals-study-plan-UPDATED.pdf",
-        "size": 4985
-    },
-    {
-        "title": "QUALS STUDY SCHEDULE UPDATED",
-        "filename": "QUALS-STUDY-SCHEDULE-UPDATED.pdf",
-        "href": "assets/pdfs/QUALS-STUDY-SCHEDULE-UPDATED.pdf",
-        "size": 6931
-    },
-    {
         "title": "NAVIGATE PAPER OUTLINE WITH QUOTES",
         "filename": "NAVIGATE-PAPER-OUTLINE-WITH-QUOTES.pdf",
         "href": "assets/pdfs/NAVIGATE-PAPER-OUTLINE-WITH-QUOTES.pdf",
         "size": 31192
-    },
-    {
-        "title": "NAVIGATE PAPER OUTLINE",
-        "filename": "NAVIGATE-PAPER-OUTLINE.pdf",
-        "href": "assets/pdfs/NAVIGATE-PAPER-OUTLINE.pdf",
-        "size": 23445
     },
     {
         "title": "NAVIGATE PRESENTATION SUMMARY",
@@ -174,12 +120,6 @@ const PDF_LIBRARY = [
         "size": 19771
     },
     {
-        "title": "Flashcards Import",
-        "filename": "flashcards_import.pdf",
-        "href": "assets/pdfs/flashcards_import.pdf",
-        "size": 2580
-    },
-    {
         "title": "INVESTING PACKET",
         "filename": "INVESTING-PACKET.pdf",
         "href": "assets/pdfs/INVESTING-PACKET.pdf",
@@ -196,12 +136,6 @@ const PDF_LIBRARY = [
         "filename": "PSYCHOLOGY-OF-CRIMINAL-CONDUCT-SUMMARY.pdf",
         "href": "assets/pdfs/PSYCHOLOGY-OF-CRIMINAL-CONDUCT-SUMMARY.pdf",
         "size": 71315
-    },
-    {
-        "title": "EPPP 3 Week Plan",
-        "filename": "EPPP_3_Week_Plan.pdf",
-        "href": "assets/pdfs/EPPP_3_Week_Plan.pdf",
-        "size": 223683
     },
     {
         "title": "Cognitive Development Quiz",
