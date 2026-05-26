@@ -103,6 +103,10 @@
         .cal-list-time { color: var(--text-secondary); font-size: .78rem; }
         .cal-list-title { font-weight: 700; }
         .cal-muted { color: var(--text-muted); font-size: .88rem; }
+        .sync-status-card { border: 1px solid var(--border-color); border-radius: 12px; padding: .7rem; background: rgba(0,245,255,.06); font-size: .82rem; color: var(--text-secondary); }
+        .sync-status-card strong { color: var(--neon-blue); display: block; margin-bottom: .2rem; }
+        .sync-status-card.error strong { color: var(--neon-pink); }
+        .sync-status-card.ready strong { color: var(--neon-green); }
 
         .calendar-stage { padding: 1rem; min-height: 70vh; }
         .month-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; }
@@ -143,6 +147,7 @@
         .cal-form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; }
         .cal-form label { display: grid; gap: .35rem; color: var(--text-secondary); font-size: .88rem; }
         .cal-form input, .cal-form select, .cal-form textarea { width: 100%; background: var(--bg-tertiary); color: var(--text-primary); border: 2px solid var(--border-color); border-radius: 10px; padding: .72rem; }
+        .duration-summary { color: var(--neon-blue); font-size: .82rem; margin-top: -.45rem; }
         .cal-form textarea { min-height: 80px; resize: vertical; }
         .cal-form input:focus, .cal-form select:focus, .cal-form textarea:focus { outline: none; border-color: var(--neon-blue); }
         .form-actions { display: flex; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
@@ -188,6 +193,12 @@
                     Import JSON
                     <input type="file" id="import-events-input" accept="application/json" hidden>
                 </label>
+            </div>
+
+            <div class="sidebar-title">Sync</div>
+            <div class="sync-status-card" id="supabase-sync-status">
+                <strong>Local-only mode</strong>
+                Calendar saves in this browser. Add Supabase config to sync for Sonya.
             </div>
         </aside>
 
@@ -247,6 +258,25 @@
                     </label>
                 </div>
                 <div class="cal-form-row">
+                    <label>Length / duration
+                        <select id="event-duration">
+                            <option value="custom">Custom / use end time</option>
+                            <option value="15">15 minutes</option>
+                            <option value="30">30 minutes</option>
+                            <option value="45">45 minutes</option>
+                            <option value="60">1 hour</option>
+                            <option value="90">1 hour 30 minutes</option>
+                            <option value="120">2 hours</option>
+                            <option value="180">3 hours</option>
+                            <option value="240">4 hours</option>
+                        </select>
+                    </label>
+                    <label>Quick note
+                        <input id="event-duration-note" disabled value="Change start/end times anytime">
+                    </label>
+                </div>
+                <div class="duration-summary" id="event-duration-summary">Duration: —</div>
+                <div class="cal-form-row">
                     <label>Repeat
                         <select id="event-repeat">
                             <option value="none">Does not repeat</option>
@@ -282,6 +312,9 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-calendar.js"></script>
     <script src="calendar.js"></script>
     <script src="theme.js"></script>
     <script src="realtime-updates.js"></script>

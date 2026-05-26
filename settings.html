@@ -121,6 +121,34 @@
             color: var(--text-secondary);
         }
 
+        .backup-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .backup-message {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            display: none;
+        }
+
+        .backup-message.success {
+            display: block;
+            color: var(--neon-green);
+            border: 1px solid rgba(57, 255, 20, 0.35);
+        }
+
+        .backup-message.error {
+            display: block;
+            color: var(--error);
+            border: 1px solid rgba(255, 0, 110, 0.35);
+        }
+
         /* PIN Reset Modal */
         .pin-reset-form {
             display: flex;
@@ -271,11 +299,17 @@
 
                 <div class="setting-item" style="margin-top: 1rem;">
                     <div class="setting-info">
-                        <h3>Export Data</h3>
-                        <p>Download all your data as a JSON file</p>
+                        <h3>Backup Center</h3>
+                        <p>Export or import all local Nest data, including IndexedDB and localStorage</p>
                     </div>
-                    <button class="btn-secondary" id="export-btn">Export</button>
+                    <div class="backup-actions">
+                        <button class="btn-secondary" id="export-btn">Export Backup</button>
+                        <button class="btn-secondary" id="import-btn">Import Backup</button>
+                        <input type="file" id="import-file" accept="application/json,.json" style="display: none;">
+                    </div>
                 </div>
+
+                <div id="backup-message" class="backup-message" role="status" aria-live="polite"></div>
 
                 <div class="setting-item">
                     <div class="setting-info">

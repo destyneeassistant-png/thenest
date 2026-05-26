@@ -5,6 +5,21 @@ class SettingsManager {
         this.currentPin = '0315'; // Default PIN
         this.resetCode = null;
         this.resetEmail = null;
+        this.dbName = 'nest_db';
+        this.knownLocalStorageKeys = [
+            'nest_pin',
+            'nest_theme',
+            'nest_events',
+            'nest_calendar_events_v1',
+            'nest_pending_updates',
+            'nest_last_sync',
+            'nest_checklists',
+            'nest_timelogs',
+            'nest_progress',
+            'nest_notes',
+            'iddCommProgress',
+            'dsm5OverviewProgress'
+        ];
         this.init();
     }
 
@@ -23,8 +38,12 @@ class SettingsManager {
         // PIN reset
         document.getElementById('change-pin-btn').addEventListener('click', () => this.openPinModal());
 
-        // Export data
+        // Backup center
         document.getElementById('export-btn').addEventListener('click', () => this.exportData());
+        document.getElementById('import-btn').addEventListener('click', () => {
+            document.getElementById('import-file').click();
+        });
+        document.getElementById('import-file').addEventListener('change', (event) => this.importData(event));
 
         // Clear data
         document.getElementById('clear-data-btn').addEventListener('click', () => this.openClearDataModal());
@@ -50,6 +69,10 @@ class SettingsManager {
     loadTheme() {
         const savedTheme = localStorage.getItem('nest_theme') || 'dark';
         this.applyTheme(savedTheme);
+
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.theme === savedTheme);
+        });
     }
 
     changeTheme(theme) {
@@ -101,7 +124,7 @@ class SettingsManager {
 
     sendPinResetCode() {
         const email = document.getElementById('reset-email').value.trim();
-        
+
         if (!email || !email.includes('@')) {
             this.showPinMessage('Please enter a valid email address', 'error');
             return;
@@ -111,25 +134,16 @@ class SettingsManager {
         this.resetCode = Math.floor(100000 + Math.random() * 900000).toString();
         this.resetEmail = email;
 
-        // In a real app, this would send an email
-        // For demo purposes, we'll show the code in the message
-        // In production, you'd integrate with an email service
-        console.log('Verification code:', this.resetCode); // Remove in production
-        
-        // Simulate email sent
+        // In a real app, this would send an email.
+        console.log('Verification code:', this.resetCode); // Remove when real auth exists.
+
         this.showPinMessage(`Verification code sent to ${email}`, 'success');
-        
-        // Show step 2 after 2 seconds
+
         setTimeout(() => {
             document.getElementById('pin-reset-step1').style.display = 'none';
             document.getElementById('pin-reset-step2').style.display = 'block';
             this.showPinMessage('Enter the 6-digit code and your new PIN', 'info');
         }, 2000);
-
-        // NOTE: In a real implementation, you would:
-        // 1. Send actual email via SMTP/API
-        // 2. Store code server-side or in localStorage with expiration
-        // 3. Rate limit attempts
     }
 
     verifyAndChangePin() {
@@ -137,14 +151,12 @@ class SettingsManager {
         const newPin = document.getElementById('new-pin').value.trim();
         const confirmPin = document.getElementById('confirm-new-pin').value.trim();
 
-        // Validate code
         if (enteredCode !== this.resetCode) {
             this.showPinMessage('Invalid verification code', 'error');
             return;
         }
 
-        // Validate PIN
-        if (!newPin || newPin.length !== 4 || !/^={4}$/.test(newPin)) {
+        if (!/^\d{4}$/.test(newPin)) {
             this.showPinMessage('PIN must be exactly 4 digits', 'error');
             return;
         }
@@ -154,78 +166,245 @@ class SettingsManager {
             return;
         }
 
-        // Change PIN
         this.currentPin = newPin;
         localStorage.setItem('nest_pin', newPin);
-        
-        this.showPinMessage('PIN changed successfully!', 'success');
-        
-        // Update app.js with new PIN
-        this.updateAppPin(newPin);
 
-        // Close modal after 2 seconds
+        this.showPinMessage('PIN changed successfully!', 'success');
+
         setTimeout(() => {
             this.closePinModal();
         }, 2000);
     }
 
-    updateAppPin(newPin) {
-        // Update the PIN in app.js by modifying localStorage
-        // The app.js will check localStorage first, then fall back to default
-        localStorage.setItem('nest_pin', newPin);
-    }
-
     showPinMessage(message, type) {
         const msgEl = document.getElementById('pin-reset-message');
         msgEl.textContent = message;
-        msgEl.style.color = type === 'error' ? 'var(--error)' : 
-                           type === 'success' ? 'var(--neon-green)' : 
+        msgEl.style.color = type === 'error' ? 'var(--error)' :
+                           type === 'success' ? 'var(--neon-green)' :
                            'var(--neon-blue)';
     }
 
-    // Data Export
-    exportData() {
-        const data = {
-            exportDate: new Date().toISOString(),
-            events: JSON.parse(localStorage.getItem('nest_events') || '[]'),
-            checklists: JSON.parse(localStorage.getItem('nest_checklists') || '{}'),
-            timelogs: JSON.parse(localStorage.getItem('nest_timelogs') || '[]'),
-            progress: JSON.parse(localStorage.getItem('nest_progress') || '{}'),
-            notes: JSON.parse(localStorage.getItem('nest_notes') || '[]'),
-            settings: {
-                theme: localStorage.getItem('nest_theme') || 'dark',
-                pin: '***HIDDEN***'
+    // Backup Center
+    async exportData() {
+        try {
+            const data = await this.createBackupPayload();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nest-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            this.showBackupMessage('Backup exported successfully.', 'success');
+        } catch (error) {
+            console.error('Export failed:', error);
+            this.showBackupMessage(`Backup export failed: ${error.message}`, 'error');
+        }
+    }
+
+    async createBackupPayload() {
+        const localStorageData = {};
+        this.knownLocalStorageKeys.forEach(key => {
+            if (localStorage.getItem(key) !== null) {
+                localStorageData[key] = localStorage.getItem(key);
             }
+        });
+
+        // Preserve any future Nest keys that use the same prefix.
+        for (let i = 0; i < localStorage.length; i += 1) {
+            const key = localStorage.key(i);
+            if ((key && key.startsWith('nest_')) && !(key in localStorageData)) {
+                localStorageData[key] = localStorage.getItem(key);
+            }
+        }
+
+        const indexedDBData = await this.exportIndexedDB();
+
+        return {
+            app: 'The Nest',
+            schemaVersion: 1,
+            exportDate: new Date().toISOString(),
+            warning: 'This backup may contain private academic, schedule, notes, and progress data. Keep it somewhere safe.',
+            localStorage: localStorageData,
+            indexedDB: indexedDBData
         };
+    }
 
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `nest-backup-${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+    openDatabase() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.dbName, 2);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result);
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                const stores = [
+                    ['checklists', { keyPath: 'date' }],
+                    ['timelogs', { keyPath: 'id', autoIncrement: true }],
+                    ['progress', { keyPath: 'category' }],
+                    ['settings', { keyPath: 'key' }],
+                    ['quiz_scores', { keyPath: 'id', autoIncrement: true }],
+                    ['pdf_files', { keyPath: 'id', autoIncrement: true }],
+                    ['notes', { keyPath: 'id', autoIncrement: true }],
+                    ['weeklyPlans', { keyPath: 'weekKey' }]
+                ];
+                stores.forEach(([storeName, options]) => {
+                    if (!db.objectStoreNames.contains(storeName)) {
+                        const store = db.createObjectStore(storeName, options);
+                        if (storeName === 'notes') {
+                            store.createIndex('date', 'date', { unique: false });
+                        }
+                    }
+                });
+            };
+        });
+    }
 
-        alert('Data exported successfully!');
+    async exportIndexedDB() {
+        if (!('indexedDB' in window)) return {};
+
+        const db = await this.openDatabase();
+        const exportData = {};
+        const storeNames = Array.from(db.objectStoreNames);
+
+        try {
+            await Promise.all(storeNames.map(storeName => new Promise((resolve, reject) => {
+                const transaction = db.transaction(storeName, 'readonly');
+                const store = transaction.objectStore(storeName);
+                const request = store.getAll();
+                request.onsuccess = () => {
+                    exportData[storeName] = request.result || [];
+                };
+                request.onerror = () => reject(request.error);
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error);
+            })));
+        } finally {
+            db.close();
+        }
+
+        return exportData;
+    }
+
+    async importData(event) {
+        const file = event.target.files[0];
+        event.target.value = '';
+        if (!file) return;
+
+        try {
+            const text = await file.text();
+            const backup = JSON.parse(text);
+            this.validateBackup(backup);
+
+            const confirmed = window.confirm(
+                'Importing this backup will replace current Nest localStorage and IndexedDB data on this browser.\n\n' +
+                'Export a backup first if you are not sure. Continue?'
+            );
+            if (!confirmed) {
+                this.showBackupMessage('Import canceled. No data was changed.', 'error');
+                return;
+            }
+
+            await this.restoreBackup(backup);
+            this.showBackupMessage('Backup imported successfully. Reloading now...', 'success');
+            setTimeout(() => window.location.reload(), 1000);
+        } catch (error) {
+            console.error('Import failed:', error);
+            this.showBackupMessage(`Backup import failed: ${error.message}`, 'error');
+        }
+    }
+
+    validateBackup(backup) {
+        if (!backup || typeof backup !== 'object') {
+            throw new Error('Backup file is not valid JSON data.');
+        }
+        if (backup.app !== 'The Nest') {
+            throw new Error('This does not look like a The Nest backup file.');
+        }
+        if (!backup.localStorage && !backup.indexedDB) {
+            throw new Error('Backup is missing localStorage and IndexedDB sections.');
+        }
+    }
+
+    async restoreBackup(backup) {
+        this.clearLocalStorageKeys();
+
+        Object.entries(backup.localStorage || {}).forEach(([key, value]) => {
+            if (typeof value === 'string') {
+                localStorage.setItem(key, value);
+            } else {
+                localStorage.setItem(key, JSON.stringify(value));
+            }
+        });
+
+        await this.restoreIndexedDB(backup.indexedDB || {});
+    }
+
+    async restoreIndexedDB(indexedDBData) {
+        await this.deleteDatabase(this.dbName);
+        const db = await this.openDatabase();
+        const storeNames = Array.from(db.objectStoreNames);
+
+        try {
+            await Promise.all(storeNames.map(storeName => new Promise((resolve, reject) => {
+                const records = Array.isArray(indexedDBData[storeName]) ? indexedDBData[storeName] : [];
+                const transaction = db.transaction(storeName, 'readwrite');
+                const store = transaction.objectStore(storeName);
+                const clearRequest = store.clear();
+
+                clearRequest.onerror = () => reject(clearRequest.error);
+                clearRequest.onsuccess = () => {
+                    records.forEach(record => store.put(record));
+                };
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error);
+            })));
+        } finally {
+            db.close();
+        }
+    }
+
+    showBackupMessage(message, type = 'success') {
+        const msgEl = document.getElementById('backup-message');
+        if (!msgEl) return;
+        msgEl.textContent = message;
+        msgEl.className = `backup-message ${type}`;
     }
 
     // Data Status
-    loadDataStatus() {
-        const events = JSON.parse(localStorage.getItem('nest_events') || '[]');
-        const checklists = Object.keys(JSON.parse(localStorage.getItem('nest_checklists') || '{}')).length;
-        const timelogs = JSON.parse(localStorage.getItem('nest_timelogs') || '[]');
-        const notes = JSON.parse(localStorage.getItem('nest_notes') || '[]');
+    async loadDataStatus() {
+        try {
+            const localEvents = this.safeParse(localStorage.getItem('nest_events'), []);
+            const calendarEvents = this.safeParse(localStorage.getItem('nest_calendar_events_v1'), []);
+            const pendingUpdates = this.safeParse(localStorage.getItem('nest_pending_updates'), []);
+            const indexedDBData = await this.exportIndexedDB();
 
-        const summary = [
-            `${events.length} events`,
-            `${checklists} checklist days`,
-            `${timelogs.length} time logs`,
-            `${notes.length} notes`
-        ].join(' • ');
+            const summary = [
+                `${calendarEvents.length || localEvents.length} calendar events`,
+                `${(indexedDBData.checklists || []).length} checklist days`,
+                `${(indexedDBData.timelogs || []).length} time logs`,
+                `${(indexedDBData.notes || []).length} notes`,
+                `${(indexedDBData.quiz_scores || []).length} quiz scores`,
+                `${(indexedDBData.pdf_files || []).length} PDF records`,
+                `${pendingUpdates.length} pending Sonya updates`
+            ].join(' • ');
 
-        document.getElementById('data-summary').textContent = summary || 'No data stored yet';
+            document.getElementById('data-summary').textContent = summary;
+        } catch (error) {
+            console.error('Failed to load data status:', error);
+            document.getElementById('data-summary').textContent = 'Unable to read data status.';
+        }
+    }
+
+    safeParse(value, fallback) {
+        if (!value) return fallback;
+        try {
+            return JSON.parse(value);
+        } catch {
+            return fallback;
+        }
     }
 
     // Clear Data with Warning
@@ -239,40 +418,41 @@ class SettingsManager {
         document.getElementById('clear-data-modal').classList.remove('active');
     }
 
-    confirmClearData() {
+    async confirmClearData() {
         const confirmInput = document.getElementById('delete-confirm-input').value;
-        
+
         if (confirmInput !== 'DELETE') {
             alert('You must type "DELETE" to confirm');
             return;
         }
 
-        // Clear all data
-        const keysToRemove = [
-            'nest_events',
-            'nest_checklists',
-            'nest_timelogs',
-            'nest_progress',
-            'nest_notes',
-            'nest_theme',
-            'nest_pin'
-        ];
-
-        keysToRemove.forEach(key => localStorage.removeItem(key));
-
-        // Clear IndexedDB
-        this.clearIndexedDB();
+        this.clearLocalStorageKeys();
+        await this.deleteDatabase(this.dbName);
 
         alert('All data has been cleared. The page will now reload.');
         window.location.reload();
     }
 
-    clearIndexedDB() {
-        const databases = ['nest_db'];
-        databases.forEach(dbName => {
+    clearLocalStorageKeys() {
+        const keysToRemove = new Set(this.knownLocalStorageKeys);
+        for (let i = 0; i < localStorage.length; i += 1) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('nest_')) {
+                keysToRemove.add(key);
+            }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+    }
+
+    deleteDatabase(dbName) {
+        return new Promise((resolve, reject) => {
             const request = indexedDB.deleteDatabase(dbName);
-            request.onsuccess = () => console.log(`Deleted ${dbName}`);
-            request.onerror = () => console.log(`Error deleting ${dbName}`);
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+            request.onblocked = () => {
+                console.warn(`Delete blocked for ${dbName}; close other tabs if import/clear does not finish.`);
+                resolve();
+            };
         });
     }
 }

@@ -618,6 +618,9 @@ body::before {
     cursor: pointer;
     transition: all 0.2s;
     width: 100%;
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
 }
 
 .btn-secondary:hover {
@@ -625,9 +628,11 @@ body::before {
     background: var(--border-color);
 }
 
-/* Calendar Hub + Theme Studio */
+/* Agent Crew + Calendar Hub + Theme Studio + PDF Library */
+.agent-crew-widget,
 .calendar-hub-widget,
-.theme-studio-widget {
+.theme-studio-widget,
+.pdf-library-widget {
     grid-column: span 2;
     background:
         radial-gradient(circle at top left, rgba(255, 0, 110, 0.18), transparent 34%),
@@ -635,7 +640,73 @@ body::before {
         var(--bg-secondary);
 }
 
-.calendar-hub-widget {
+.agent-crew-widget {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    border-color: rgba(0, 245, 255, 0.42);
+}
+
+.agent-crew-heading p:not(.widget-kicker) {
+    color: var(--text-secondary);
+}
+
+.agent-crew-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.agent-card {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    min-height: 100%;
+    padding: 1rem;
+    background: rgba(26, 26, 46, 0.82);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.12);
+}
+
+.agent-card h3 {
+    margin-bottom: 0.15rem;
+    color: var(--text-primary);
+}
+
+.agent-avatar {
+    flex: 0 0 auto;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(131, 56, 236, 0.65), rgba(255, 0, 110, 0.55));
+    box-shadow: 0 0 14px rgba(255, 0, 110, 0.16);
+    font-size: 1.25rem;
+}
+
+.agent-role {
+    color: var(--neon-blue);
+    font-size: 0.86rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 0.45rem;
+}
+
+.agent-status {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.sonya-card { border-left: 4px solid var(--neon-pink); }
+.ivy-card { border-left: 4px solid var(--neon-green); }
+.nova-card { border-left: 4px solid var(--neon-blue); }
+.sage-card { border-left: 4px solid var(--neon-purple); }
+
+.calendar-hub-widget,
+.pdf-library-widget {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -676,13 +747,22 @@ body::before {
     gap: 0.75rem;
 }
 
+@media (max-width: 1100px) {
+    .agent-crew-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 900px) {
+    .agent-crew-widget,
     .calendar-hub-widget,
-    .theme-studio-widget {
+    .theme-studio-widget,
+    .pdf-library-widget {
         grid-column: span 1;
     }
 
     .calendar-hub-widget,
+    .pdf-library-widget,
     .calendar-hub-actions {
         flex-direction: column;
         align-items: stretch;
@@ -896,11 +976,190 @@ body::before {
     display: block;
 }
 
+/* PDF Library Page */
+.logo-link {
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.header-link {
+    width: auto;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.9rem;
+}
+
+.pdf-library-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.pdf-hero {
+    background:
+        radial-gradient(circle at top left, rgba(255, 0, 110, 0.2), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(0, 245, 255, 0.16), transparent 35%),
+        var(--bg-secondary);
+}
+
+.pdf-hero h1 {
+    font-size: clamp(2rem, 6vw, 4rem);
+    line-height: 1;
+    margin-bottom: 0.75rem;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.pdf-hero p,
+.pdf-section-heading p {
+    color: var(--text-secondary);
+}
+
+.pdf-library-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.25rem;
+}
+
+.pdf-search-label {
+    color: var(--neon-blue);
+    font-weight: 700;
+}
+
+.pdf-search {
+    flex: 1;
+    min-width: 240px;
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-primary);
+    padding: 0.85rem 1rem;
+    font: inherit;
+}
+
+.pdf-search:focus {
+    outline: none;
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 16px rgba(0, 245, 255, 0.18);
+}
+
+.pdf-count {
+    color: var(--neon-green);
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+.pdf-list-section {
+    overflow: hidden;
+}
+
+.pdf-section-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.pdf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.pdf-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--neon-purple);
+    border-radius: 12px;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.pdf-card:hover {
+    transform: translateX(4px);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 18px rgba(0, 245, 255, 0.08);
+}
+
+.pdf-card-icon {
+    font-size: 1.8rem;
+}
+
+.pdf-card h3 {
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+}
+
+.pdf-filename {
+    color: var(--text-muted);
+    font-family: monospace;
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
+}
+
+.pdf-card-actions {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+.pdf-open-btn,
+.pdf-download-btn {
+    min-width: 110px;
+    padding: 0.7rem 0.9rem;
+}
+
+.empty-state {
+    color: var(--text-muted);
+    text-align: center;
+    padding: 2rem;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .dashboard {
         grid-template-columns: 1fr;
         padding: 1rem;
+    }
+
+    .pdf-library-page {
+        padding: 1rem;
+    }
+
+    .pdf-section-heading,
+    .pdf-card,
+    .pdf-card-actions {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pdf-card-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .agent-crew-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .agent-card {
+        flex-direction: column;
     }
 
     .weekly-day-header {

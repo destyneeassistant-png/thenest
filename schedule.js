@@ -28,36 +28,9 @@ const categoryLabels = {
     other: 'Other'
 };
 
-// Destynee's Permanent Weekly Schedule
-const weeklySchedule = {
-    1: [ // Monday
-        { title: 'Group Supervision', time: '12:00', duration: '1 hour', category: 'supervision', recurring: true },
-        { title: 'Client Session', time: '13:00', duration: '1 hour', category: 'client', recurring: true },
-        { title: 'Client Session', time: '14:00', duration: '1 hour', category: 'client', recurring: true }
-    ],
-    2: [ // Tuesday
-        { title: 'Dissertation Meeting', time: '09:00', duration: '45 min', category: 'dissertation', recurring: true },
-        { title: 'Cognitive Development Class', time: '10:00', duration: '8.5 hours', category: 'class', recurring: true }
-    ],
-    3: [ // Wednesday
-        { title: 'Individual Supervision', time: '08:30', duration: '1 hour', category: 'supervision', recurring: true },
-        { title: 'Client Session', time: '10:00', duration: '1 hour', category: 'client', recurring: true },
-        { title: 'Client Session', time: '12:00', duration: '1 hour', category: 'client', recurring: true },
-        { title: 'Client Session', time: '13:00', duration: '1 hour', category: 'client', recurring: true }
-    ],
-    4: [ // Thursday - OFF DAY
-        { title: 'OFF DAY - Dissertation/Quals Focus', time: '09:00', duration: 'all day', category: 'study', recurring: true, allDay: true }
-    ],
-    5: [ // Friday - OFF DAY
-        { title: 'OFF DAY - Dissertation/Quals Focus', time: '09:00', duration: 'all day', category: 'study', recurring: true, allDay: true }
-    ],
-    6: [ // Saturday - Weekend Study
-        { title: 'Heavy Study Day', time: '08:00', duration: 'all day', category: 'study', recurring: true, allDay: true }
-    ],
-    0: [ // Sunday - Weekend Study
-        { title: 'Heavy Study Day', time: '08:00', duration: 'all day', category: 'study', recurring: true, allDay: true }
-    ]
-};
+// No permanent weekly schedule.
+// Destynee's schedule changes each semester, so only user-added/current events should display.
+const weeklySchedule = {};
 
 class ScheduleManager {
     constructor() {

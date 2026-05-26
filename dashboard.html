@@ -24,6 +24,49 @@
         </header>
 
         <main class="dashboard">
+            <!-- Agent Crew Dashboard -->
+            <section class="widget agent-crew-widget">
+                <div class="agent-crew-heading">
+                    <p class="widget-kicker">Cron Bots + Agent Crew</p>
+                    <h2>🤖 Who's Working on What</h2>
+                    <p>Quick status so you can open The Nest and immediately see the support crew's lanes.</p>
+                </div>
+                <div class="agent-crew-grid" aria-label="Agent crew roles and current work">
+                    <article class="agent-card sonya-card">
+                        <div class="agent-avatar" aria-hidden="true">💬</div>
+                        <div>
+                            <h3>Sonya</h3>
+                            <p class="agent-role">Main chat · accountability · coordination</p>
+                            <p class="agent-status">Current lane: staying present with you, keeping focus, and coordinating the rest of the crew.</p>
+                        </div>
+                    </article>
+                    <article class="agent-card ivy-card">
+                        <div class="agent-avatar" aria-hidden="true">🗓️</div>
+                        <div>
+                            <h3>Ivy</h3>
+                            <p class="agent-role">Life organization · schedule flow</p>
+                            <p class="agent-status">Current lane: watching the calendar/schedule systems and preventing last-minute surprises.</p>
+                        </div>
+                    </article>
+                    <article class="agent-card nova-card">
+                        <div class="agent-avatar" aria-hidden="true">🛠️</div>
+                        <div>
+                            <h3>Nova</h3>
+                            <p class="agent-role">PDFs/docs · app/build · extra tasks</p>
+                            <p class="agent-status">Current lane: publishing the PDF Library and upgrading The Nest dashboard.</p>
+                        </div>
+                    </article>
+                    <article class="agent-card sage-card">
+                        <div class="agent-avatar" aria-hidden="true">📚</div>
+                        <div>
+                            <h3>Sage</h3>
+                            <p class="agent-role">Empirical dissertation research</p>
+                            <p class="agent-status">Current lane: evidence-based dissertation support with exact citations.</p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
             <!-- Today's Schedule Widget -->
             <section class="widget schedule-widget">
                 <h2><span class="icon-calendar"></span> Today's Agenda</h2>
@@ -167,6 +210,18 @@
                 </div>
             </section>
 
+            <!-- PDF Library Hub -->
+            <section class="widget pdf-library-widget">
+                <div class="calendar-hub-copy">
+                    <p class="widget-kicker">Resource Vault</p>
+                    <h2>📚 PDF Library</h2>
+                    <p>Open one clean shelf for the study packets, dissertation notes, schedules, and handouts Sonya/Ivy created for you.</p>
+                </div>
+                <div class="calendar-hub-actions">
+                    <a href="pdf-library.html" class="action-btn primary-hub-action">Open PDF Library</a>
+                </div>
+            </section>
+
             <!-- Calendar Widget -->
             <section class="widget calendar-widget">
                 <h2><span class="icon-calendar"></span> Quick Month View</h2>
@@ -186,6 +241,7 @@
                 <h2><span class="icon-bolt"></span> Quick Actions</h2>
                 <div class="action-buttons">
                     <a href="quiz.html" class="action-btn">[Q] Take Quiz</a>
+                    <a href="pdf-library.html" class="action-btn">[P] PDF Library</a>
                     <a href="upload.html" class="action-btn">[U] Upload PDF</a>
                     <a href="notes.html" class="action-btn">[N] Notes</a>
                     <a href="calendar.html" class="action-btn">[C] Calendar</a>

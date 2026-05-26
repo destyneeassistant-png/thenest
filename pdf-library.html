@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>The Nest - PDF Library</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="assets/owl-icon.svg">
+</head>
+<body>
+    <div class="screen active">
+        <header class="app-header">
+            <a class="logo logo-link" href="dashboard.html" title="Back to Dashboard">
+                <img src="assets/owl-icon.svg" alt="" class="owl-icon-small">
+                <span>The Nest</span>
+            </a>
+            <div class="header-date">PDF Library</div>
+            <div class="header-actions">
+                <a class="btn-secondary header-link" href="dashboard.html">Dashboard</a>
+                <button class="icon-btn" title="Settings" onclick="window.location.href='settings.html'">⚙</button>
+            </div>
+        </header>
+
+        <main class="pdf-library-page">
+            <section class="pdf-hero widget">
+                <p class="widget-kicker">Resource Vault</p>
+                <h1>📚 PDF Library</h1>
+                <p>All PDFs Sonya/Ivy found on this machine and copied into The Nest for one-click access. Use Open to view in the browser or Download to save a copy.</p>
+                <div class="pdf-library-tools">
+                    <label class="pdf-search-label" for="pdf-search">Search PDFs</label>
+                    <input id="pdf-search" class="pdf-search" type="search" placeholder="Search dissertation, quals, packet, schedule...">
+                    <span id="pdf-count" class="pdf-count">Loading PDFs...</span>
+                </div>
+            </section>
+
+            <section class="pdf-list-section widget">
+                <div class="pdf-section-heading">
+                    <h2>Available PDFs</h2>
+                    <p>No secrets or local source paths are shown here — just app-accessible copies.</p>
+                </div>
+                <div id="pdf-list" class="pdf-list" aria-live="polite"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="pdf-library-data.js"></script>
+    <script src="pdf-library.js"></script>
+</body>
+</html>

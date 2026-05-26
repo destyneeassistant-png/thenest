@@ -3,6 +3,7 @@
 
 const CALENDAR_KEY = 'nest_calendar_events_v1';
 const LEGACY_KEY = 'nest_events';
+const CALENDAR_MIGRATION_KEY = 'nest_calendar_removed_old_semester_schedule_v2';
 
 const CALENDARS = {
     class: { label: 'Class', color: '#ff006e' },
@@ -15,21 +16,7 @@ const CALENDARS = {
     other: { label: 'Other', color: '#a0a0b0' }
 };
 
-const SEED_RECURRING = [
-    { title: 'Group Supervision', weekday: 1, start: '12:00', end: '13:00', calendar: 'clinical' },
-    { title: 'Client Session', weekday: 1, start: '13:00', end: '14:00', calendar: 'clinical' },
-    { title: 'Client Session', weekday: 1, start: '14:00', end: '15:00', calendar: 'clinical' },
-    { title: 'Dissertation Meeting', weekday: 2, start: '09:00', end: '09:45', calendar: 'dissertation' },
-    { title: 'Cognitive Development Class', weekday: 2, start: '10:00', end: '18:30', calendar: 'class' },
-    { title: 'Individual Supervision', weekday: 3, start: '08:30', end: '09:30', calendar: 'clinical' },
-    { title: 'Client Session', weekday: 3, start: '10:00', end: '11:00', calendar: 'clinical' },
-    { title: 'Client Session', weekday: 3, start: '12:00', end: '13:00', calendar: 'clinical' },
-    { title: 'Client Session', weekday: 3, start: '13:00', end: '14:00', calendar: 'clinical' },
-    { title: 'OFF DAY - Dissertation / Quals Focus', weekday: 4, start: '09:00', end: '17:00', calendar: 'study' },
-    { title: 'OFF DAY - Dissertation / Quals Focus', weekday: 5, start: '09:00', end: '17:00', calendar: 'study' },
-    { title: 'Heavy Study Day', weekday: 6, start: '08:00', end: '15:00', calendar: 'study' },
-    { title: 'Heavy Study Day', weekday: 0, start: '08:00', end: '15:00', calendar: 'study' }
-];
+const SEED_RECURRING = [];
 
 const pad = n => String(n).padStart(2, '0');
 const ymd = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
@@ -67,6 +54,7 @@ class NestCalendar {
         this.search = '';
         this.events = this.loadEvents();
         this.editingId = null;
+        this.sync = window.NestSupabaseCalendarSync ? new window.NestSupabaseCalendarSync() : null;
     }
 
     init() {
@@ -75,6 +63,8 @@ class NestCalendar {
         });
         this.bindEvents();
         this.render();
+        this.updateSyncStatus();
+        this.syncFromSupabase();
     }
 
     bindEvents() {
@@ -104,11 +94,24 @@ class NestCalendar {
         document.getElementById('delete-event-btn').addEventListener('click', () => this.deleteEvent());
         document.getElementById('export-events-btn').addEventListener('click', () => this.exportEvents());
         document.getElementById('import-events-input').addEventListener('change', e => this.importEvents(e));
+
+        const startInput = document.getElementById('event-start');
+        const endInput = document.getElementById('event-end');
+        const durationSelect = document.getElementById('event-duration');
+        durationSelect.addEventListener('change', () => this.applyDurationPreset());
+        startInput.addEventListener('input', () => {
+            if (durationSelect.value !== 'custom') this.applyDurationPreset();
+            this.updateDurationSummary();
+        });
+        endInput.addEventListener('input', () => {
+            durationSelect.value = 'custom';
+            this.updateDurationSummary();
+        });
     }
 
     loadEvents() {
         const existing = JSON.parse(localStorage.getItem(CALENDAR_KEY) || 'null');
-        if (existing) return existing;
+        if (existing) return this.cleanupOldSemesterScheduleSeeds(existing);
 
         const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY) || '[]').map(item => ({
             id: `legacy-${item.id || crypto.randomUUID()}`,
@@ -140,10 +143,73 @@ class NestCalendar {
         return events;
     }
 
+    cleanupOldSemesterScheduleSeeds(events) {
+        if (localStorage.getItem(CALENDAR_MIGRATION_KEY)) return events;
+        const cleaned = events.filter(event => !(
+            String(event.id || '').startsWith('seed-') ||
+            event.id === 'seed-2-10-00-cognitive-development-class' ||
+            event.id === 'seed-2-09-00-dissertation-meeting' ||
+            (event.title === 'Cognitive Development Class' && event.repeat === 'weekly' && event.start === '10:00' && event.end === '18:30') ||
+            (event.title === 'Dissertation Meeting' && event.repeat === 'weekly' && event.start === '09:00' && event.end === '09:45')
+        ));
+        localStorage.setItem(CALENDAR_MIGRATION_KEY, 'true');
+        if (cleaned.length !== events.length) localStorage.setItem(CALENDAR_KEY, JSON.stringify(cleaned));
+        return cleaned;
+    }
+
     deriveEnd(start, duration) {
         const mins = /45/.test(duration) ? 45 : /30/.test(duration) ? 30 : /2/.test(duration) ? 120 : 60;
         const total = minutesOf(start) + mins;
         return `${pad(Math.floor(total / 60) % 24)}:${pad(total % 60)}`;
+    }
+
+    endFromMinutes(start, durationMinutes) {
+        const total = minutesOf(start) + Number(durationMinutes);
+        return `${pad(Math.floor(total / 60) % 24)}:${pad(total % 60)}`;
+    }
+
+    durationBetween(start, end) {
+        let minutes = minutesOf(end) - minutesOf(start);
+        if (minutes < 0) minutes += 24 * 60;
+        return minutes;
+    }
+
+    durationLabel(minutes) {
+        if (!Number.isFinite(minutes) || minutes <= 0) return '—';
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        if (!hours) return `${mins} minutes`;
+        if (!mins) return `${hours} hour${hours === 1 ? '' : 's'}`;
+        return `${hours} hour${hours === 1 ? '' : 's'} ${mins} minutes`;
+    }
+
+    inferDurationPreset(start, end) {
+        const minutes = this.durationBetween(start, end);
+        return ['15', '30', '45', '60', '90', '120', '180', '240'].includes(String(minutes)) ? String(minutes) : 'custom';
+    }
+
+    applyDurationPreset() {
+        const duration = document.getElementById('event-duration').value;
+        const start = document.getElementById('event-start').value;
+        if (duration === 'custom' || !start) {
+            this.updateDurationSummary();
+            return;
+        }
+        document.getElementById('event-end').value = this.endFromMinutes(start, duration);
+        this.updateDurationSummary();
+    }
+
+    updateDurationSummary() {
+        const start = document.getElementById('event-start')?.value;
+        const end = document.getElementById('event-end')?.value;
+        const summary = document.getElementById('event-duration-summary');
+        if (!summary) return;
+        if (!start || !end) {
+            summary.textContent = 'Duration: —';
+            return;
+        }
+        const minutes = this.durationBetween(start, end);
+        summary.textContent = `Duration: ${this.durationLabel(minutes)} (${fmtTime(start)}–${fmtTime(end)})`;
     }
 
     nextWeekday(weekday) {
@@ -152,7 +218,71 @@ class NestCalendar {
         return addDays(date, diff);
     }
 
-    saveAll() { localStorage.setItem(CALENDAR_KEY, JSON.stringify(this.events)); }
+    saveAll() {
+        const stamped = this.events.map(event => ({
+            ...event,
+            updatedAt: event.updatedAt || new Date().toISOString()
+        }));
+        this.events = stamped;
+        localStorage.setItem(CALENDAR_KEY, JSON.stringify(this.events));
+    }
+
+    updateSyncStatus(message, state = 'local') {
+        const el = document.getElementById('supabase-sync-status');
+        if (!el) return;
+        el.classList.toggle('ready', state === 'ready');
+        el.classList.toggle('error', state === 'error');
+        if (message) {
+            el.innerHTML = message;
+            return;
+        }
+        if (this.sync?.enabled) {
+            el.classList.add('ready');
+            el.innerHTML = '<strong>Supabase sync on</strong>Local saves stay in this browser and sync to Supabase for Sonya when network/config allow it.';
+        } else {
+            el.innerHTML = '<strong>Local-only mode</strong>Calendar saves in this browser. Add Supabase config to sync for Sonya.';
+        }
+    }
+
+    async syncFromSupabase() {
+        if (!this.sync?.enabled) return;
+        try {
+            this.updateSyncStatus('<strong>Syncing...</strong>Pulling calendar events from Supabase.', 'ready');
+            const result = await this.sync.pullEvents();
+            if (!result.ok) return;
+            const merged = this.sync.mergeEvents(this.events, result.events);
+            this.events = merged;
+            this.saveAll();
+            await this.sync.replaceEvents(this.events);
+            this.render();
+            this.updateSyncStatus(`<strong>Supabase sync on</strong>${this.events.length} calendar event${this.events.length === 1 ? '' : 's'} available locally and in Supabase.`, 'ready');
+        } catch (err) {
+            console.error('Supabase calendar sync failed:', err);
+            this.updateSyncStatus(`<strong>Sync error</strong>Still saving locally. ${escapeHtml(err.message || err)}`, 'error');
+        }
+    }
+
+    async syncSavedEvent(event) {
+        if (!this.sync?.enabled) return;
+        try {
+            await this.sync.upsertEvent(event);
+            this.updateSyncStatus(`<strong>Synced</strong>${escapeHtml(event.title)} saved to this browser and Supabase.`, 'ready');
+        } catch (err) {
+            console.error('Supabase event save failed:', err);
+            this.updateSyncStatus(`<strong>Sync error</strong>Event saved locally only. ${escapeHtml(err.message || err)}`, 'error');
+        }
+    }
+
+    async syncDeletedEvent(id) {
+        if (!this.sync?.enabled) return;
+        try {
+            await this.sync.deleteEvent(id);
+            this.updateSyncStatus('<strong>Synced</strong>Event deleted locally and marked deleted in Supabase.', 'ready');
+        } catch (err) {
+            console.error('Supabase event delete failed:', err);
+            this.updateSyncStatus(`<strong>Sync error</strong>Event deleted locally only. ${escapeHtml(err.message || err)}`, 'error');
+        }
+    }
 
     navigate(direction) {
         if (this.view === 'month') this.cursor.setMonth(this.cursor.getMonth() + direction);
@@ -377,6 +507,10 @@ class NestCalendar {
         document.getElementById('event-date').value = event?.date || ymd(date);
         document.getElementById('event-start').value = event?.start || time;
         document.getElementById('event-end').value = event?.end || this.deriveEnd(time, '1 hour');
+        document.getElementById('event-duration').value = this.inferDurationPreset(
+            document.getElementById('event-start').value,
+            document.getElementById('event-end').value
+        );
         document.getElementById('event-calendar').value = event?.calendar || 'other';
         document.getElementById('event-repeat').value = event?.repeat || 'none';
         document.getElementById('event-reminder').value = event?.reminder || 'none';
@@ -384,6 +518,7 @@ class NestCalendar {
         document.getElementById('event-notes').value = event?.notes || '';
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
+        this.updateDurationSummary();
         setTimeout(() => document.getElementById('event-title').focus(), 50);
     }
 
@@ -393,7 +528,7 @@ class NestCalendar {
         this.editingId = null;
     }
 
-    saveEvent(e) {
+    async saveEvent(e) {
         e.preventDefault();
         const event = {
             id: this.editingId || crypto.randomUUID(),
@@ -405,7 +540,8 @@ class NestCalendar {
             repeat: document.getElementById('event-repeat').value,
             reminder: document.getElementById('event-reminder').value,
             location: document.getElementById('event-location').value.trim(),
-            notes: document.getElementById('event-notes').value.trim()
+            notes: document.getElementById('event-notes').value.trim(),
+            updatedAt: new Date().toISOString()
         };
         if (minutesOf(event.end) <= minutesOf(event.start)) {
             alert('End time needs to be after start time.');
@@ -417,15 +553,18 @@ class NestCalendar {
             this.events.push(event);
         }
         this.saveAll();
+        await this.syncSavedEvent(event);
         this.closeModal();
         this.render();
     }
 
-    deleteEvent() {
+    async deleteEvent() {
         if (!this.editingId) return;
         if (!confirm('Delete this event?')) return;
-        this.events = this.events.filter(event => event.id !== this.editingId);
+        const deletedId = this.editingId;
+        this.events = this.events.filter(event => event.id !== deletedId);
         this.saveAll();
+        await this.syncDeletedEvent(deletedId);
         this.closeModal();
         this.render();
     }
@@ -456,10 +595,12 @@ class NestCalendar {
                 repeat: item.repeat || 'none',
                 reminder: item.reminder || 'none',
                 location: item.location || '',
-                notes: item.notes || ''
+                notes: item.notes || '',
+                updatedAt: item.updatedAt || item.updated_at || new Date().toISOString()
             }));
             this.events = cleaned;
             this.saveAll();
+            if (this.sync?.enabled) await this.sync.replaceEvents(this.events);
             this.render();
             alert(`Imported ${cleaned.length} events.`);
         } catch (err) {

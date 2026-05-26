@@ -1,0 +1,11 @@
+# Local/private frontend Supabase config. Safe disabled placeholder.
+# Copy supabase-config.example.js to supabase-config.js and fill it locally/deployment-side.
+supabase-config.js
+
+# Environment files may contain server-side service keys.
+.env
+.env.*
+
+# Generated Python cache from local syntax checks.
+__pycache__/
+*.py[cod]
