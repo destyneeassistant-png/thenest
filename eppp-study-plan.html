@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<meta name='theme-color' content='#0a0a0f'>
+<title>EPPP Feynman Study Plan</title>
+<link rel='manifest' href='manifest.json'>
+<link rel='stylesheet' href='styles.css'>
+<link rel='icon' type='image/svg+xml' href='assets/owl-icon.svg'>
+<style>
+.eppp-shell{max-width:1180px;margin:0 auto;padding:2rem;}
+.eppp-hero{border:1px solid var(--border-color);border-radius:28px;padding:2rem;background:linear-gradient(135deg,rgba(255,122,182,.18),rgba(157,124,255,.16)),var(--bg-secondary);box-shadow:var(--panel-shadow);}
+.eppp-hero h1{font-size:clamp(2rem,6vw,4.5rem);line-height:1;margin-bottom:1rem;background:linear-gradient(90deg,var(--neon-pink),var(--neon-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.25rem;}
+.eppp-section{margin-top:1.5rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:24px;padding:1.5rem;box-shadow:var(--panel-shadow);}
+.stat-grid,.chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-top:1rem;}
+.stat{background:var(--bg-tertiary);padding:1rem;border-radius:18px;border:1px solid var(--border-color);}
+.stat b{font-size:1.8rem;color:var(--neon-pink);display:block;}
+.timeline{display:grid;gap:.75rem;margin-top:1rem;}
+.bar{display:grid;grid-template-columns:110px 1fr;gap:.75rem;align-items:center;}
+.bar span:last-child{height:22px;border-radius:999px;background:linear-gradient(90deg,var(--c),rgba(255,255,255,.2));min-width:40px;}
+.domain-table{width:100%;border-collapse:collapse;margin-top:1rem;}
+.domain-table th,.domain-table td{padding:.75rem;border-bottom:1px solid var(--border-color);text-align:left;vertical-align:top;}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:.5rem;}
+.org-list li{margin:.8rem 0;padding:.85rem;border-left:4px solid var(--neon-pink);background:var(--bg-tertiary);border-radius:12px;}
+.plan-stack{display:grid;gap:1rem;margin-top:1rem;}
+.plan-card{border:1px solid color-mix(in srgb,var(--domain) 55%,var(--border-color));border-radius:22px;padding:1.25rem;background:linear-gradient(120deg,color-mix(in srgb,var(--domain) 16%,transparent),transparent),var(--bg-tertiary);}
+.plan-card-top{display:flex;justify-content:space-between;color:var(--text-secondary);gap:1rem;}
+.pill{background:var(--domain);color:#10101a;border-radius:999px;padding:.2rem .65rem;font-weight:800;}
+.week-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.65rem;margin-top:1rem;}
+.day-row{display:flex;gap:.6rem;align-items:flex-start;background:rgba(255,255,255,.04);border:1px solid var(--border-color);border-radius:14px;padding:.75rem;}
+.day-row small{color:var(--text-secondary);}
+.day-row input[type='checkbox']{margin-top:.3rem;transform:scale(1.25);accent-color:var(--neon-pink);}
+.page-control{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem;}
+.page-control input{width:90px;padding:.45rem;border-radius:10px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);}
+.method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;}
+.method-card{background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:18px;padding:1rem;}
+.progress-panel{position:sticky;top:85px;z-index:5;background:rgba(5,5,13,.92);backdrop-filter:blur(16px);}
+@media(max-width:760px){.eppp-shell{padding:1rem;}.bar{grid-template-columns:1fr;}.domain-table{font-size:.9rem;}}
+</style>
+</head>
+<body>
+<header class='app-header'>
+  <div class='logo' onclick="window.location.href='dashboard.html'" style='cursor:pointer'><img src='assets/owl-icon.svg' alt='' class='owl-icon-small'><span>The Nest</span></div>
+  <div class='header-date'>EPPP Plan</div>
+  <div class='header-actions'><button class='icon-btn' onclick="window.location.href='dashboard.html'">⌂</button></div>
+</header>
+<main class='eppp-shell'>
+<section class='eppp-hero'>
+<h1>EPPP Feynman Study Plan</h1>
+<p>Start organizing: <strong>June 22–28, 2026</strong>. Core study begins <strong>June 29</strong>. This plan is built for remembering, not just getting through pages: read, explain, quiz, repair, retrieve, repeat.</p>
+<div class='hero-actions'><a class='action-btn' href='EPPP_Feynman_Study_Plan_June_2026.pdf'>Open PDF</a><button class='action-btn' id='reset-eppp'>Reset Tracker</button></div>
+</section>
+<section class='eppp-section progress-panel'>
+<h2>Progress Tracker</h2>
+<div class='stat-grid'>
+<div class='stat'><b id='overallPct'>0%</b><span>daily tasks complete</span></div>
+<div class='stat'><b id='pagesPct'>0%</b><span>pages complete</span></div>
+<div class='stat'><b id='checksDone'>0/0</b><span>checkpoints done</span></div>
+<div class='stat'><b id='daysLeft'>--</b><span>days until Nov 1 readiness target</span></div>
+</div>
+</section>
+<section class='eppp-section'><h2>Last Week of June: Organization Week</h2><ol class='org-list'><li><strong>Mon Jun 22 — Set up the system:</strong> Gather all EPPP books, flashcards, PowerPoints, audios, section quizzes, domain quizzes, practice exams, assessment exams, simulations. Make one folder per domain. Create a “wrong answers + why” notebook.</li><li><strong>Tue Jun 23 — Build the tracker:</strong> Record page counts for every domain, number of lectures/audio files, number of section quizzes, and domain quiz availability. Put page counts into the web-app tracker.</li><li><strong>Wed Jun 24 — Baseline + map weak areas:</strong> Take one full assessment or diagnostic in testing conditions if available. Do not study first. Log score by domain and write the top 3 weak areas.</li><li><strong>Thu Jun 25 — Create templates:</strong> Create one notes template: Big idea, terms, Feynman explanation, examples, what I confuse, quiz misses, memory hooks. Create flashcard rules and color code domains.</li><li><strong>Fri Jun 26 — Set the weekly rhythm:</strong> Block study windows in your calendar. Pick video sources for each domain. Decide what counts as “done” for reading, notes, quiz, review, and teach-back.</li><li><strong>Sat Jun 27 — Organized preview day:</strong> Skim table of contents for Clinical + Abnormal. Make page targets for Week 1. Watch one overview video. Light flashcard pass only.</li><li><strong>Sun Jun 28 — Rest + launch prep:</strong> Rest day. Only 20 minutes allowed: set out Monday materials, open tracker, write your reason for passing, sleep.</li></ol></section>
+<section class='eppp-section'><h2>Study Rhythm You’ll Use Every Week</h2><div class='method-grid'>
+<div class='method-card'><h3>1. First pass</h3><p>Read/listen/watch for understanding. No perfect notes. Mark confusing ideas.</p></div>
+<div class='method-card'><h3>2. Feynman explain</h3><p>Close the book and explain the concept in plain language out loud. If you get stuck, that is the study target.</p></div>
+<div class='method-card'><h3>3. Quiz</h3><p>Use section quizzes quickly. Use domain quizzes after weekly synthesis. Don’t wait until you feel ready.</p></div>
+<div class='method-card'><h3>4. Repair</h3><p>Every missed item gets a why-wrong/why-right note and one memory cue.</p></div>
+<div class='method-card'><h3>5. Retrieve</h3><p>Daily flashcards + weekly mixed review. Memory comes from pulling it out, not rereading.</p></div>
+</div></section>
+<section class='eppp-section'><h2>Domain Map</h2><table class='domain-table'><thead><tr><th>Domain</th><th>Time</th><th>Materials to use</th></tr></thead><tbody><tr><td><span class='dot' style='background:#ff7ab6'></span>Clinical Psychology</td><td>2 week(s)</td><td>book chapters, PowerPoints, audio, flashcards, notes, section quizzes, domain quiz</td></tr><tr><td><span class='dot' style='background:#9d7cff'></span>Abnormal Psychology</td><td>2 week(s)</td><td>DSM/diagnosis readings, lectures, audio, flashcards, section quizzes, domain quiz</td></tr><tr><td><span class='dot' style='background:#ffd166'></span>Ethics</td><td>1 week(s)</td><td>ethics book, code/decision models, PowerPoints, audio, flashcards, section quizzes, domain quiz</td></tr><tr><td><span class='dot' style='background:#b8f7d4'></span>Industrial/Organizational Psychology</td><td>1 week(s)</td><td>I/O book, lectures, audio, flashcards, section quizzes, domain quiz</td></tr><tr><td><span class='dot' style='background:#80ed99'></span>Learning Theory</td><td>1 week(s)</td><td>learning theory book, behaviorism/cognition notes, videos, flashcards, quizzes</td></tr><tr><td><span class='dot' style='background:#f7aef8'></span>Lifespan Development</td><td>1 week(s)</td><td>development book, milestone charts, audio, flashcards, quizzes</td></tr><tr><td><span class='dot' style='background:#90dbf4'></span>Physiological Psychology &amp; Psychopharmacology</td><td>2 week(s)</td><td>physio + psychopharm books, neuro charts, med classes, videos, flashcards, quizzes</td></tr><tr><td><span class='dot' style='background:#cdb4db'></span>Psychological Assessment</td><td>2 week(s)</td><td>assessment book, test tables, PowerPoints, audio, flashcards, section/domain quizzes</td></tr><tr><td><span class='dot' style='background:#fbf8cc'></span>Social Psychology</td><td>1 week(s)</td><td>social psych book, classic findings, PowerPoints, flashcards, quizzes</td></tr><tr><td><span class='dot' style='background:#a0c4ff'></span>Statistics</td><td>1 week(s)</td><td>stats book, formula sheet, worked examples, videos, flashcards, quizzes</td></tr><tr><td><span class='dot' style='background:#ffc6ff'></span>Test Construction</td><td>1 week(s)</td><td>test construction book, reliability/validity charts, practice questions, domain quiz</td></tr></tbody></table></section>
+<section class='eppp-section'><h2>Timeline Chart</h2><div class='timeline'><div class='bar' style='--c:#ff7ab6'><strong>Week 1</strong><span title='Clinical 1/2' style='width:47%'>Clinical 1/2 · Jun 29</span></div><div class='bar' style='--c:#ff7ab6'><strong>Week 2</strong><span title='Clinical 2/2' style='width:59%'>Clinical 2/2 · Jul 6</span></div><div class='bar' style='--c:#9d7cff'><strong>Week 3</strong><span title='Abnormal 1/2' style='width:71%'>Abnormal 1/2 · Jul 13</span></div><div class='bar' style='--c:#9d7cff'><strong>Week 4</strong><span title='Abnormal 2/2' style='width:83%'>Abnormal 2/2 · Jul 20</span></div><div class='bar' style='--c:#ffd166'><strong>Week 5</strong><span title='Ethics' style='width:35%'>Ethics · Jul 27</span></div><div class='bar' style='--c:#b8f7d4'><strong>Week 6</strong><span title='I/O' style='width:47%'>I/O · Aug 3</span></div><div class='bar' style='--c:#80ed99'><strong>Week 7</strong><span title='Learning' style='width:59%'>Learning · Aug 10</span></div><div class='bar' style='--c:#f7aef8'><strong>Week 8</strong><span title='Lifespan' style='width:71%'>Lifespan · Aug 17</span></div><div class='bar' style='--c:#90dbf4'><strong>Week 9</strong><span title='Physio/Psychopharm 1/2' style='width:83%'>Physio/Psychopharm 1/2 · Aug 24</span></div><div class='bar' style='--c:#90dbf4'><strong>Week 10</strong><span title='Physio/Psychopharm 2/2' style='width:35%'>Physio/Psychopharm 2/2 · Aug 31</span></div><div class='bar' style='--c:#cdb4db'><strong>Week 11</strong><span title='Assessment 1/2' style='width:47%'>Assessment 1/2 · Sep 7</span></div><div class='bar' style='--c:#cdb4db'><strong>Week 12</strong><span title='Assessment 2/2' style='width:59%'>Assessment 2/2 · Sep 14</span></div><div class='bar' style='--c:#fbf8cc'><strong>Week 13</strong><span title='Social' style='width:71%'>Social · Sep 21</span></div><div class='bar' style='--c:#a0c4ff'><strong>Week 14</strong><span title='Stats' style='width:83%'>Stats · Sep 28</span></div><div class='bar' style='--c:#ffc6ff'><strong>Week 15</strong><span title='Test Construction' style='width:35%'>Test Construction · Oct 5</span></div><div class='bar' style='--c:#ffffff'><strong>Week 16</strong><span title='Integration + Weak Areas' style='width:47%'>Integration + Weak Areas · Oct 12</span></div><div class='bar' style='--c:#ffffff'><strong>Week 17</strong><span title='Practice Exams + Repair' style='width:59%'>Practice Exams + Repair · Oct 19</span></div><div class='bar' style='--c:#ffffff'><strong>Week 18</strong><span title='Final Exam Simulations' style='width:71%'>Final Exam Simulations · Oct 26</span></div></div></section>
+<section class='eppp-section'><h2>Daily Detailed Plan</h2><div class='plan-stack'>
+    <article class='plan-card' style='--domain:#ff7ab6'>
+      <div class='plan-card-top'><span class='pill'>Week 1</span><span>Jun 29–Jul 5</span></div>
+      <h3>Clinical Psychology — Part 1 of 2</h3>
+      <p><strong>Materials:</strong> book chapters, PowerPoints, audio, flashcards, notes, section quizzes, domain quiz</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week1-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week1-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week1-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week1-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week1-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week1-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week1-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week1' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week1' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#ff7ab6'>
+      <div class='plan-card-top'><span class='pill'>Week 2</span><span>Jul 6–Jul 12</span></div>
+      <h3>Clinical Psychology — Part 2 of 2</h3>
+      <p><strong>Materials:</strong> book chapters, PowerPoints, audio, flashcards, notes, section quizzes, domain quiz</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week2-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week2-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week2-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week2-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week2-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week2-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week2-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week2' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week2' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#9d7cff'>
+      <div class='plan-card-top'><span class='pill'>Week 3</span><span>Jul 13–Jul 19</span></div>
+      <h3>Abnormal Psychology — Part 1 of 2</h3>
+      <p><strong>Materials:</strong> DSM/diagnosis readings, lectures, audio, flashcards, section quizzes, domain quiz</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week3-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week3-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week3-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week3-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week3-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week3-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week3-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week3' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week3' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#9d7cff'>
+      <div class='plan-card-top'><span class='pill'>Week 4</span><span>Jul 20–Jul 26</span></div>
+      <h3>Abnormal Psychology — Part 2 of 2</h3>
+      <p><strong>Materials:</strong> DSM/diagnosis readings, lectures, audio, flashcards, section quizzes, domain quiz</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week4-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week4-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week4-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week4-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week4-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week4-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week4-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week4' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week4' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#ffd166'>
+      <div class='plan-card-top'><span class='pill'>Week 5</span><span>Jul 27–Aug 2</span></div>
+      <h3>Ethics</h3>
+      <p><strong>Materials:</strong> ethics book, code/decision models, PowerPoints, audio, flashcards, section quizzes, domain quiz</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week5-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week5-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week5-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week5-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week5-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week5-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week5-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week5' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week5' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#b8f7d4'>
+      <div class='plan-card-top'><span class='pill'>Week 6</span><span>Aug 3–Aug 9</span></div>
+      <h3>Industrial/Organizational Psychology</h3>
+      <p><strong>Materials:</strong> I/O book, lectures, audio, flashcards, section quizzes, domain quiz</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week6-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week6-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week6-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week6-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week6-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week6-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week6-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week6' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week6' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#80ed99'>
+      <div class='plan-card-top'><span class='pill'>Week 7</span><span>Aug 10–Aug 16</span></div>
+      <h3>Learning Theory</h3>
+      <p><strong>Materials:</strong> learning theory book, behaviorism/cognition notes, videos, flashcards, quizzes</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week7-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week7-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week7-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week7-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week7-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week7-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week7-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week7' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week7' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#f7aef8'>
+      <div class='plan-card-top'><span class='pill'>Week 8</span><span>Aug 17–Aug 23</span></div>
+      <h3>Lifespan Development</h3>
+      <p><strong>Materials:</strong> development book, milestone charts, audio, flashcards, quizzes</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week8-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week8-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week8-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week8-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week8-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week8-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week8-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week8' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week8' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#90dbf4'>
+      <div class='plan-card-top'><span class='pill'>Week 9</span><span>Aug 24–Aug 30</span></div>
+      <h3>Physiological Psychology &amp; Psychopharmacology — Part 1 of 2</h3>
+      <p><strong>Materials:</strong> physio + psychopharm books, neuro charts, med classes, videos, flashcards, quizzes</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week9-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week9-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week9-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week9-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week9-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week9-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week9-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week9' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week9' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#90dbf4'>
+      <div class='plan-card-top'><span class='pill'>Week 10</span><span>Aug 31–Sep 6</span></div>
+      <h3>Physiological Psychology &amp; Psychopharmacology — Part 2 of 2</h3>
+      <p><strong>Materials:</strong> physio + psychopharm books, neuro charts, med classes, videos, flashcards, quizzes</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week10-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week10-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week10-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week10-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week10-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week10-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week10-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week10' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week10' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#cdb4db'>
+      <div class='plan-card-top'><span class='pill'>Week 11</span><span>Sep 7–Sep 13</span></div>
+      <h3>Psychological Assessment — Part 1 of 2</h3>
+      <p><strong>Materials:</strong> assessment book, test tables, PowerPoints, audio, flashcards, section/domain quizzes</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week11-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week11-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week11-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week11-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week11-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week11-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week11-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week11' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week11' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#cdb4db'>
+      <div class='plan-card-top'><span class='pill'>Week 12</span><span>Sep 14–Sep 20</span></div>
+      <h3>Psychological Assessment — Part 2 of 2</h3>
+      <p><strong>Materials:</strong> assessment book, test tables, PowerPoints, audio, flashcards, section/domain quizzes</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week12-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week12-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week12-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week12-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week12-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week12-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week12-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week12' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week12' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#fbf8cc'>
+      <div class='plan-card-top'><span class='pill'>Week 13</span><span>Sep 21–Sep 27</span></div>
+      <h3>Social Psychology</h3>
+      <p><strong>Materials:</strong> social psych book, classic findings, PowerPoints, flashcards, quizzes</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week13-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week13-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week13-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week13-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week13-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week13-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week13-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week13' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week13' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#a0c4ff'>
+      <div class='plan-card-top'><span class='pill'>Week 14</span><span>Sep 28–Oct 4</span></div>
+      <h3>Statistics</h3>
+      <p><strong>Materials:</strong> stats book, formula sheet, worked examples, videos, flashcards, quizzes</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week14-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week14-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week14-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week14-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week14-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week14-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week14-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week14' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week14' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#ffc6ff'>
+      <div class='plan-card-top'><span class='pill'>Week 15</span><span>Oct 5–Oct 11</span></div>
+      <h3>Test Construction</h3>
+      <p><strong>Materials:</strong> test construction book, reliability/validity charts, practice questions, domain quiz</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week15-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week15-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week15-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week15-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week15-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week15-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week15-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week15' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week15' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#ffffff'>
+      <div class='plan-card-top'><span class='pill'>Week 16</span><span>Oct 12–Oct 18</span></div>
+      <h3>Integration + Weak Areas</h3>
+      <p><strong>Materials:</strong> mixed-domain review, incorrect-question notebook, memory retrieval</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week16-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week16-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week16-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week16-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week16-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week16-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week16-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week16' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week16' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#ffffff'>
+      <div class='plan-card-top'><span class='pill'>Week 17</span><span>Oct 19–Oct 25</span></div>
+      <h3>Practice Exams + Repair</h3>
+      <p><strong>Materials:</strong> full assessment exams, targeted repair, timed stamina</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week17-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week17-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week17-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week17-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week17-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week17-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week17-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week17' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week17' placeholder='0'></label>
+      </div>
+    </article>
+    <article class='plan-card' style='--domain:#ffffff'>
+      <div class='plan-card-top'><span class='pill'>Week 18</span><span>Oct 26–Nov 1</span></div>
+      <h3>Final Exam Simulations</h3>
+      <p><strong>Materials:</strong> simulation exams, ethics/statistics refresh, calm confidence</p>
+      <div class='week-grid'>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week18-monday'>
+        <span><strong>Monday:</strong> Orientation + first pass<br><small>Read/listen/watch the first chunk. Make simple notes only. End with a 10-minute Feynman explanation out loud.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week18-tuesday'>
+        <span><strong>Tuesday:</strong> Deepen + section quiz<br><small>Read the next chunk. Convert notes into memory hooks and flashcards. Take section quiz 1 or the next available section quiz.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week18-wednesday'>
+        <span><strong>Wednesday:</strong> Teach-back + application<br><small>Use PowerPoint/audio to reinforce. Teach the topic like explaining it to a smart friend. Do 25-40 practice questions.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week18-thursday'>
+        <span><strong>Thursday:</strong> Finish new content<br><small>Finish the domain/week reading target. Update notes. Make a “things I keep mixing up” list.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week18-friday'>
+        <span><strong>Friday:</strong> Section quizzes + repair<br><small>Take remaining section quizzes for this week. Review every miss: why wrong, why right answer is right, memory cue.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week18-saturday'>
+        <span><strong>Saturday:</strong> Domain review + domain quiz<br><small>Take the domain quiz or a mixed set if domain quiz is not ready. Build a one-page domain map. Feynman teach-back 20 minutes.</small></span>
+      </label>
+      <label class='day-row'>
+        <input type='checkbox' data-check='week18-sunday'>
+        <span><strong>Sunday:</strong> Rest + light retrieval<br><small>Rest day. Optional only: 20-30 minutes flashcards/wrong-answer review. No heavy new content.</small></span>
+      </label></div>
+      <div class='page-control'>
+        <label>Page target <input type='number' min='0' data-pages='target-week18' placeholder='add'></label>
+        <label>Pages done <input type='number' min='0' data-pages='done-week18' placeholder='0'></label>
+      </div>
+    </article></div></section>
+<section class='eppp-section'><h2>When Page Counts Change</h2><p>Add the page target inside each week card. If one domain is heavier than expected, do not panic. Move overflow into the Integration + Weak Areas week. The plan is designed to flex without losing the retrieval cycle.</p></section>
+</main>
+<script>
+const checks=[...document.querySelectorAll('[data-check]')];
+const nums=[...document.querySelectorAll('[data-pages]')];
+function loadEPPP(){checks.forEach(c=>c.checked=localStorage.getItem('eppp-'+c.dataset.check)==='1');nums.forEach(n=>n.value=localStorage.getItem('eppp-'+n.dataset.pages)||'');updateEPPP();}
+function updateEPPP(){checks.forEach(c=>localStorage.setItem('eppp-'+c.dataset.check,c.checked?'1':'0'));nums.forEach(n=>localStorage.setItem('eppp-'+n.dataset.pages,n.value));let done=checks.filter(c=>c.checked).length;let total=checks.length;document.getElementById('overallPct').textContent=Math.round(done/total*100)+'%';document.getElementById('checksDone').textContent=done+'/'+total;let target=0, pages=0;nums.forEach(n=>{if(n.dataset.pages.startsWith('target')) target+=Number(n.value||0); else pages+=Number(n.value||0);});document.getElementById('pagesPct').textContent=target?Math.min(100,Math.round(pages/target*100))+'%':'0%';let today=new Date();let ready=new Date('2026-11-01T12:00:00');let diff=Math.ceil((ready-today)/86400000);document.getElementById('daysLeft').textContent=diff;}
+checks.forEach(c=>c.addEventListener('change',updateEPPP));nums.forEach(n=>n.addEventListener('input',updateEPPP));
+document.getElementById('reset-eppp').addEventListener('click',()=>{if(confirm('Reset all EPPP tracker checkboxes and page counts?')){Object.keys(localStorage).filter(k=>k.startsWith('eppp-')).forEach(k=>localStorage.removeItem(k));loadEPPP();}});
+loadEPPP();
+</script>
+<script src='theme.js'></script><script src='realtime-updates.js'></script>
+</body></html>
