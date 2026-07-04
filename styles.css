@@ -590,12 +590,27 @@ body::before {
 }
 
 /* Fact Widget */
+.facts-row {
+    grid-column: span 3;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+.facts-row .fact-widget {
+    min-width: 0;
+}
+
 .fact-content {
     background: var(--bg-tertiary);
     padding: 1.5rem;
     border-radius: 12px;
     margin-bottom: 1rem;
     border-left: 4px solid var(--neon-purple);
+}
+
+.forensics-fact-content {
+    border-left-color: var(--neon-blue);
 }
 
 .fact-text {
@@ -757,8 +772,13 @@ body::before {
     .agent-crew-widget,
     .calendar-hub-widget,
     .theme-studio-widget,
-    .pdf-library-widget {
+    .pdf-library-widget,
+    .facts-row {
         grid-column: span 1;
+    }
+
+    .facts-row {
+        grid-template-columns: 1fr;
     }
 
     .calendar-hub-widget,

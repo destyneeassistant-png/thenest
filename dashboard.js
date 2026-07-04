@@ -220,6 +220,16 @@ class Dashboard {
             { text: "Desistance from crime is promoted by cognitive/identity shifts, social bonds, employment, and treatment engagement.", source: "Life-Course Criminology" },
             { text: "Schema therapy addresses maladaptive schemas like mistrust/abuse and entitlement common in offender populations.", source: "Young, 2003" }
         ];
+        this.forensicsFacts = [
+            { text: "Risk-Need-Responsivity links effective correctional intervention to three questions: how much service, what needs to target, and how to deliver it responsively.", source: "Andrews & Bonta" },
+            { text: "Dynamic risk factors are changeable needs, such as antisocial cognition, antisocial peers, substance use, employment instability, and family conflict.", source: "Psychology of Criminal Conduct" },
+            { text: "Desistance is not usually a single event; it is a process of building a non-criminal identity, social bonds, adult roles, and realistic opportunities.", source: "Maruna / Life-Course Criminology" },
+            { text: "Correctional staff are part of the rehabilitation environment because everyday interactions can reinforce either prosocial behavior or institutional survival patterns.", source: "Schaefer, 2017" },
+            { text: "Trauma-informed correctional practice does not remove accountability; it changes how safety, predictability, choice, and skill-building are communicated.", source: "Vaswani & Paul, 2019" },
+            { text: "CBT-based correctional programs focus on the link between thoughts, emotions, decisions, behavior, and consequences.", source: "Lipsey et al., 2007" },
+            { text: "Emerging adults in correctional settings may need more repetition, coaching, modeling, and concrete practice because self-regulation and future planning are still developing.", source: "Arnett, 2000" },
+            { text: "Assessment alone does not reduce risk; risk information has to be translated into case planning, skill practice, and consistent follow-through.", source: "Viljoen et al., 2018" }
+        ];
         this.init();
     }
 
@@ -240,7 +250,8 @@ class Dashboard {
         this.loadCalendar();
         console.log('Calendar loaded');
         this.loadRandomFact();
-        console.log('Fact loaded');
+        this.loadRandomForensicsFact();
+        console.log('Facts loaded');
         
         // Then load DB-dependent items
         try {
@@ -279,8 +290,9 @@ class Dashboard {
             btn.addEventListener('click', (e) => this.addTime(e.target.dataset.cat));
         });
 
-        // Fact rotator
+        // Fact rotators
         document.getElementById('new-fact-btn').addEventListener('click', () => this.loadRandomFact());
+        document.getElementById('new-forensics-fact-btn').addEventListener('click', () => this.loadRandomForensicsFact());
 
         // Calendar navigation
         document.getElementById('prev-month').addEventListener('click', () => this.changeMonth(-1));
@@ -595,6 +607,12 @@ class Dashboard {
         const fact = this.psychFacts[Math.floor(Math.random() * this.psychFacts.length)];
         document.querySelector('#psych-fact .fact-text').textContent = `"${fact.text}"`;
         document.querySelector('#psych-fact .fact-source').textContent = `— ${fact.source}`;
+    }
+
+    loadRandomForensicsFact() {
+        const fact = this.forensicsFacts[Math.floor(Math.random() * this.forensicsFacts.length)];
+        document.querySelector('#forensics-fact .fact-text').textContent = `"${fact.text}"`;
+        document.querySelector('#forensics-fact .fact-source').textContent = `— ${fact.source}`;
     }
 
     logout() {

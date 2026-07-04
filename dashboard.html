@@ -187,15 +187,26 @@
                 </div>
             </section>
 
-            <!-- Psychology Fact Widget -->
-            <section class="widget fact-widget">
-                <h2><span class="icon-brain"></span> Psychology Fact</h2>
-                <div class="fact-content" id="psych-fact">
-                    <p class="fact-text">"Emerging adulthood (ages 18-25) is a distinct developmental period characterized by identity exploration, instability, self-focus, feeling in-between, and possibilities."</p>
-                    <p class="fact-source">— Arnett, 2000</p>
-                </div>
-                <button class="btn-secondary" id="new-fact-btn">New Fact</button>
-            </section>
+            <!-- Fact Widgets -->
+            <div class="facts-row" aria-label="Psychology and forensics fact widgets">
+                <section class="widget fact-widget">
+                    <h2><span class="icon-brain"></span> Psychology Fact</h2>
+                    <div class="fact-content" id="psych-fact">
+                        <p class="fact-text">"Emerging adulthood (ages 18-25) is a distinct developmental period characterized by identity exploration, instability, self-focus, feeling in-between, and possibilities."</p>
+                        <p class="fact-source">— Arnett, 2000</p>
+                    </div>
+                    <button class="btn-secondary" id="new-fact-btn">New Fact</button>
+                </section>
+
+                <section class="widget fact-widget forensics-fact-widget">
+                    <h2><span aria-hidden="true">⚖️</span> Forensics Fact</h2>
+                    <div class="fact-content forensics-fact-content" id="forensics-fact">
+                        <p class="fact-text">"Risk-Need-Responsivity is one of the dominant frameworks for matching justice-involved people to appropriate intervention intensity, targets, and delivery style."</p>
+                        <p class="fact-source">— Andrews &amp; Bonta</p>
+                    </div>
+                    <button class="btn-secondary" id="new-forensics-fact-btn">New Fact</button>
+                </section>
+            </div>
 
             <!-- Calendar Hub -->
             <section class="widget calendar-hub-widget">
