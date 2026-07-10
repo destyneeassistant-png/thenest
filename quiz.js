@@ -215,20 +215,15 @@ class Quiz {
 
     init() {
         this.setupEventListeners();
-        this.loadScoreHistory();
     }
 
     setupEventListeners() {
         // Topic selection
-        document.querySelectorAll('.topic-btn').forEach(btn => {
+        document.querySelectorAll('.topic-btn[data-topic]').forEach(btn => {
             btn.addEventListener('click', (e) => this.selectTopic(e.currentTarget.dataset.topic));
         });
 
-        // Navigation
-        document.getElementById('back-btn').addEventListener('click', () => {
-            window.location.href = 'dashboard.html';
-        });
-
+        // Quiz navigation
         document.getElementById('quit-btn').addEventListener('click', () => this.quitQuiz());
         document.getElementById('next-btn').addEventListener('click', () => this.nextQuestion());
         document.getElementById('restart-btn').addEventListener('click', () => this.restartQuiz());
@@ -341,8 +336,18 @@ class Quiz {
 
         if (scores.length === 0) {
             container.innerHTML = '<p style="color: var(--text-muted);">No previous scores</p>';
+            const recommendation = document.getElementById('aggregate-recommendation');
+            if (recommendation) recommendation.textContent = 'Complete a Nest quiz to receive an aggregate recommendation from recorded scores. Older standalone quizzes may store only completion progress, so question-level history is not inferred.';
             return;
         }
+
+        const average = Math.round(scores.reduce((sum, score) => sum + Number(score.percentage || 0), 0) / scores.length);
+        const recommendation = document.getElementById('aggregate-recommendation');
+        if (recommendation) recommendation.textContent = average >= 80
+            ? `Recorded average: ${average}%. Maintain recall with mixed-topic practice.`
+            : average >= 65
+                ? `Recorded average: ${average}%. Revisit the lowest-scoring recorded topics, then retest.`
+                : `Recorded average: ${average}%. Review core concepts before another short quiz.`;
 
         const topicNames = {
             'cognitive-dev': 'Cognitive Dev',
@@ -384,9 +389,16 @@ class Quiz {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     const db = new QuizDatabase();
-    await db.init();
     const quiz = new Quiz(db);
     quiz.init();
+    window.nestQuiz = quiz;
+    db.init()
+        .then(() => quiz.loadScoreHistory())
+        .catch(error => {
+            console.error('Quiz score history is unavailable:', error);
+            const recommendation = document.getElementById('aggregate-recommendation');
+            if (recommendation) recommendation.textContent = 'Quiz practice is available, but score history could not be opened in this browser.';
+        });
 });

@@ -1,64 +1,57 @@
 (() => {
-    const pdfs = Array.isArray(window.PDF_LIBRARY) ? window.PDF_LIBRARY : (typeof PDF_LIBRARY !== 'undefined' ? PDF_LIBRARY : []);
-    const listEl = document.getElementById('pdf-list');
-    const countEl = document.getElementById('pdf-count');
-    const searchEl = document.getElementById('pdf-search');
+  const docs = Array.isArray(window.PDF_LIBRARY) ? window.PDF_LIBRARY : [];
+  const FAVORITES_KEY = 'nest-library-favorites';
+  const RECENT_KEY = 'nest-library-recent';
+  const $ = id => document.getElementById(id);
+  const parse = (value, fallback) => { try { return JSON.parse(value) ?? fallback; } catch { return fallback; } };
+  const escapeHtml = value => String(value || '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+  let favorites = new Set(parse(localStorage.getItem(FAVORITES_KEY), []));
 
-    function formatBytes(bytes) {
-        if (!Number.isFinite(bytes) || bytes <= 0) return '';
-        const units = ['B', 'KB', 'MB', 'GB'];
-        let size = bytes;
-        let unit = 0;
-        while (size >= 1024 && unit < units.length - 1) {
-            size /= 1024;
-            unit += 1;
-        }
-        return `${size.toFixed(size >= 10 || unit === 0 ? 0 : 1)} ${units[unit]}`;
-    }
+  const categories = [...new Set(docs.map(document => document.category).filter(Boolean))].sort();
+  $('category-filter').innerHTML += categories.map(category => `<option>${escapeHtml(category)}</option>`).join('');
 
-    function matches(pdf, term) {
-        if (!term) return true;
-        const haystack = `${pdf.title} ${pdf.filename}`.toLowerCase();
-        return haystack.includes(term.toLowerCase());
-    }
+  function render() {
+    const query = $('pdf-search').value.trim().toLowerCase();
+    const category = $('category-filter').value;
+    const status = $('status-filter').value;
+    const favoritesOnly = $('favorites-only').checked;
+    const shown = docs.filter(document =>
+      (!category || document.category === category) &&
+      (!status || document.status === status) &&
+      (!favoritesOnly || favorites.has(document.href)) &&
+      (!query || [document.title, document.filename, document.category, document.type, document.status].join(' ').toLowerCase().includes(query))
+    );
+    $('pdf-count').textContent = `${shown.length} of ${docs.length}`;
+    $('pdf-list').innerHTML = shown.length ? shown.map(document => `
+      <article class="pdf-card">
+        <div>
+          <div><span class="badge">${escapeHtml(document.category)}</span><span class="badge">${escapeHtml(document.status)}</span><span class="badge">${escapeHtml(document.privacy)}</span></div>
+          <h3>${escapeHtml(document.title)}</h3>
+          <p class="pdf-filename">${escapeHtml(document.type || 'PDF')} · ${escapeHtml(document.filename)}</p>
+        </div>
+        <div class="pdf-card-actions">
+          <button class="favorite-btn" data-favorite="${escapeHtml(document.href)}" aria-label="${favorites.has(document.href) ? 'Remove from' : 'Add to'} favorites">${favorites.has(document.href) ? '★' : '☆'}</button>
+          <a class="action-btn" data-open="${escapeHtml(document.href)}" href="${encodeURI(document.href)}" target="_blank" rel="noopener">Open</a>
+          <a class="btn-secondary" href="${encodeURI(document.href)}" download>Download</a>
+        </div>
+      </article>`).join('') : '<p class="empty">No documents match these filters.</p>';
 
-    function render() {
-        const term = searchEl.value.trim();
-        const filtered = pdfs.filter(pdf => matches(pdf, term));
-        countEl.textContent = `${filtered.length} of ${pdfs.length} PDFs`;
+    document.querySelectorAll('[data-favorite]').forEach(button => {
+      button.onclick = () => {
+        favorites.has(button.dataset.favorite) ? favorites.delete(button.dataset.favorite) : favorites.add(button.dataset.favorite);
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favorites]));
+        render();
+      };
+    });
+    document.querySelectorAll('[data-open]').forEach(link => {
+      link.onclick = () => {
+        const recent = parse(localStorage.getItem(RECENT_KEY), []).filter(item => item.href !== link.dataset.open);
+        recent.unshift({ href: link.dataset.open, openedAt: new Date().toISOString() });
+        localStorage.setItem(RECENT_KEY, JSON.stringify(recent.slice(0, 20)));
+      };
+    });
+  }
 
-        if (!filtered.length) {
-            listEl.innerHTML = '<p class="empty-state">No PDFs match that search.</p>';
-            return;
-        }
-
-        listEl.innerHTML = filtered.map(pdf => {
-            const size = formatBytes(pdf.size);
-            return `
-                <article class="pdf-card">
-                    <div class="pdf-card-icon" aria-hidden="true">📄</div>
-                    <div class="pdf-card-body">
-                        <h3>${escapeHtml(pdf.title)}</h3>
-                        <p class="pdf-filename">${escapeHtml(pdf.filename)}${size ? ` · ${size}` : ''}</p>
-                    </div>
-                    <div class="pdf-card-actions">
-                        <a class="action-btn pdf-open-btn" href="${encodeURI(pdf.href)}" target="_blank" rel="noopener">Open</a>
-                        <a class="btn-secondary pdf-download-btn" href="${encodeURI(pdf.href)}" download>Download</a>
-                    </div>
-                </article>
-            `;
-        }).join('');
-    }
-
-    function escapeHtml(value) {
-        return String(value)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
-
-    searchEl.addEventListener('input', render);
-    render();
+  ['pdf-search', 'category-filter', 'status-filter', 'favorites-only'].forEach(id => $(id).addEventListener('input', render));
+  render();
 })();

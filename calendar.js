@@ -16,8 +16,6 @@ const CALENDARS = {
     other: { label: 'Other', color: '#a0a0b0' }
 };
 
-const SEED_RECURRING = [];
-
 const pad = n => String(n).padStart(2, '0');
 const ymd = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 const parseLocalDate = value => {
@@ -78,9 +76,22 @@ class NestCalendar {
         });
         document.querySelectorAll('.cal-view-btn').forEach(btn => btn.addEventListener('click', () => {
             this.view = btn.dataset.view;
-            document.querySelectorAll('.cal-view-btn').forEach(b => b.classList.toggle('active', b === btn));
+            document.querySelectorAll('.cal-view-btn').forEach(b => {
+                b.classList.toggle('active', b === btn);
+                b.setAttribute('aria-selected', String(b === btn));
+                b.tabIndex = b === btn ? 0 : -1;
+            });
             this.render();
         }));
+        document.querySelector('[role="tablist"]').addEventListener('keydown', event => {
+            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+            const tabs = [...document.querySelectorAll('.cal-view-btn')];
+            const current = tabs.indexOf(document.activeElement);
+            const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (current + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+            event.preventDefault();
+            tabs[next].focus();
+            tabs[next].click();
+        });
         document.getElementById('calendar-search').addEventListener('input', e => {
             this.search = e.target.value.trim().toLowerCase();
             this.render();
@@ -89,6 +100,9 @@ class NestCalendar {
         document.getElementById('cancel-event-btn').addEventListener('click', () => this.closeModal());
         document.getElementById('event-modal').addEventListener('click', e => {
             if (e.target.id === 'event-modal') this.closeModal();
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && document.getElementById('event-modal').classList.contains('active')) this.closeModal();
         });
         document.getElementById('event-form').addEventListener('submit', e => this.saveEvent(e));
         document.getElementById('delete-event-btn').addEventListener('click', () => this.deleteEvent());
@@ -126,19 +140,7 @@ class NestCalendar {
             notes: item.duration || ''
         }));
 
-        const seeded = SEED_RECURRING.map(item => ({
-            id: `seed-${item.weekday}-${item.start}-${item.title.replace(/\W+/g, '-').toLowerCase()}`,
-            title: item.title,
-            date: ymd(this.nextWeekday(item.weekday)),
-            start: item.start,
-            end: item.end,
-            calendar: item.calendar,
-            repeat: 'weekly',
-            reminder: 'none',
-            location: '',
-            notes: 'Permanent weekly schedule item'
-        }));
-        const events = [...seeded, ...legacy];
+        const events = legacy;
         localStorage.setItem(CALENDAR_KEY, JSON.stringify(events));
         return events;
     }
@@ -146,7 +148,6 @@ class NestCalendar {
     cleanupOldSemesterScheduleSeeds(events) {
         if (localStorage.getItem(CALENDAR_MIGRATION_KEY)) return events;
         const cleaned = events.filter(event => !(
-            String(event.id || '').startsWith('seed-') ||
             event.id === 'seed-2-10-00-cognitive-development-class' ||
             event.id === 'seed-2-09-00-dissertation-meeting' ||
             (event.title === 'Cognitive Development Class' && event.repeat === 'weekly' && event.start === '10:00' && event.end === '18:30') ||
@@ -240,7 +241,7 @@ class NestCalendar {
             el.classList.add('ready');
             el.innerHTML = '<strong>Supabase sync on</strong>Local saves stay in this browser and sync to Supabase for Sonya when network/config allow it.';
         } else {
-            el.innerHTML = '<strong>Local-only mode</strong>Calendar saves in this browser. Add Supabase config to sync for Sonya.';
+            el.innerHTML = '<strong>Browser-local calendar</strong>Events stay in this browser unless you export them. Cloud sync is not configured.';
         }
     }
 
@@ -494,6 +495,7 @@ class NestCalendar {
     }
 
     openModal(id = null, date = this.selected, time = '09:00') {
+        this.previousFocus = document.activeElement;
         this.editingId = id;
         const modal = document.getElementById('event-modal');
         const form = document.getElementById('event-form');
@@ -526,6 +528,8 @@ class NestCalendar {
         document.getElementById('event-modal').classList.remove('active');
         document.getElementById('event-modal').setAttribute('aria-hidden', 'true');
         this.editingId = null;
+        if (this.previousFocus?.isConnected) this.previousFocus.focus();
+        this.previousFocus = null;
     }
 
     async saveEvent(e) {

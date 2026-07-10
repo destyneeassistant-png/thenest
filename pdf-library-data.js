@@ -1,5 +1,40 @@
 const PDF_LIBRARY = [
     {
+        "title": "Yoga History, Research, and Core Tenets",
+        "filename": "Yoga_History_Research_and_Core_Tenets.pdf",
+        "href": "assets/pdfs/Yoga_History_Research_and_Core_Tenets.pdf",
+        "size": 77680,
+        "type": "PDF"
+    },
+    {
+        "title": "Dissertation Article Source Notes Packet",
+        "filename": "Dissertation_Article_Source_Notes_Packet.pdf",
+        "href": "assets/pdfs/Dissertation_Article_Source_Notes_Packet.pdf",
+        "size": 101890,
+        "type": "PDF"
+    },
+    {
+        "title": "Internship Sites Decision Guide",
+        "filename": "Destynee_Internship_Sites_Decision_Guide.pdf",
+        "href": "assets/pdfs/Destynee_Internship_Sites_Decision_Guide.pdf",
+        "size": 819922,
+        "type": "PDF"
+    },
+    {
+        "title": "Internship Sites Decision Guide - Editable Word Doc",
+        "filename": "Destynee_Internship_Sites_Decision_Guide.docx",
+        "href": "assets/documents/Destynee_Internship_Sites_Decision_Guide.docx",
+        "size": 691529,
+        "type": "DOCX"
+    },
+    {
+        "title": "Internship Sites Enriched Data",
+        "filename": "Destynee_Internship_Sites_Enriched_Data.xlsx",
+        "href": "assets/documents/Destynee_Internship_Sites_Enriched_Data.xlsx",
+        "size": 13338,
+        "type": "XLSX"
+    },
+    {
         "title": "AI Foundations Packet",
         "filename": "AI_Foundations_Packet.pdf",
         "href": "assets/pdfs/AI_Foundations_Packet.pdf",
@@ -174,3 +209,17 @@ const PDF_LIBRARY = [
         "size": 24621
     }
 ];
+
+// Metadata is normalized without changing the unpublished document entries above.
+PDF_LIBRARY.forEach(document => {
+    const text = `${document.title} ${document.filename}`.toLowerCase();
+    document.category = document.category || (
+        /dissertation|desistance|risk factor|chapter|section 5|rnr|glm|needs assessment/.test(text) ? 'Dissertation' :
+        /eppp|quiz|quals|dsm|flashcard|psychology|nervous|personality/.test(text) ? 'Study' :
+        /internship|practicum|navigate|yoga/.test(text) ? 'Professional' : 'Reference'
+    );
+    document.privacy = document.privacy || 'Public link';
+    document.status = document.status || (/february calendar 2026|quals dissertation combined schedule/.test(text) ? 'Archived' : 'Current');
+    document.type = document.type || 'PDF';
+});
+window.PDF_LIBRARY = PDF_LIBRARY;
